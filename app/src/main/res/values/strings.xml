@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Your desires</string>
+    <string name="app_name">Бойся своих желаний</string>
 
     <string name="def_filter_str">Поиск по фильтру</string>
     <string name="tag_filter_str">Поиск по тэгам</string>
