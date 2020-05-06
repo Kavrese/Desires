@@ -1,0 +1,12 @@
+<resources>
+    <string name="app_name">Your desires</string>
+
+    <string name="def_filter_str">Поиск по фильтру</string>
+    <string name="tag_filter_str">Поиск по тэгам</string>
+    <string name="name_filter_str">Поиск по заголовку желания</string>
+
+    <string name="status_1">В ожидании</string>
+    <string name="status_2">Выполнено</string>
+    <string name="status_3">Отложено</string>
+    <string name="delete">Удалить</string>
+</resources>

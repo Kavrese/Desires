@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="size">
+        <item>25sp</item>
+        <item>20sp</item>
+        <item>30sp</item>
+        <item>40sp</item>
+    </array>
+</resources>
