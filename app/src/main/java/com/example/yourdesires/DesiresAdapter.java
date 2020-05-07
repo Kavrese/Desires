@@ -49,7 +49,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     }
 
     @Override
-    public void onBindViewHolder(@NonNull final DesiresViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
         holder.name.setText(arrayList.get(position).getName());
         holder.tag1.setText(arrayList.get(position).getTag1());
         holder.data.setText(arrayList.get(position).getData());
@@ -90,6 +90,10 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 break;
                             case R.id.menu_sleep:
                                 holder.statusIMG.setImageResource(R.color.red);
+                                bool = true;
+                                break;
+                            case R.id.menu_delete:
+                                arrayList.remove(position);
                                 bool = true;
                                 break;
                         }

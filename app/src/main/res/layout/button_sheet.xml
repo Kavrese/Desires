@@ -31,6 +31,7 @@
         android:layout_weight="5"
         android:ems="10"
         android:gravity="center"
+        android:singleLine="true"
         android:hint="Описание желания" />
 
     <LinearLayout

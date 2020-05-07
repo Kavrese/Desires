@@ -1,5 +1,6 @@
 package com.example.yourdesires;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -15,6 +16,7 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -44,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     TextView name_botton_sheet,text_first;
     EditText tag1,tag2,op;
     Button save;
+    ImageView backIMG;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +56,7 @@ public class MainActivity extends AppCompatActivity {
         tag1 = findViewById(R.id.tag1_b);
         tag2 = findViewById(R.id.tag2_b);
         op = findViewById(R.id.op);
+        backIMG = findViewById(R.id.back_img);
         text_first = findViewById(R.id.text_first);
         bottonSheet = findViewById(R.id.bottom_sheet);
         bottomSheetBehavior = BottomSheetBehavior.from(bottonSheet);
@@ -73,6 +77,29 @@ public class MainActivity extends AppCompatActivity {
                 newDesires (String.valueOf(desiresText.getText()),String.valueOf(tag1.getText()),String.valueOf(tag2.getText()),String.valueOf(op.getText()));
             }
         });
+        bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
+            @Override
+            public void onStateChanged(@NonNull View view, int i) {
+                if(i == BottomSheetBehavior.STATE_HIDDEN){
+                    backIMG.setVisibility(View.GONE);
+                    remove();
+                }
+                if(i == BottomSheetBehavior.STATE_EXPANDED){
+                    backIMG.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onSlide(@NonNull View view, float v) {
+
+            }
+        });
+        backIMG.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+            }
+        });
     }
 
     public void openBottonSheet (View view){
@@ -81,6 +108,7 @@ public class MainActivity extends AppCompatActivity {
         String name = String.valueOf(desiresText.getText());
         if(!name.equals("")){
             name_botton_sheet.setText("Новое желание: "+name);
+            backIMG.setVisibility(View.VISIBLE);
             bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
         }else{
             Toast.makeText(this, "Введите заголовок желания", Toast.LENGTH_SHORT).show();
@@ -105,16 +133,24 @@ public class MainActivity extends AppCompatActivity {
                     list.add(new Desires(String.valueOf(desiresText.getText()), 1, tag1, tag2, data));
                     recyclerView.getAdapter().notifyDataSetChanged();
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                    desiresText.setText("");
-                    this.tag1.setText("");
-                    this.tag2.setText("");
-                    this.op.setText("");
-                    text_first.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    desiresText.setEnabled(true);
                 }
             }
         }
+    }
+
+    public void remove (){
+        desiresText.setText("");
+        this.tag1.setText("");
+        this.tag2.setText("");
+        this.op.setText("");
+        if (list.size() == 0){
+            recyclerView.setVisibility(View.GONE);
+            text_first.setVisibility(View.VISIBLE);
+        }else{
+            recyclerView.setVisibility(View.VISIBLE);
+            text_first.setVisibility(View.GONE);
+        }
+        desiresText.setEnabled(true);
     }
 
     @Override

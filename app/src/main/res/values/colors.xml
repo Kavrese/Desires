@@ -11,4 +11,5 @@
     <color name="red">#BC0000</color>
     <color name="back_1">#DDDDDD</color>
     <color name="white_2">#B6B6B6</color>
+    <color name="back_back">#9C000000</color>
 </resources>
