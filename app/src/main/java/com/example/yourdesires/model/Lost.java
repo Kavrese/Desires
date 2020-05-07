@@ -16,6 +16,14 @@ public class Lost extends BaseModel {
     int id;
     @Column
     String desires;
+    @Column
+    String tag1;
+    @Column
+    String tag2;
+    @Column
+    String op;
+    @Column
+    String data;
 
     public int getId(){return id;}
 
@@ -25,4 +33,36 @@ public class Lost extends BaseModel {
         return desires;}
 
     public void setDesires(String desires) { this.desires = desires;}
+
+    public String getData() {
+        return data;
+    }
+
+    public String getTag1() {
+        return tag1;
+    }
+
+    public String getTag2() {
+        return tag2;
+    }
+
+    public String getOp() {
+        return op;
+    }
+
+    public void setTag1(String tag1) {
+        this.tag1 = tag1;
+    }
+
+    public void setTag2(String tag2) {
+        this.tag2 = tag2;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public void setOp(String op) {
+        this.op = op;
+    }
 }

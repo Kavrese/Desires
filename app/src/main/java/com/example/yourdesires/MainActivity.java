@@ -1,6 +1,7 @@
 package com.example.yourdesires;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,13 +28,17 @@ import com.example.yourdesires.model.MyDataBase;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity {
     boolean back_presed = false;
@@ -100,9 +105,15 @@ public class MainActivity extends AppCompatActivity {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
+        //List<Lost> listL = getOrSetDataBase("getAll","0","0","0","0",0,"0");
     }
 
     public void openBottonSheet (View view){
+        List <Lost> losts = SQLite.select()
+                .from(Lost.class)
+                .where(Lost_Table.id.is(2))
+                .queryList();
+        Toast.makeText(this, String.valueOf(losts.get(0)), Toast.LENGTH_SHORT).show();
         desiresText.setEnabled(false);
         hiddenKeyboard();
         String name = String.valueOf(desiresText.getText());
@@ -167,6 +178,57 @@ public class MainActivity extends AppCompatActivity {
         }else{
             System.exit(1);
         }
+    }
+    public void onClick1 (View view){
+        getOrSetDataBase("new","0","0","0","0",0,"0");
+        getOrSetDataBase("show","0","0","0","0",0,"0");
+    }
+    public void onClick2 (View view){
+        getOrSetDataBase("update","0","0","0","0",0,"0");
+        getOrSetDataBase("show","0","0","0","0",0,"0");
+    }
+    public List<Lost> getOrSetDataBase (String command,String name,String op,String tag1,String tag2,int num,String data){
+        FlowManager.init(new FlowConfig.Builder(this).build());
+        if(command.equals("show")){
+            List<Lost> lost = SQLite.select()
+                    .from(Lost.class)
+                    .where(Lost_Table.id.is(2))
+                    .queryList();
+            Toast.makeText(this,String.valueOf(lost.get(0)), Toast.LENGTH_SHORT).show();
+        }
+        if(command.equals("new")){
+            Lost lost = new Lost();
+            lost.setId(15);
+            lost.setDesires("what");
+            lost.setData("0");
+            lost.setOp("0");
+            lost.setTag2("0");
+            lost.save();
+        }
+        if(command.equals("update")){
+            Lost lost = new Lost();
+            lost.setId(15);
+            lost.setDesires("new what");
+            lost.update();
+        }
+        List<Lost> losts;
+        if(command.equals("getAll")){
+            losts = SQLite.select()
+                    .from(Lost.class)
+                    .queryList();
+            return losts;
+        }
+        if(command.equals("setAll")){
+            Lost lost = new Lost();
+            lost.setId(num);
+            lost.setDesires(name);
+            lost.setTag1(tag1);
+            lost.setTag2(tag2);
+            lost.setOp(op);
+            lost.setData(data);
+            lost.save();
+        }
+        return null;
     }
 
     public void hiddenKeyboard(){
