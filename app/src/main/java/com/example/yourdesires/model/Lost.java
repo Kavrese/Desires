@@ -23,6 +23,8 @@ public class Lost extends BaseModel {
     @Column
     String op;
     @Column
+    int status;
+    @Column
     String data;
 
     public int getId(){return id;}
@@ -40,6 +42,14 @@ public class Lost extends BaseModel {
 
     public String getTag1() {
         return tag1;
+    }
+
+    public int getStatus() {
+        return status;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
     }
 
     public String getTag2() {

@@ -136,20 +136,6 @@
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
 
-            <Button
-                android:id="@+id/bt"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="onClick1"
-                android:text="new" />
-
-            <Button
-                android:id="@+id/button3"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:onClick="onClick2"
-                android:text="update" />
-
         </LinearLayout>
 
         <ImageView

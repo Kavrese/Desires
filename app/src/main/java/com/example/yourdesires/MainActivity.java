@@ -105,15 +105,18 @@ public class MainActivity extends AppCompatActivity {
                 bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
             }
         });
-        //List<Lost> listL = getOrSetDataBase("getAll","0","0","0","0",0,"0");
+
+        List<Lost> listL = getOrSetDataBase("getAll","0","0","0","0",0,"0",0);
+        for(int i = 0; i<listL.size();i++){
+            list.add(new Desires(String.valueOf(listL.get(0).getDesires()),
+                    listL.get(0).getStatus(),String.valueOf(listL.get(0).getTag1()),
+                    String.valueOf(listL.get(0).getTag2()),String.valueOf(listL.get(0).getData())));
+
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
 
     public void openBottonSheet (View view){
-        List <Lost> losts = SQLite.select()
-                .from(Lost.class)
-                .where(Lost_Table.id.is(2))
-                .queryList();
-        Toast.makeText(this, String.valueOf(losts.get(0)), Toast.LENGTH_SHORT).show();
         desiresText.setEnabled(false);
         hiddenKeyboard();
         String name = String.valueOf(desiresText.getText());
@@ -131,19 +134,22 @@ public class MainActivity extends AppCompatActivity {
         if(op.equals("")){
             Toast.makeText(MainActivity.this, "Заполните описание", Toast.LENGTH_SHORT).show();
         }else {
-            if (tag1.equals("")) {
+            if (tag1.equals("") && tag2.equals("")) {
                 Toast.makeText(MainActivity.this, "Заполните хотя-бы 1 tag", Toast.LENGTH_SHORT).show();
             } else {
                 if(tag1.equals(tag2)){
                     Toast.makeText(this, "Повторяющееся tag'и ", Toast.LENGTH_SHORT).show();
                 }else {
-                    if (tag2.equals("")) {
+                    if (tag2.equals(""))
                         tag2 = "no";
-                    }
+                    if(tag1.equals(""))
+                        tag1 = "no";
+
                     String data = dateFormat.format(new Date());
                     list.add(new Desires(String.valueOf(desiresText.getText()), 1, tag1, tag2, data));
                     recyclerView.getAdapter().notifyDataSetChanged();
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    getOrSetDataBase("setAll",name,op,tag1,tag2,list.size(),data,1);
                 }
             }
         }
@@ -179,39 +185,14 @@ public class MainActivity extends AppCompatActivity {
             System.exit(1);
         }
     }
-    public void onClick1 (View view){
-        getOrSetDataBase("new","0","0","0","0",0,"0");
-        getOrSetDataBase("show","0","0","0","0",0,"0");
-    }
-    public void onClick2 (View view){
-        getOrSetDataBase("update","0","0","0","0",0,"0");
-        getOrSetDataBase("show","0","0","0","0",0,"0");
-    }
-    public List<Lost> getOrSetDataBase (String command,String name,String op,String tag1,String tag2,int num,String data){
+    public List<Lost> getOrSetDataBase (String command,String name,String op,String tag1,String tag2,int num,String data,int status){
         FlowManager.init(new FlowConfig.Builder(this).build());
-        if(command.equals("show")){
-            List<Lost> lost = SQLite.select()
-                    .from(Lost.class)
-                    .where(Lost_Table.id.is(2))
-                    .queryList();
-            Toast.makeText(this,String.valueOf(lost.get(0)), Toast.LENGTH_SHORT).show();
-        }
-        if(command.equals("new")){
-            Lost lost = new Lost();
-            lost.setId(15);
-            lost.setDesires("what");
-            lost.setData("0");
-            lost.setOp("0");
-            lost.setTag2("0");
-            lost.save();
-        }
-        if(command.equals("update")){
-            Lost lost = new Lost();
-            lost.setId(15);
-            lost.setDesires("new what");
-            lost.update();
-        }
+
         List<Lost> losts;
+        SQLite.delete()
+                .from(Lost.class)
+                .where(Lost_Table.desires.is("test"))
+                .execute();
         if(command.equals("getAll")){
             losts = SQLite.select()
                     .from(Lost.class)
@@ -222,6 +203,7 @@ public class MainActivity extends AppCompatActivity {
             Lost lost = new Lost();
             lost.setId(num);
             lost.setDesires(name);
+            lost.setStatus(status);
             lost.setTag1(tag1);
             lost.setTag2(tag2);
             lost.setOp(op);
