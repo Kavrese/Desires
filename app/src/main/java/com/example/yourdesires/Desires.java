@@ -12,6 +12,10 @@ public class Desires {
         this.op = op;
     }
 
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
     public String getName() {
         return name;
     }

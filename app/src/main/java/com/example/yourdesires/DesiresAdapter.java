@@ -92,6 +92,8 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                         boolean bool = false;
                         switch (item.getItemId()) {
                             case R.id.menu_work:
+                                arrayList.get(position).setStatus(1);
+                                holder.statusIMG.setImageResource(R.color.yellow);
                                 SQLite.update(Lost.class)
                                         .set(Lost_Table.status.is(1))
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
@@ -99,6 +101,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 bool = true;
                                 break;
                             case R.id.menu_great:
+                                arrayList.get(position).setStatus(2);
                                 holder.statusIMG.setImageResource(R.color.green);
                                 SQLite.update(Lost.class)
                                         .set(Lost_Table.status.is(2))
@@ -107,6 +110,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 bool = true;
                                 break;
                             case R.id.menu_time:
+                                arrayList.get(position).setStatus(3);
                                 holder.statusIMG.setImageResource(R.color.orange);
                                 SQLite.update(Lost.class)
                                         .set(Lost_Table.status.is(3))
@@ -115,7 +119,9 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 bool = true;
                                 break;
                             case R.id.menu_sleep:
+
                                 holder.statusIMG.setImageResource(R.color.red);
+                                arrayList.get(position).setStatus(4);
                                 SQLite.update(Lost.class)
                                         .set(Lost_Table.status.is(4))
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
