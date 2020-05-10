@@ -1,9 +1,6 @@
 package com.example.yourdesires;
 
 import android.content.Context;
-import android.graphics.Color;
-import android.os.Build;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,16 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
+import com.example.yourdesires.model.Lost;
+import com.example.yourdesires.model.Lost_Table;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.zip.Inflater;
+import java.util.List;
 
 public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresViewHolder> {
     ArrayList<Desires> arrayList;
@@ -52,6 +48,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
 
     @Override
     public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
+        final MainActivity main = new MainActivity();
         holder.name.setText(arrayList.get(position).getName());
         holder.tag1.setText(arrayList.get(position).getTag1());
         holder.data.setText(arrayList.get(position).getData());
@@ -77,6 +74,9 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                 holder.statusIMG.setImageResource(R.color.green);
                 break;
             case 3:
+                holder.statusIMG.setImageResource(R.color.orange);
+                break;
+            case 4:
                 holder.statusIMG.setImageResource(R.color.red);
                 break;
         }
@@ -92,23 +92,42 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                         boolean bool = false;
                         switch (item.getItemId()) {
                             case R.id.menu_work:
-                                holder.statusIMG.setImageResource(R.color.yellow);
+                                SQLite.update(Lost.class)
+                                        .set(Lost_Table.status.is(1))
+                                        .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
+                                        .execute();
                                 bool = true;
                                 break;
                             case R.id.menu_great:
                                 holder.statusIMG.setImageResource(R.color.green);
+                                SQLite.update(Lost.class)
+                                        .set(Lost_Table.status.is(2))
+                                        .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
+                                        .execute();
                                 bool = true;
                                 break;
                             case R.id.menu_time:
                                 holder.statusIMG.setImageResource(R.color.orange);
+                                SQLite.update(Lost.class)
+                                        .set(Lost_Table.status.is(3))
+                                        .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
+                                        .execute();
                                 bool = true;
                                 break;
                             case R.id.menu_sleep:
                                 holder.statusIMG.setImageResource(R.color.red);
+                                SQLite.update(Lost.class)
+                                        .set(Lost_Table.status.is(4))
+                                        .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
+                                        .execute();
                                 bool = true;
                                 break;
                             case R.id.menu_delete:
+                                SQLite.delete(Lost.class)
+                                        .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
+                                        .execute();
                                 arrayList.remove(position);
+                                notifyDataSetChanged();
                                 bool = true;
                                 break;
                         }

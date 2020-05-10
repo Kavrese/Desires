@@ -60,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        FlowManager.init(new FlowConfig.Builder(this).build());
         searchType = "def";
         search = findViewById(R.id.search);
         searchText = findViewById(R.id.search_text);
@@ -79,9 +80,6 @@ public class MainActivity extends AppCompatActivity {
         list2 = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         desiresText = findViewById(R.id.text_plus);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new DesiresAdapter(list);
-        recyclerView.setAdapter(adapter);
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -126,15 +124,10 @@ public class MainActivity extends AppCompatActivity {
                 popupMenu2.show();
             }
         });
-
-        if(list.size() != 0){
-            text_first.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
         save.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                newDesires (String.valueOf(desiresText.getText()),String.valueOf(tag1.getText()),String.valueOf(tag2.getText()),String.valueOf(op.getText()));
+                newDesires (String.valueOf(desiresText.getText()),String.valueOf(tag1.getText()),String.valueOf(tag2.getText()),String.valueOf(op.getText()),1);
             }
         });
         bottomSheetBehavior.setBottomSheetCallback(new BottomSheetBehavior.BottomSheetCallback() {
@@ -163,12 +156,17 @@ public class MainActivity extends AppCompatActivity {
 
         List<Lost> listL = getOrSetDataBase("getAll","0","0","0","0",0,"0",0);
         for(int i = 0; i<listL.size();i++){
-            list.add(new Desires(String.valueOf(listL.get(0).getDesires()),
-                    listL.get(0).getStatus(),String.valueOf(listL.get(0).getTag1()),
-                    String.valueOf(listL.get(0).getTag2()),String.valueOf(listL.get(0).getData())));
-
+            list.add(new Desires(String.valueOf(listL.get(i).getDesires()),
+                    listL.get(i).getStatus(),String.valueOf(listL.get(i).getTag1()),
+                    String.valueOf(listL.get(i).getTag2()),String.valueOf(listL.get(i).getData()),String.valueOf(listL.get(i).getDesires())));
         }
-        recyclerView.getAdapter().notifyDataSetChanged();
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        adapter = new DesiresAdapter(list);
+        recyclerView.setAdapter(adapter);
+        if(list.size() != 0){
+            text_first.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void openBottonSheet (View view){
@@ -185,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void newDesires (String name, String tag1, String tag2, String op){
+    public void newDesires (String name, String tag1, String tag2, String op,int status){
         DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         if(op.equals("")){
             Toast.makeText(MainActivity.this, "Заполните описание", Toast.LENGTH_SHORT).show();
@@ -205,10 +203,10 @@ public class MainActivity extends AppCompatActivity {
                     }
 
                     String data = dateFormat.format(new Date());
-                    list.add(new Desires(String.valueOf(desiresText.getText()), 1, tag1, tag2, data));
+                    list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data,op));
                     recyclerView.getAdapter().notifyDataSetChanged();
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                   // getOrSetDataBase("setAll",name,op,tag1,tag2,list.size(),data,1);
+                    getOrSetDataBase("setAll",name,op,tag1,tag2,list.size(),data,1);
                 }
             }
         }
@@ -246,7 +244,6 @@ public class MainActivity extends AppCompatActivity {
     }
     public List<Lost> getOrSetDataBase (String command,String name,String op,String tag1,String tag2,int num,String data,int status){
         FlowManager.init(new FlowConfig.Builder(this).build());
-
         List<Lost> losts;
         if(command.equals("getAll")){
             losts = SQLite.select()

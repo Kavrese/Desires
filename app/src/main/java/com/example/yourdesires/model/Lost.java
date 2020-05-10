@@ -11,6 +11,7 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.sql.Blob;
+import java.util.List;
 
 @Table(database = MyDataBase.class)
 public class Lost extends BaseModel {
