@@ -2,6 +2,7 @@ package com.example.yourdesires;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.os.Build;
 import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -10,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -22,14 +24,13 @@ import java.util.zip.Inflater;
 
 public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresViewHolder> {
     ArrayList<Desires> arrayList;
-
     public DesiresAdapter (ArrayList<Desires> arrayList){
         this.arrayList = arrayList;
     }
 
     public class DesiresViewHolder extends RecyclerView.ViewHolder {
         TextView name,tag1,tag2,data;
-        ImageView statusIMG,menu;
+        ImageView statusIMG,menu,star;
         public DesiresViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name_desires);
@@ -43,9 +44,10 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
 
     @NonNull
     @Override
-    public DesiresViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.maket_recycler_view,parent,false);
-        return new DesiresViewHolder(view);
+    public DesiresViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
+        final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.maket_recycler_view,parent,false);
+        final DesiresViewHolder desiresViewHolder = new DesiresViewHolder(view);
+        return desiresViewHolder;
     }
 
     @Override
@@ -53,11 +55,20 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         holder.name.setText(arrayList.get(position).getName());
         holder.tag1.setText(arrayList.get(position).getTag1());
         holder.data.setText(arrayList.get(position).getData());
+
         if(arrayList.get(position).getTag2().equals("no")){
             holder.tag2.setVisibility(View.INVISIBLE);
         }else{
             holder.tag2.setText(arrayList.get(position).getTag2());
         }
+
+        if(arrayList.get(position).getTag1().equals("no")){
+            holder.tag1.setText(arrayList.get(position).getTag2());
+            holder.tag2.setVisibility(View.INVISIBLE);
+        }else{
+            holder.tag1.setText(arrayList.get(position).getTag1());
+        }
+
         switch (arrayList.get(position).getStatus()){
             case 1:
                 holder.statusIMG.setImageResource(R.color.yellow);
@@ -86,6 +97,10 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 break;
                             case R.id.menu_great:
                                 holder.statusIMG.setImageResource(R.color.green);
+                                bool = true;
+                                break;
+                            case R.id.menu_time:
+                                holder.statusIMG.setImageResource(R.color.orange);
                                 bool = true;
                                 break;
                             case R.id.menu_sleep:

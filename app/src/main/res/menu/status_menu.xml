@@ -6,6 +6,9 @@
     <item
         android:id="@+id/menu_great"
         android:title="@string/status_2"/>
+
+    <item android:id="@+id/menu_time"
+        android:title="@string/status_4"/>
     <item
         android:id="@+id/menu_sleep"
         android:title="@string/status_3"/>

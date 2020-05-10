@@ -1,5 +1,9 @@
 package com.example.yourdesires.model;
 
+import android.widget.Toast;
+
+import androidx.core.view.accessibility.AccessibilityViewCommand;
+
 import com.raizlabs.android.dbflow.annotation.Column;
 import com.raizlabs.android.dbflow.annotation.PrimaryKey;
 import com.raizlabs.android.dbflow.annotation.Table;
@@ -29,7 +33,9 @@ public class Lost extends BaseModel {
 
     public int getId(){return id;}
 
-    public void setId(int id) {this.id = id;}
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getDesires() {
         return desires;}
