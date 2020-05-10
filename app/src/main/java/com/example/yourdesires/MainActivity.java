@@ -136,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
                 if(i == BottomSheetBehavior.STATE_HIDDEN){
                     backIMG.setVisibility(View.GONE);
                     remove();
+                    hiddenKeyboard();
                 }
                 if(i == BottomSheetBehavior.STATE_EXPANDED){
                     backIMG.setVisibility(View.VISIBLE);

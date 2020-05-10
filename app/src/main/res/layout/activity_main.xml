@@ -54,6 +54,7 @@
                         android:background="@drawable/maket_search"
                         android:descendantFocusability="beforeDescendants"
                         android:focusableInTouchMode="true"
+                        android:autoSizeTextType="uniform"
                         android:gravity="center"
                         android:hint="@string/def_filter_str"
                         android:maxLines="1"
