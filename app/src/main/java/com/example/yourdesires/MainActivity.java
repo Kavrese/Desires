@@ -36,7 +36,7 @@ import java.util.List;
 public class MainActivity extends AppCompatActivity {
     int pos;
     boolean back_presed = false;
-    String searchType,command;
+    String searchType;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
     ArrayList<Desires> list;
@@ -161,8 +161,19 @@ public class MainActivity extends AppCompatActivity {
         showFirstIMG();
     }
     public void getIntentMet (){
-        pos = getIntent().getIntExtra("position",0);
-        command = getIntent().getStringExtra("command");
+        String command = getIntent().getStringExtra("command");
+        pos = getIntent().getIntExtra("position", 0);
+        if(command != null && command.equals("new data")) {
+            getOrSetDataBase("update name", getIntent().getStringExtra("name"), "0", "0", "0", pos, "0", 0);
+            list.get(pos).setName(getIntent().getStringExtra("name"));
+            getOrSetDataBase("update op", "0", getIntent().getStringExtra("op"), "0", "0", pos, "0", 0);
+            list.get(pos).setOp(getIntent().getStringExtra("op"));
+            getOrSetDataBase("update tag1", "0", "0", getIntent().getStringExtra("tag1"), "0", pos, "0", 0);
+            list.get(pos).setTag1(getIntent().getStringExtra("tag1"));
+            getOrSetDataBase("update tag2", "0", "0", "0", getIntent().getStringExtra("tag2"), pos, "0", 0);
+            list.get(pos).setTag2(getIntent().getStringExtra("tag2"));
+            recyclerView.getAdapter().notifyDataSetChanged();
+        }
         if(command != null) {
             switch (command){
                 case "yellow":
@@ -303,6 +314,30 @@ public class MainActivity extends AppCompatActivity {
         if(command.equals("update status")){
             SQLite.update(Lost.class)
                     .set(Lost_Table.status.is(status))
+                    .where(Lost_Table.desires.is(String.valueOf(list.get(num).getName())))
+                    .execute();
+        }
+        if(command.equals("update name")){
+            SQLite.update(Lost.class)
+                    .set(Lost_Table.desires.is(name))
+                    .where(Lost_Table.desires.is(String.valueOf(list.get(num).getName())))
+                    .execute();
+        }
+        if(command.equals("update tag1")){
+            SQLite.update(Lost.class)
+                    .set(Lost_Table.tag1.is(tag1))
+                    .where(Lost_Table.desires.is(String.valueOf(list.get(num).getName())))
+                    .execute();
+        }
+        if(command.equals("update tag2")){
+            SQLite.update(Lost.class)
+                    .set(Lost_Table.tag2.is(tag2))
+                    .where(Lost_Table.desires.is(String.valueOf(list.get(num).getName())))
+                    .execute();
+        }
+        if(command.equals("update op")){
+            SQLite.update(Lost.class)
+                    .set(Lost_Table.op.is(op))
                     .where(Lost_Table.desires.is(String.valueOf(list.get(num).getName())))
                     .execute();
         }

@@ -58,12 +58,17 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                 in.putExtra("name",holder.name.getText());
                 in.putExtra("status",arrayList.get(position).getStatus());
                 in.putExtra("position",position);
+                in.putExtra("data",arrayList.get(position).getData());
+                in.putExtra("op",arrayList.get(position).getOp());
+                in.putExtra("tag1",arrayList.get(position).getTag1());
+                in.putExtra("tag2",arrayList.get(position).getTag2());
                 context.startActivity(in);
             }
         });
         holder.name.setText(arrayList.get(position).getName());
         holder.tag1.setText(arrayList.get(position).getTag1());
         holder.data.setText(arrayList.get(position).getData());
+
         if(arrayList.get(position).getTag2().equals("no")){
             holder.tag2.setVisibility(View.INVISIBLE);
         }else{

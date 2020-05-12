@@ -16,6 +16,26 @@ public class Desires {
         this.status = status;
     }
 
+    public void setOp(String op) {
+        this.op = op;
+    }
+
+    public void setData(String data) {
+        this.data = data;
+    }
+
+    public void setTag1(String tag1) {
+        this.tag1 = tag1;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setTag2(String tag2) {
+        this.tag2 = tag2;
+    }
+
     public String getName() {
         return name;
     }
