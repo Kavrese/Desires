@@ -1,6 +1,7 @@
 package com.example.yourdesires;
 
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -8,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -16,7 +19,6 @@ import com.example.yourdesires.model.Lost_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresViewHolder> {
     ArrayList<Desires> arrayList;
@@ -26,7 +28,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
 
     public class DesiresViewHolder extends RecyclerView.ViewHolder {
         TextView name,tag1,tag2,data;
-        ImageView statusIMG,menu,star;
+        ImageView statusIMG,menu;
         public DesiresViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name_desires);
@@ -48,11 +50,20 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
 
     @Override
     public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
-        final MainActivity main = new MainActivity();
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Context context = v.getContext();
+                Intent in = new Intent(context, DesiresActivity.class);
+                in.putExtra("name",holder.name.getText());
+                in.putExtra("status",arrayList.get(position).getStatus());
+                in.putExtra("position",position);
+                context.startActivity(in);
+            }
+        });
         holder.name.setText(arrayList.get(position).getName());
         holder.tag1.setText(arrayList.get(position).getTag1());
         holder.data.setText(arrayList.get(position).getData());
-
         if(arrayList.get(position).getTag2().equals("no")){
             holder.tag2.setVisibility(View.INVISIBLE);
         }else{
@@ -119,7 +130,6 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 bool = true;
                                 break;
                             case R.id.menu_sleep:
-
                                 holder.statusIMG.setImageResource(R.color.red);
                                 arrayList.get(position).setStatus(4);
                                 SQLite.update(Lost.class)

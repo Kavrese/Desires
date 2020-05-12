@@ -13,7 +13,11 @@
         android:roundIcon="@mipmap/icon_asset"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SplachScreenActivity"
+        <activity android:name=".DesiresActivity"
+            android:screenOrientation="portrait">
+        </activity>
+        <activity
+            android:name=".SplachScreenActivity"
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

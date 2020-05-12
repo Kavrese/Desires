@@ -1,20 +1,16 @@
 package com.example.yourdesires;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.inputmethodservice.Keyboard;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.TextUtils;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -26,29 +22,24 @@ import android.widget.Toast;
 
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
-import com.example.yourdesires.model.MyDataBase;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class MainActivity extends AppCompatActivity {
+    int pos;
     boolean back_presed = false;
-    String searchType;
+    String searchType,command;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
     ArrayList<Desires> list;
-    ArrayList<Desires> list2;
     EditText desiresText,searchText;
     LinearLayout bottonSheet,lin;
     BottomSheetBehavior bottomSheetBehavior;
@@ -77,24 +68,8 @@ public class MainActivity extends AppCompatActivity {
         bottomSheetBehavior = BottomSheetBehavior.from(bottonSheet);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         list = new ArrayList<>();
-        list2 = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         desiresText = findViewById(R.id.text_plus);
-        search.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if ("def".equals(searchType)) {
-                    Toast.makeText(MainActivity.this, "Выберите фильтр", Toast.LENGTH_SHORT).show();
-                } else if (list.size() == 0){
-                    Toast.makeText(MainActivity.this, "Создайте хоть одно желание", Toast.LENGTH_SHORT).show();
-                } else if (String.valueOf(searchText.getText()).equals("")){
-                    Toast.makeText(MainActivity.this, "Заполните поле для поиска", Toast.LENGTH_SHORT).show();
-                }else{
-                    list = onSearch(list, searchType,String.valueOf(searchText.getText()));
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                }
-            }
-        });
         filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -168,19 +143,73 @@ public class MainActivity extends AppCompatActivity {
             text_first.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
         }
+        search.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if ("def".equals(searchType)) {
+                    Toast.makeText(MainActivity.this, "Выберите фильтр", Toast.LENGTH_SHORT).show();
+                } else if (list.size() == 0){
+                    Toast.makeText(MainActivity.this, "Создайте хоть одно желание", Toast.LENGTH_SHORT).show();
+                } else if (String.valueOf(searchText.getText()).equals("")){
+                    Toast.makeText(MainActivity.this, "Заполните поле для поиска", Toast.LENGTH_SHORT).show();
+                }else{
+                    list = onSearch(list, searchType,String.valueOf(searchText.getText()));
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                }
+            }
+        });
+        getIntentMet();
+    }
+    public void getIntentMet (){
+        pos = getIntent().getIntExtra("position",0);
+        command = getIntent().getStringExtra("command");
+        if(command != null) {
+            switch (command){
+                case "yellow":
+                    getOrSetDataBase("update status","0","0","0","0",pos,"0",1);
+                    list.get(pos).setStatus(1);
+                    break;
+                case "green":
+                    getOrSetDataBase("update status","0","0","0","0",pos,"0",2);
+                    list.get(pos).setStatus(2);
+                    break;
+                case "orange":
+                    getOrSetDataBase("update status","0","0","0","0",pos,"0",3);
+                    list.get(pos).setStatus(3);
+                    break;
+                case "red":
+                    getOrSetDataBase("update status","0","0","0","0",pos,"0",4);
+                    list.get(pos).setStatus(4);
+                    break;
+                case "delete":
+                    getOrSetDataBase("delete","0","0","0","0",pos,"0",4);
+                    list.remove(pos);
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                    break;
+            }
+        }
     }
 
     public void openBottonSheet (View view){
-        desiresText.setEnabled(false);
-        hiddenKeyboard();
-        String name = String.valueOf(desiresText.getText());
-        if(!name.equals("")){
-            name_botton_sheet.setText("Новое желание: "+name);
-            backIMG.setVisibility(View.VISIBLE);
-            bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
-        }else{
-            Toast.makeText(this, "Введите заголовок желания", Toast.LENGTH_SHORT).show();
-            desiresText.setEnabled(true);
+        boolean bool = true;
+        for(int i = 0;i<list.size();i++){
+            if(list.get(i).getName().equals(String.valueOf(desiresText.getText()))){
+                Toast.makeText(MainActivity.this, "Желание с таким заголовком уже есть", Toast.LENGTH_LONG).show();
+                bool = false;
+            }
+        }
+        if(bool) {
+            desiresText.setEnabled(false);
+            hiddenKeyboard();
+            String name = String.valueOf(desiresText.getText());
+            if (!name.equals("")) {
+                name_botton_sheet.setText("Новое желание: " + name);
+                backIMG.setVisibility(View.VISIBLE);
+                bottomSheetBehavior.setState(BottomSheetBehavior.STATE_COLLAPSED);
+            } else {
+                Toast.makeText(this, "Введите заголовок желания", Toast.LENGTH_SHORT).show();
+                desiresText.setEnabled(true);
+            }
         }
     }
 
@@ -203,11 +232,12 @@ public class MainActivity extends AppCompatActivity {
                         tag1 = "no";
                     }
 
-                    String data = dateFormat.format(new Date());
-                    list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data,op));
-                    recyclerView.getAdapter().notifyDataSetChanged();
-                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                    getOrSetDataBase("setAll",name,op,tag1,tag2,list.size(),data,1);
+                        String data = dateFormat.format(new Date());
+                        list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op));
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                        getOrSetDataBase("setAll", name, op, tag1, tag2, list.size(), data, 1);
+
                 }
             }
         }
@@ -263,6 +293,17 @@ public class MainActivity extends AppCompatActivity {
             lost.setData(data);
             lost.save();
         }
+        if(command.equals("update status")){
+            SQLite.update(Lost.class)
+                    .set(Lost_Table.status.is(status))
+                    .where(Lost_Table.desires.is(String.valueOf(list.get(num).getName())))
+                    .execute();
+        }
+        if(command.equals("delete")){
+            SQLite.delete(Lost.class)
+                    .where(Lost_Table.desires.is(String.valueOf(list.get(num).getName())))
+                    .execute();
+        }
         return null;
     }
 
@@ -296,8 +337,10 @@ public class MainActivity extends AppCompatActivity {
                             num = 1;
                         break;
                         case "Отложено на время":
-                        case "Отложено":
                             num = 3;
+                            break;
+                        case "Отложено":
+                            num = 4;
                             break;
                         case "Выполнено":
                             num = 2;
