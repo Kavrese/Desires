@@ -39,8 +39,7 @@
                 android:layout_weight="7.5"
                 android:ellipsize="end"
                 android:gravity="left|center"
-                android:maxLines="1"
-                android:singleLine="true"
+                android:autoSizeTextType="uniform"
                 android:text="Желание"
                 android:textColor="#000000"
                 android:textSize="24sp" />

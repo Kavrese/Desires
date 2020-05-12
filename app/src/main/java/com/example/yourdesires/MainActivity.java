@@ -82,14 +82,17 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.menu_filter1:
                                 searchText.setHint(R.string.name_filter_str);
                                 searchType = "name";
+                                filter.setImageResource(R.drawable.tool_name);
                                 break;
                             case R.id.menu_filter2:
                                 searchText.setHint(R.string.tag_filter_str);
                                 searchType = "tag";
+                                filter.setImageResource(R.drawable.tool_tag);
                                 break;
                             case R.id.menu_filter3:
                                 searchText.setHint(R.string.status_filter_str);
                                 searchType = "status";
+                                filter.setImageResource(R.drawable.tool_status);
 
                                 break;
                         }
@@ -139,10 +142,6 @@ public class MainActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DesiresAdapter(list);
         recyclerView.setAdapter(adapter);
-        if(list.size() != 0){
-            text_first.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
-        }
         search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -159,6 +158,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
         getIntentMet();
+        showFirstIMG();
     }
     public void getIntentMet (){
         pos = getIntent().getIntExtra("position",0);
@@ -185,6 +185,7 @@ public class MainActivity extends AppCompatActivity {
                     getOrSetDataBase("delete","0","0","0","0",pos,"0",4);
                     list.remove(pos);
                     recyclerView.getAdapter().notifyDataSetChanged();
+                    showFirstIMG();
                     break;
             }
         }
@@ -210,6 +211,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Введите заголовок желания", Toast.LENGTH_SHORT).show();
                 desiresText.setEnabled(true);
             }
+        }
+    }
+    private void showFirstIMG (){
+        if(list.size() != 0){
+            text_first.setVisibility(View.GONE);
+            recyclerView.setVisibility(View.VISIBLE);
         }
     }
 
