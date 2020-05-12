@@ -4,15 +4,17 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
+
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        >
+        android:background="@color/white_3">
 
         <LinearLayout
             android:id="@+id/con"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:background="@color/white_back"
             android:orientation="vertical"
             android:weightSum="100">
 
@@ -21,7 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:background="?attr/colorPrimary"
+                android:background="@drawable/maket_up"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme">
 
@@ -51,13 +53,14 @@
                         android:layout_marginRight="10dp"
                         android:layout_marginBottom="10dp"
                         android:layout_weight="8"
+                        android:autoSizeTextType="uniform"
                         android:background="@drawable/maket_search"
                         android:descendantFocusability="beforeDescendants"
                         android:focusableInTouchMode="true"
-                        android:autoSizeTextType="uniform"
-                        android:gravity="center"
+                        android:gravity="center|left"
                         android:hint="@string/def_filter_str"
                         android:maxLines="1"
+                        android:paddingLeft="10dp"
                         android:singleLine="true"
                         android:textColor="@color/dark"
                         android:textColorHint="@color/grey"
@@ -98,7 +101,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:background="?attr/colorPrimary"
+                android:background="@drawable/maket_dawn"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme">
 
@@ -117,7 +120,7 @@
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
                         android:layout_weight="9"
-                        android:background="@drawable/maket_add_new_name_desires"
+                        android:background="@color/white"
                         android:gravity="center|left"
                         android:hint="Введите заголовок желания"
                         android:maxLines="1"
@@ -149,6 +152,8 @@
             app:srcCompat="@color/back_back" />
 
     </RelativeLayout>
+
     <include
-        layout="@layout/button_sheet" />
+        layout="@layout/button_sheet"
+        android:visibility="visible" />
 </com.google.android.material.circularreveal.coordinatorlayout.CircularRevealCoordinatorLayout>

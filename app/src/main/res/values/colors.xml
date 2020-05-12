@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#6200EE</color>
-    <color name="colorPrimaryDark">#3700B3</color>
+    <color name="colorPrimary">#FFF</color>
+    <color name="colorPrimaryDark">#C6C6C6</color>
     <color name="colorAccent">#03DAC5</color>
     <color name="white">#FFF</color>
+    <color name="white_back">#EFEFEF</color>
     <color name="dark">#000</color>
     <color name="grey">#686868</color>
     <color name="yellow">#FFE500</color>
@@ -15,4 +16,5 @@
     <color name="white_3">#DADADA</color>
     <color name="back_back">#9C000000</color>
     <color name="dark_half">#121327</color>
+    <color name="color_search">#8CCACACA</color>
 </resources>
