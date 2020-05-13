@@ -23,9 +23,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:background="@drawable/maket_up"
-                android:minHeight="?attr/actionBarSize"
-                android:theme="?attr/actionBarTheme">
+                android:background="@drawable/maket_up">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -119,7 +117,7 @@
                         android:layout_height="match_parent"
                         android:layout_marginTop="10dp"
                         android:layout_marginBottom="10dp"
-                        android:layout_weight="9"
+                        android:layout_weight="8"
                         android:background="@color/white"
                         android:gravity="center|left"
                         android:hint="Введите заголовок желания"
@@ -139,6 +137,14 @@
                         android:layout_weight="1"
                         android:onClick="openBottonSheet"
                         app:srcCompat="@drawable/plus" />
+
+                    <ImageView
+                        android:id="@+id/rgb"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="10dp"
+                        android:layout_weight="1"
+                        app:srcCompat="@drawable/rgb" />
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
 
@@ -155,5 +161,5 @@
 
     <include
         layout="@layout/button_sheet"
-        android:visibility="visible" />
+        android:visibility="gone" />
 </com.google.android.material.circularreveal.coordinatorlayout.CircularRevealCoordinatorLayout>

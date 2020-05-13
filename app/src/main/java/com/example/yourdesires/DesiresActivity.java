@@ -3,6 +3,7 @@ package com.example.yourdesires;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -11,6 +12,10 @@ import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+
 public class DesiresActivity extends AppCompatActivity {
 String command,tag1S,tag2S;
 int status,pos;
@@ -23,6 +28,7 @@ ImageView menu;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
         command = "new data";
+        DateFormat time = new SimpleDateFormat("HH");
         op = findViewById(R.id.op);
         scrap = findViewById(R.id.scrap);
         time_des = findViewById(R.id.time_des);
@@ -119,6 +125,49 @@ ImageView menu;
             public void onClick(View v) {
                 hideTag2();
                 tag2.setText("");
+            }
+        });
+        time_des.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu pop_time_des1 = new PopupMenu(v.getContext(),v);
+                pop_time_des1.inflate(R.menu.menu_time_des_1);
+                pop_time_des1.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        boolean bool = false;
+                        SharedPreferences sh = getSharedPreferences("0",0);
+                        SharedPreferences.Editor ed;
+                        switch (item.getItemId()){
+                            case R.id.menu_next:
+                                ed = sh.edit();
+                                ed.putString("background","next");
+                                ed.apply();
+                                bool= true;
+                                break;
+                            case R.id.menu_data:
+                                ed = sh.edit();
+                                ed.putString("background","data");
+                                ed.apply();
+                                bool= true;
+                                break;
+                            case R.id.menu_return:
+                                ed = sh.edit();
+                                ed.putString("background","return");
+                                ed.apply();
+                                bool= true;
+                                break;
+                        }
+                        return bool;
+                    }
+                });
+                pop_time_des1.show();
+            }
+        });
+        time_des2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
             }
         });
     }

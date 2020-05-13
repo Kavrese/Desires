@@ -12,5 +12,7 @@
     <string name="status_4">Отложено на время</string>
     <string name="delete">Удалить</string>
 
-
+    <string name="des_return">При следующем запуске</string>
+    <string name="des_next">Завтра</string>
+    <string name="des_data">Выбрать дату</string>
 </resources>

@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -19,6 +20,7 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.Toolbar;
 
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
@@ -32,11 +34,13 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     int pos;
     boolean back_presed = false;
-    String searchType;
+    boolean light = true;
+    String searchType = "null";
     DesiresAdapter adapter;
     RecyclerView recyclerView;
     ArrayList<Desires> list;
@@ -46,13 +50,29 @@ public class MainActivity extends AppCompatActivity {
     TextView name_botton_sheet,text_first;
     EditText tag1,tag2,op;
     Button save;
-    ImageView backIMG,filter,search;
+    ImageView backIMG,filter,search,rgb,plus;
+    LinearLayout con;
+    androidx.appcompat.widget.Toolbar up,dawn;
+    SharedPreferences sh;
+    SharedPreferences.Editor ed;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FlowManager.init(new FlowConfig.Builder(this).build());
+        sh = getSharedPreferences("0",0);
+      if(sh.getString("color","light").equals("light")){
+          switchColor("light");
+      }else{
+          switchColor("dark");
+      }
         searchType = "def";
+        rgb = findViewById(R.id.rgb);
+        up = findViewById(R.id.up_toolbar);
+        con = findViewById(R.id.con);
+        dawn = findViewById(R.id.dawn_toolbar);
+        setSupportActionBar(up);
+        setSupportActionBar(dawn);
         search = findViewById(R.id.search);
         searchText = findViewById(R.id.search_text);
         filter = findViewById(R.id.filter);
@@ -82,18 +102,17 @@ public class MainActivity extends AppCompatActivity {
                             case R.id.menu_filter1:
                                 searchText.setHint(R.string.name_filter_str);
                                 searchType = "name";
-                                filter.setImageResource(R.drawable.tool_name);
+                                switchFilter(searchType);
                                 break;
                             case R.id.menu_filter2:
                                 searchText.setHint(R.string.tag_filter_str);
                                 searchType = "tag";
-                                filter.setImageResource(R.drawable.tool_tag);
+                                switchFilter(searchType);
                                 break;
                             case R.id.menu_filter3:
                                 searchText.setHint(R.string.status_filter_str);
                                 searchType = "status";
-                                filter.setImageResource(R.drawable.tool_status);
-
+                                switchFilter(searchType);
                                 break;
                         }
                         return false;
@@ -157,8 +176,58 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        rgb.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(light)
+                switchColor("dark");
+                else
+                switchColor("light");
+            }
+        });
         getIntentMet();
         showFirstIMG();
+    }
+    public void switchColor (String color){
+        plus = findViewById(R.id.plus);
+        con = findViewById(R.id.con);
+        up = findViewById(R.id.up_toolbar);
+        dawn = findViewById(R.id.dawn_toolbar);
+        rgb = findViewById(R.id.rgb);
+        search = findViewById(R.id.search);
+        filter = findViewById(R.id.filter);
+        desiresText = findViewById(R.id.text_plus);
+        switch (color){
+            case "dark":
+                up.setBackgroundResource(R.color.dark_2);
+                dawn.setBackgroundResource(R.color.dark_2);
+                rgb.setImageResource(R.drawable.rgb_light);
+                search.setImageResource(R.drawable.search_light);
+                con.setBackgroundResource(R.color.dark);
+                desiresText.setBackgroundResource(R.color.dark_2);
+                desiresText.setTextColor(getResources().getColor(R.color.white_text));
+                getWindow().setStatusBarColor(getResources().getColor(R.color.dark_3));
+                plus.setImageResource(R.drawable.plus_light);
+                light = false;
+                switchFilter(searchType);
+                break;
+            case "light":
+                up.setBackgroundResource(R.drawable.maket_up);
+                dawn.setBackgroundResource(R.drawable.maket_dawn);
+                rgb.setImageResource(R.drawable.rgb);
+                search.setImageResource(R.drawable.search);
+                con.setBackgroundResource(R.color.white_back);
+                desiresText.setBackgroundResource(R.color.white);
+                getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+                desiresText.setTextColor(getResources().getColor(R.color.dark));
+                plus.setImageResource(R.drawable.plus);
+                light = true;
+                switchFilter(searchType);
+                break;
+        }
+        ed = sh.edit();
+        ed.putString("color",color);
+        ed.apply();
     }
     public void getIntentMet (){
         String command = getIntent().getStringExtra("command");
@@ -197,6 +266,40 @@ public class MainActivity extends AppCompatActivity {
                     list.remove(pos);
                     recyclerView.getAdapter().notifyDataSetChanged();
                     showFirstIMG();
+                    break;
+            }
+        }
+    }
+
+    public void switchFilter (String searchType2){
+        if(!light) {
+            switch (searchType2) {
+                case "name":
+                    filter.setImageResource(R.drawable.tool_name_light);
+                    break;
+                case "tag":
+                    filter.setImageResource(R.drawable.tool_tag_light);
+                    break;
+                case "status":
+                    filter.setImageResource(R.drawable.tool_status_light);
+                    break;
+                case "null":
+                    filter.setImageResource(R.drawable.tool_light);
+                    break;
+            }
+        }else{
+            switch (searchType2) {
+                case "name":
+                    filter.setImageResource(R.drawable.tool_name);
+                    break;
+                case "tag":
+                    filter.setImageResource(R.drawable.tool_tag);
+                    break;
+                case "status":
+                    filter.setImageResource(R.drawable.tool_status);
+                    break;
+                case "null":
+                    filter.setImageResource(R.drawable.filter);
                     break;
             }
         }

@@ -6,6 +6,8 @@
     <color name="white">#FFF</color>
     <color name="white_back">#EFEFEF</color>
     <color name="dark">#000</color>
+    <color name="dark_2">#353535</color>
+    <color name="dark_3">#555555</color>
     <color name="grey">#686868</color>
     <color name="yellow">#FFE500</color>
     <color name="green">#4CAF50</color>
@@ -17,5 +19,6 @@
     <color name="white_3">#DADADA</color>
     <color name="back_back">#9C000000</color>
     <color name="dark_half">#121327</color>
-    <color name="color_search">#8CCACACA</color>
+    <color name="color_search">#C6C6C6</color>
+    <color name="white_text">#DDDDDD</color>
 </resources>
