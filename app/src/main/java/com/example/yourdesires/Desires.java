@@ -3,13 +3,22 @@ package com.example.yourdesires;
 public class Desires {
     private String name,tag1,tag2,data,op;
     private int status;
-    public Desires (String name, int status ,String tag1, String tag2,String data,String op){
+    private boolean light;
+    public Desires (String name, int status ,String tag1, String tag2,String data,String op,boolean light){
         this.name = name;
         this.status = status;
         this.tag1 = tag1;
         this.tag2 = tag2;
         this.data = data;
         this.op = op;
+        this.light = light;
+    }
+    public boolean getLight (){
+        return light;
+    }
+
+    public void setLight(boolean light) {
+        this.light = light;
     }
 
     public void setStatus(int status) {

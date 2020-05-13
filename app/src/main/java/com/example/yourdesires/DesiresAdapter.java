@@ -7,6 +7,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -29,6 +30,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     public class DesiresViewHolder extends RecyclerView.ViewHolder {
         TextView name,tag1,tag2,data;
         ImageView statusIMG,menu;
+        LinearLayout lin;
         public DesiresViewHolder(@NonNull View itemView) {
             super(itemView);
             name = itemView.findViewById(R.id.name_desires);
@@ -37,6 +39,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             statusIMG = itemView.findViewById(R.id.status);
             data = itemView.findViewById(R.id.data);
             menu = itemView.findViewById(R.id.menu);
+            lin = itemView.findViewById(R.id.lin);
         }
     }
 
@@ -55,13 +58,18 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             public void onClick(View v) {
                 Context context = v.getContext();
                 Intent in = new Intent(context, DesiresActivity.class);
-                in.putExtra("name",holder.name.getText());
-                in.putExtra("status",arrayList.get(position).getStatus());
-                in.putExtra("position",position);
-                in.putExtra("data",arrayList.get(position).getData());
-                in.putExtra("op",arrayList.get(position).getOp());
-                in.putExtra("tag1",arrayList.get(position).getTag1());
-                in.putExtra("tag2",arrayList.get(position).getTag2());
+                in.putExtra("name", holder.name.getText());
+                in.putExtra("status", arrayList.get(position).getStatus());
+                in.putExtra("position", position);
+                in.putExtra("data", arrayList.get(position).getData());
+                in.putExtra("op", arrayList.get(position).getOp());
+                in.putExtra("tag1", arrayList.get(position).getTag1());
+                in.putExtra("tag2", arrayList.get(position).getTag2());
+                if (arrayList.get(position).getLight()) {
+                    in.putExtra("color", "light");
+                } else{
+                    in.putExtra("color", "dark");
+            }
                 context.startActivity(in);
             }
         });
@@ -158,6 +166,21 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                 popupMenu.show();
             }
         });
+        if(arrayList.get(position).getLight()){
+            holder.lin.setBackgroundResource(R.drawable.maket_back_recycler_view);
+            holder.menu.setImageResource(R.drawable.open_menu);
+            holder.name.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.dark));
+            holder.tag1.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.grey));
+            holder.tag2.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.grey));
+            holder.data.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.dark));
+        }else{
+            holder.lin.setBackgroundResource(R.drawable.maket_back_recycler_view_dark);
+            holder.menu.setImageResource(R.drawable.open_menu_light);
+            holder.name.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white));
+            holder.tag1.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white_text));
+            holder.tag2.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white_text));
+            holder.data.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white));
+        }
     }
 
     @Override

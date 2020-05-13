@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
     int pos;
     boolean back_presed = false;
     boolean light = true;
-    String searchType = "null";
+    String searchType;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
     ArrayList<Desires> list;
@@ -61,11 +61,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         FlowManager.init(new FlowConfig.Builder(this).build());
         sh = getSharedPreferences("0",0);
-      if(sh.getString("color","light").equals("light")){
-          switchColor("light");
-      }else{
-          switchColor("dark");
-      }
         searchType = "def";
         rgb = findViewById(R.id.rgb);
         up = findViewById(R.id.up_toolbar);
@@ -156,7 +151,7 @@ public class MainActivity extends AppCompatActivity {
         for(int i = 0; i<listL.size();i++){
             list.add(new Desires(String.valueOf(listL.get(i).getDesires()),
                     listL.get(i).getStatus(),String.valueOf(listL.get(i).getTag1()),
-                    String.valueOf(listL.get(i).getTag2()),String.valueOf(listL.get(i).getData()),String.valueOf(listL.get(i).getDesires())));
+                    String.valueOf(listL.get(i).getTag2()),String.valueOf(listL.get(i).getData()),String.valueOf(listL.get(i).getDesires()),light));
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DesiresAdapter(list);
@@ -187,8 +182,14 @@ public class MainActivity extends AppCompatActivity {
         });
         getIntentMet();
         showFirstIMG();
+        if(sh.getString("color","light").equals("light")){
+            switchColor("light");
+        }else{
+            switchColor("dark");
+        }
     }
     public void switchColor (String color){
+        text_first = findViewById(R.id.text_first);
         plus = findViewById(R.id.plus);
         con = findViewById(R.id.con);
         up = findViewById(R.id.up_toolbar);
@@ -199,11 +200,12 @@ public class MainActivity extends AppCompatActivity {
         desiresText = findViewById(R.id.text_plus);
         switch (color){
             case "dark":
+                text_first.setTextColor(getResources().getColor(R.color.white));
                 up.setBackgroundResource(R.color.dark_2);
                 dawn.setBackgroundResource(R.color.dark_2);
                 rgb.setImageResource(R.drawable.rgb_light);
                 search.setImageResource(R.drawable.search_light);
-                con.setBackgroundResource(R.color.dark);
+                con.setBackgroundResource(R.color.dark_back);
                 desiresText.setBackgroundResource(R.color.dark_2);
                 desiresText.setTextColor(getResources().getColor(R.color.white_text));
                 getWindow().setStatusBarColor(getResources().getColor(R.color.dark_3));
@@ -212,6 +214,7 @@ public class MainActivity extends AppCompatActivity {
                 switchFilter(searchType);
                 break;
             case "light":
+                text_first.setTextColor(getResources().getColor(R.color.dark));
                 up.setBackgroundResource(R.drawable.maket_up);
                 dawn.setBackgroundResource(R.drawable.maket_dawn);
                 rgb.setImageResource(R.drawable.rgb);
@@ -228,6 +231,13 @@ public class MainActivity extends AppCompatActivity {
         ed = sh.edit();
         ed.putString("color",color);
         ed.apply();
+        editMaketRecyclerView(light,list);
+    }
+    public void editMaketRecyclerView (boolean light,ArrayList<Desires> list){
+            for(int i = 0;i<list.size();i++){
+                list.get(i).setLight(light);
+            }
+            recyclerView.getAdapter().notifyDataSetChanged();
     }
     public void getIntentMet (){
         String command = getIntent().getStringExtra("command");
@@ -283,7 +293,7 @@ public class MainActivity extends AppCompatActivity {
                 case "status":
                     filter.setImageResource(R.drawable.tool_status_light);
                     break;
-                case "null":
+                case "def":
                     filter.setImageResource(R.drawable.tool_light);
                     break;
             }
@@ -298,7 +308,7 @@ public class MainActivity extends AppCompatActivity {
                 case "status":
                     filter.setImageResource(R.drawable.tool_status);
                     break;
-                case "null":
+                case "def":
                     filter.setImageResource(R.drawable.filter);
                     break;
             }
@@ -352,9 +362,8 @@ public class MainActivity extends AppCompatActivity {
                     if (tag1.equals("")) {
                         tag1 = "no";
                     }
-
                         String data = dateFormat.format(new Date());
-                        list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op));
+                        list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op,light));
                         recyclerView.getAdapter().notifyDataSetChanged();
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                         getOrSetDataBase("setAll", name, op, tag1, tag2, list.size(), data, 1);

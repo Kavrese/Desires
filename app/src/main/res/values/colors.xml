@@ -6,6 +6,7 @@
     <color name="white">#FFF</color>
     <color name="white_back">#EFEFEF</color>
     <color name="dark">#000</color>
+    <color name="dark_back">#131313</color>
     <color name="dark_2">#353535</color>
     <color name="dark_3">#555555</color>
     <color name="grey">#686868</color>

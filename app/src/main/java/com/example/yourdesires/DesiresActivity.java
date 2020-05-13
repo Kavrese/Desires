@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,14 +20,21 @@ import java.text.SimpleDateFormat;
 public class DesiresActivity extends AppCompatActivity {
 String command,tag1S,tag2S;
 int status,pos;
-TextView data,time_des,time_des2;
+TextView data,time_des,time_des2,text;
 EditText op,desires,tag1,tag2;
 ImageView statusColor,back,plus,scrap;
 ImageView menu;
+androidx.appcompat.widget.Toolbar toolbar;
+LinearLayout lin,lin_tag,lin_time;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
+        lin = findViewById(R.id.lin_des);
+        lin_tag = findViewById(R.id.lin_tag);
+        lin_time = findViewById(R.id.lin_time);
+        text = findViewById(R.id.text);
+        toolbar = findViewById(R.id.des_toolbar);
         command = "new data";
         DateFormat time = new SimpleDateFormat("HH");
         op = findViewById(R.id.op);
@@ -44,21 +52,23 @@ ImageView menu;
         op.setText(getIntent().getStringExtra("op"));
         tag1S = getIntent().getStringExtra("tag1");
         tag2S = getIntent().getStringExtra("tag2");
+        switchColor(getIntent().getStringExtra("color"));
         data.setText(getIntent().getStringExtra("data"));
         status = getIntent().getIntExtra("status",1);
+
         if(!tag1S.equals("no") && !tag2S.equals("no")){
             tag1.setText(tag1S);
             tag2.setText(tag2S);
-            showTag2();
         }else {
             if(tag1S.equals("no")) {
                 tag1.setText(tag2S);
+                tag2.setText(tag1S);
                 hideTag2();
             }else {
                 tag1.setText(tag1S);
             }
             if(tag2S.equals("no")){
-                tag2.setText("");
+                tag2.setText(tag2S);
                 hideTag2();
             }else{
                 tag2.setText(tag2S);
@@ -117,6 +127,7 @@ ImageView menu;
         plus.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                tag2.setText("");
                 showTag2();
             }
         });
@@ -124,7 +135,7 @@ ImageView menu;
             @Override
             public void onClick(View v) {
                 hideTag2();
-                tag2.setText("");
+                tag2.setText("no");
             }
         });
         time_des.setOnClickListener(new View.OnClickListener() {
@@ -208,6 +219,56 @@ ImageView menu;
             case 4:
                 statusColor.setImageResource(R.color.red);
                 break;
+        }
+    }
+    private void switchColor (String color){
+        if(color.equals("light")){
+            toolbar.setBackgroundColor(getResources().getColor(R.color.white));
+            desires.setTextColor(getResources().getColor(R.color.dark));
+            desires.setBackgroundResource(R.drawable.maket_up);
+            lin.setBackgroundColor(getResources().getColor(R.color.white_back));
+            lin_tag.setBackgroundResource(R.drawable.maket_block);
+            lin_time.setBackgroundResource(R.drawable.maket_block);
+            text.setTextColor(getResources().getColor(R.color.dark));
+            op.setTextColor(getResources().getColor(R.color.dark));
+            op.setBackgroundResource(R.drawable.maket_block);
+            tag1.setBackgroundResource(R.color.white);
+            tag2.setBackgroundResource(R.color.white);
+            time_des.setTextColor(getResources().getColor(R.color.dark));
+            time_des2.setTextColor(getResources().getColor(R.color.dark));
+            time_des.setBackgroundResource(R.drawable.maket_up);
+            time_des2.setBackgroundResource(R.color.white);
+            data.setTextColor(getResources().getColor(R.color.dark));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
+            back.setImageResource(R.drawable.back);
+            plus.setImageResource(R.drawable.plus);
+            menu.setImageResource(R.drawable.menu_toolbar);
+            scrap.setImageResource(R.drawable.mys);
+        }else if (color.equals("dark")){
+            toolbar.setBackgroundColor(getResources().getColor(R.color.dark_2));
+            desires.setTextColor(getResources().getColor(R.color.white));
+            desires.setBackgroundResource(R.color.dark_2);
+            lin.setBackgroundColor(getResources().getColor(R.color.dark_back));
+            lin_tag.setBackgroundResource(R.drawable.maket_block_dark);
+            lin_time.setBackgroundResource(R.drawable.maket_block_dark);
+            text.setTextColor(getResources().getColor(R.color.white));
+            op.setTextColor(getResources().getColor(R.color.white));
+            op.setBackgroundResource(R.drawable.maket_block_dark);
+            tag1.setBackgroundResource(R.color.dark_2);
+            tag2.setBackgroundResource(R.color.dark_2);
+            tag1.setTextColor(getResources().getColor(R.color.white));
+            tag2.setTextColor(getResources().getColor(R.color.white));
+            time_des.setTextColor(getResources().getColor(R.color.white));
+            time_des2.setTextColor(getResources().getColor(R.color.white));
+            time_des.setBackgroundResource(R.drawable.maket_up_dark);
+            time_des2.setBackgroundResource(R.color.dark_2);
+            data.setBackgroundResource(R.color.dark_2);
+            data.setTextColor(getResources().getColor(R.color.white));
+            getWindow().setStatusBarColor(getResources().getColor(R.color.dark_3));
+            back.setImageResource(R.drawable.arrow_light);
+            plus.setImageResource(R.drawable.plus_light);
+            menu.setImageResource(R.drawable.tri_light);
+            scrap.setImageResource(R.drawable.trash_light);
         }
     }
     private void showTag2 (){
