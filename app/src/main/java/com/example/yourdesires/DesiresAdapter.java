@@ -50,7 +50,6 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         final DesiresViewHolder desiresViewHolder = new DesiresViewHolder(view);
         return desiresViewHolder;
     }
-
     @Override
     public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
         holder.itemView.setOnClickListener(new View.OnClickListener() {

@@ -1,7 +1,11 @@
 package com.example.yourdesires;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -13,7 +17,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
@@ -55,25 +58,20 @@ LinearLayout lin,lin_tag,lin_time;
         switchColor(getIntent().getStringExtra("color"));
         data.setText(getIntent().getStringExtra("data"));
         status = getIntent().getIntExtra("status",1);
-
-        if(!tag1S.equals("no") && !tag2S.equals("no")){
+        if(tag2S.equals("")){
+            hideTag2();
+        }
+        if(tag1S.equals("no")){
+            tag1.setText(tag2S);
+            tag2.setText("");
+            hideTag2();
+        }else if (tag2S.equals("no")){
+            hideTag2();
+        } else {
             tag1.setText(tag1S);
             tag2.setText(tag2S);
-        }else {
-            if(tag1S.equals("no")) {
-                tag1.setText(tag2S);
-                tag2.setText(tag1S);
-                hideTag2();
-            }else {
-                tag1.setText(tag1S);
-            }
-            if(tag2S.equals("no")){
-                tag2.setText(tag2S);
-                hideTag2();
-            }else{
-                tag2.setText(tag2S);
-            }
         }
+
         statusColor = findViewById(R.id.statusColor);
         editStatusColor(status);
         back.setOnClickListener(new View.OnClickListener() {
@@ -135,7 +133,7 @@ LinearLayout lin,lin_tag,lin_time;
             @Override
             public void onClick(View v) {
                 hideTag2();
-                tag2.setText("no");
+                tag2.setText("");
             }
         });
         time_des.setOnClickListener(new View.OnClickListener() {
@@ -181,6 +179,9 @@ LinearLayout lin,lin_tag,lin_time;
 
             }
         });
+        if(!tag2.getText().toString().equals("")){
+            scrap.setVisibility(View.VISIBLE);
+        }
     }
     private void inputIntent(){
         Intent in = new Intent(DesiresActivity.this,MainActivity.class);
@@ -197,6 +198,9 @@ LinearLayout lin,lin_tag,lin_time;
         }else if(String.valueOf(desires.getText()).equals("")) {
             Toast.makeText(this, "Заполните заголовок желания", Toast.LENGTH_SHORT).show();
         }else{
+            if(tag2.getText().toString().equals("")){
+                tag2S = "no";
+            }
             in.putExtra("tag1",String.valueOf(tag1.getText()));
             in.putExtra("tag2",String.valueOf(tag2.getText()));
             in.putExtra("op",String.valueOf(op.getText()));

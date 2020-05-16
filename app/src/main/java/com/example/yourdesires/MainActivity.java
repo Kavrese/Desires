@@ -12,6 +12,7 @@ import android.os.Handler;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
@@ -36,7 +37,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity{
     int pos;
     boolean back_presed = false;
     boolean light = true;
@@ -180,8 +181,8 @@ public class MainActivity extends AppCompatActivity {
                 switchColor("light");
             }
         });
-        getIntentMet();
         showFirstIMG();
+        getIntentMet();
         if(sh.getString("color","light").equals("light")){
             switchColor("light");
         }else{
@@ -280,7 +281,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
     public void switchFilter (String searchType2){
         if(!light) {
             switch (searchType2) {
