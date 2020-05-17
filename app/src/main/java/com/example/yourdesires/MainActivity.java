@@ -74,7 +74,17 @@ public class MainActivity extends AppCompatActivity{
         listSearch = new ArrayList<>();
         position = new ArrayList();
         sh = getSharedPreferences("0",0);
+        String start = sh.getString("next_start","false");
+        if(!start.equals("false")){
+            Toast.makeText(this, "Вы просили напомнить вам об желании: "+ start, Toast.LENGTH_SHORT).show();
+            ed = sh.edit();
+            ed.putString("next_start","false");
+            ed.apply();
+        }
         searchType = "def";
+        ed = sh.edit();
+        ed.putString("search","false");
+        ed.apply();
         sbros = findViewById(R.id.sbros);
         sbros.hide();
         rgb = findViewById(R.id.rgb);

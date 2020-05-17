@@ -1,14 +1,23 @@
 package com.example.yourdesires;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.provider.AlarmClock;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -21,6 +30,7 @@ import android.widget.Toast;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Objects;
 
 public class DesiresActivity extends AppCompatActivity {
@@ -152,22 +162,28 @@ SharedPreferences.Editor ed;
                         boolean bool = false;
                         SharedPreferences sh = getSharedPreferences("0",0);
                         SharedPreferences.Editor ed;
+                        Intent in_clock = new Intent(AlarmClock.ACTION_SET_ALARM);
                         switch (item.getItemId()){
                             case R.id.menu_next:
-                                ed = sh.edit();
-                                ed.putString("background","next");
-                                ed.apply();
+                                DateFormat dateFormat = new SimpleDateFormat("HH");
+                                String hour_str = dateFormat.format(new Date());
+                                int hour = Integer.parseInt(hour_str);
+                                dateFormat = new SimpleDateFormat("mm");
+                                String minutesStr = dateFormat.format(new Date());
+                                int minutes = Integer.parseInt(minutesStr);
+                                in_clock.putExtra(AlarmClock.EXTRA_MESSAGE,"Напомнить про желание: "+desires.getText().toString());
+                                in_clock.putExtra(AlarmClock.EXTRA_HOUR,hour);
+                                in_clock.putExtra(AlarmClock.EXTRA_MINUTES,minutes);
+                                startActivity(in_clock);
                                 bool= true;
                                 break;
                             case R.id.menu_data:
-                                ed = sh.edit();
-                                ed.putString("background","data");
-                                ed.apply();
+
                                 bool= true;
                                 break;
                             case R.id.menu_return:
                                 ed = sh.edit();
-                                ed.putString("background","return");
+                                ed.putString("next_start",desires.getText().toString());
                                 ed.apply();
                                 bool= true;
                                 break;
@@ -188,6 +204,8 @@ SharedPreferences.Editor ed;
             scrap.setVisibility(View.VISIBLE);
         }
     }
+
+
     private void inputIntent(){
         Intent in = new Intent(DesiresActivity.this,MainActivity.class);
         in.putExtra("command",command);
