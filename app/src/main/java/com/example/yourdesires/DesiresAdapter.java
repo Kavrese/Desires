@@ -64,6 +64,8 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                 in.putExtra("op", arrayList.get(position).getOp());
                 in.putExtra("tag1", arrayList.get(position).getTag1());
                 in.putExtra("tag2", arrayList.get(position).getTag2());
+                in.putExtra("search",arrayList.get(position).getSearch());
+                in.putExtra("positions",arrayList.get(position).getPosition());
                 if (arrayList.get(position).getLight()) {
                     in.putExtra("color", "light");
                 } else{
@@ -105,7 +107,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         }
         holder.menu.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(final View v) {
                 Context con = v.getContext();
                 PopupMenu popupMenu = new PopupMenu(con,v);
                 popupMenu.inflate(R.menu.status_menu);

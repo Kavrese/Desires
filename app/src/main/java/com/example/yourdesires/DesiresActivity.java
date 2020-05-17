@@ -15,10 +15,13 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class DesiresActivity extends AppCompatActivity {
 String command,tag1S,tag2S;
@@ -29,17 +32,19 @@ ImageView statusColor,back,plus,scrap;
 ImageView menu;
 androidx.appcompat.widget.Toolbar toolbar;
 LinearLayout lin,lin_tag,lin_time;
+SharedPreferences sh;
+SharedPreferences.Editor ed;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
+        sh = getSharedPreferences("0",0);
         lin = findViewById(R.id.lin_des);
         lin_tag = findViewById(R.id.lin_tag);
         lin_time = findViewById(R.id.lin_time);
         text = findViewById(R.id.text);
         toolbar = findViewById(R.id.des_toolbar);
         command = "new data";
-        DateFormat time = new SimpleDateFormat("HH");
         op = findViewById(R.id.op);
         scrap = findViewById(R.id.scrap);
         time_des = findViewById(R.id.time_des);
@@ -187,6 +192,14 @@ LinearLayout lin,lin_tag,lin_time;
         Intent in = new Intent(DesiresActivity.this,MainActivity.class);
         in.putExtra("command",command);
         pos = getIntent().getIntExtra("position",0);
+
+        if(sh.getString("search","false").equals("true")){
+            ArrayList positions = getIntent().getIntegerArrayListExtra("positions");
+            pos =((Integer) positions.get(pos));
+            ed = sh.edit();
+            ed.putString("search","false");
+            ed.apply();
+        }
         in.putExtra("position",pos);
         in.putExtra("op",String.valueOf(op.getText()));
         if(String.valueOf(tag1.getText()).equals("") && String.valueOf(tag2.getText()).equals("")) {

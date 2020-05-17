@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -13,7 +14,10 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -26,6 +30,8 @@ import android.widget.Toolbar;
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.snackbar.Snackbar;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
@@ -41,10 +47,13 @@ public class MainActivity extends AppCompatActivity{
     int pos;
     boolean back_presed = false;
     boolean light = true;
+    boolean searchB = false;
     String searchType;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
     ArrayList<Desires> list;
+    ArrayList<Desires> listSearch;
+    ArrayList<Integer> position;
     EditText desiresText,searchText;
     LinearLayout bottonSheet,lin;
     BottomSheetBehavior bottomSheetBehavior;
@@ -56,13 +65,18 @@ public class MainActivity extends AppCompatActivity{
     androidx.appcompat.widget.Toolbar up,dawn;
     SharedPreferences sh;
     SharedPreferences.Editor ed;
+    FloatingActionButton sbros;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FlowManager.init(new FlowConfig.Builder(this).build());
+        listSearch = new ArrayList<>();
+        position = new ArrayList();
         sh = getSharedPreferences("0",0);
         searchType = "def";
+        sbros = findViewById(R.id.sbros);
+        sbros.hide();
         rgb = findViewById(R.id.rgb);
         up = findViewById(R.id.up_toolbar);
         con = findViewById(R.id.con);
@@ -86,6 +100,15 @@ public class MainActivity extends AppCompatActivity{
         list = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         desiresText = findViewById(R.id.text_plus);
+        sbros.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                adapter = new DesiresAdapter(list);
+                recyclerView.setAdapter(adapter);
+                recyclerView.getAdapter().notifyDataSetChanged();
+                sbros.hide();
+            }
+        });
         filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -152,7 +175,7 @@ public class MainActivity extends AppCompatActivity{
         for(int i = 0; i<listL.size();i++){
             list.add(new Desires(String.valueOf(listL.get(i).getDesires()),
                     listL.get(i).getStatus(),String.valueOf(listL.get(i).getTag1()),
-                    String.valueOf(listL.get(i).getTag2()),String.valueOf(listL.get(i).getData()),String.valueOf(listL.get(i).getDesires()),light));
+                    String.valueOf(listL.get(i).getTag2()),String.valueOf(listL.get(i).getData()),String.valueOf(listL.get(i).getDesires()),light,searchB,position));
         }
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DesiresAdapter(list);
@@ -167,8 +190,18 @@ public class MainActivity extends AppCompatActivity{
                 } else if (String.valueOf(searchText.getText()).equals("")){
                     Toast.makeText(MainActivity.this, "Заполните поле для поиска", Toast.LENGTH_SHORT).show();
                 }else{
-                    list = onSearch(list, searchType,String.valueOf(searchText.getText()));
-                    recyclerView.getAdapter().notifyDataSetChanged();
+                    listSearch = onSearch(list, searchType,String.valueOf(searchText.getText()));
+                    if(listSearch.size() != 0) {
+                        ed = sh.edit();
+                        ed.putString("search","true");
+                        ed.apply();
+                        adapter = new DesiresAdapter(listSearch);
+                        recyclerView.setAdapter(adapter);
+                        recyclerView.getAdapter().notifyDataSetChanged();
+                        sbros.show();
+                        Animation sbros_anim = AnimationUtils.loadAnimation(MainActivity.this,R.anim.anim_sbros);
+                        sbros.startAnimation(sbros_anim);
+                    }
                 }
             }
         });
@@ -181,13 +214,13 @@ public class MainActivity extends AppCompatActivity{
                 switchColor("light");
             }
         });
-        showFirstIMG();
         getIntentMet();
         if(sh.getString("color","light").equals("light")){
             switchColor("light");
         }else{
             switchColor("dark");
         }
+        onFirstIMG();
     }
     public void switchColor (String color){
         text_first = findViewById(R.id.text_first);
@@ -276,7 +309,7 @@ public class MainActivity extends AppCompatActivity{
                     getOrSetDataBase("delete","0","0","0","0",pos,"0",4);
                     list.remove(pos);
                     recyclerView.getAdapter().notifyDataSetChanged();
-                    showFirstIMG();
+                    onFirstIMG();
                     break;
             }
         }
@@ -337,10 +370,21 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-    private void showFirstIMG (){
-        if(list.size() != 0){
+    private void hiddenFirstIMG (){
             text_first.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showFirstIMG (){
+        text_first.setVisibility(View.VISIBLE);
+        recyclerView.setVisibility(View.GONE);
+    }
+
+    public void onFirstIMG(){
+        if(list.size() == 0){
+            showFirstIMG();
+        }else{
+            hiddenFirstIMG();
         }
     }
 
@@ -363,7 +407,7 @@ public class MainActivity extends AppCompatActivity{
                         tag1 = "no";
                     }
                         String data = dateFormat.format(new Date());
-                        list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op,light));
+                        list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op,light,searchB,position));
                         recyclerView.getAdapter().notifyDataSetChanged();
                         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                         getOrSetDataBase("setAll", name, op, tag1, tag2, list.size(), data, 1);
@@ -378,13 +422,7 @@ public class MainActivity extends AppCompatActivity{
         this.tag1.setText("");
         this.tag2.setText("");
         this.op.setText("");
-        if (list.size() == 0){
-            recyclerView.setVisibility(View.GONE);
-            text_first.setVisibility(View.VISIBLE);
-        }else{
-            recyclerView.setVisibility(View.VISIBLE);
-            text_first.setVisibility(View.GONE);
-        }
+        onFirstIMG();
         desiresText.setEnabled(true);
     }
 
@@ -473,6 +511,7 @@ public class MainActivity extends AppCompatActivity{
                 for(int i= 0;i<list.size();i++){
                     if(list.get(i).getName().equals(pole)){
                         buffer.add(list.get(i));
+                        position.add(i);
                     }
                 }
                 break;
@@ -480,6 +519,7 @@ public class MainActivity extends AppCompatActivity{
                 for(int i= 0;i<list.size();i++){
                     if(list.get(i).getTag1().equals(pole) || list.get(i).getTag2().equals(pole)){
                         buffer.add(list.get(i));
+                        position.add(i);
                     }
                 }
                 break;
@@ -505,10 +545,14 @@ public class MainActivity extends AppCompatActivity{
                     }else{
                         if(list.get(i).getStatus() == num){
                             buffer.add(list.get(i));
+                            position.add(i);
                         }
                     }
                 }
                 break;
+        }
+        if(buffer.size() == 0){
+            Snackbar.make(search,"Ничего не найденно",Snackbar.LENGTH_SHORT).show();
         }
         return buffer;
     }
