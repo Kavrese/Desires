@@ -6,18 +6,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.Window;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -25,7 +21,6 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.Toolbar;
 
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
@@ -41,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity{
     int pos;
@@ -57,11 +51,11 @@ public class MainActivity extends AppCompatActivity{
     EditText desiresText,searchText;
     LinearLayout bottonSheet,lin;
     BottomSheetBehavior bottomSheetBehavior;
-    TextView name_botton_sheet,text_first;
+    TextView name_botton_sheet,text_first,text_start;
     EditText tag1,tag2,op;
-    Button save;
+    Button save,next_start;
     ImageView backIMG,filter,search,rgb,plus;
-    LinearLayout con;
+    LinearLayout con,lin_next;
     androidx.appcompat.widget.Toolbar up,dawn;
     SharedPreferences sh;
     SharedPreferences.Editor ed;
@@ -72,13 +66,30 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         FlowManager.init(new FlowConfig.Builder(this).build());
         listSearch = new ArrayList<>();
-        position = new ArrayList();
+        position = new ArrayList<>();
+        text_start = findViewById(R.id.text_next_start);
+        lin_next = findViewById(R.id.lin_next_start);
+        next_start = findViewById(R.id.button_next_start);
+        next_start.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                onHiddenNextWindow();
+            }
+        });
         sh = getSharedPreferences("0",0);
         String start = sh.getString("next_start","false");
-        if(!start.equals("false")){
-            Toast.makeText(this, "Вы просили напомнить вам об желании: "+ start, Toast.LENGTH_SHORT).show();
+        String prover = sh.getString("proverka","false");
+        if(start.equals("false") && prover.equals("true")){
+            ed = sh.edit();
+            ed.putString("proverka","false");
+            ed.apply();
+        }else if(!start.equals("false") && prover.equals("true")){
+            onShowNextWindow();
+            Toast.makeText(this, text_start.getText().toString() + sh.getString("next_start","error"), Toast.LENGTH_SHORT).show();
+            text_start.setText(text_start.getText().toString() + sh.getString("next_start","error"));
             ed = sh.edit();
             ed.putString("next_start","false");
+            ed.putString("proverka","false");
             ed.apply();
         }
         searchType = "def";
@@ -565,5 +576,11 @@ public class MainActivity extends AppCompatActivity{
             Snackbar.make(search,"Ничего не найденно",Snackbar.LENGTH_SHORT).show();
         }
         return buffer;
+    }
+    public void onShowNextWindow (){
+        lin_next.setVisibility(View.VISIBLE);
+    }
+    public void onHiddenNextWindow (){
+        lin_next.setVisibility(View.GONE);
     }
 }

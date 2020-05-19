@@ -12,11 +12,13 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.usage.UsageEvents;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.provider.AlarmClock;
+import android.provider.CalendarContract;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,6 +32,7 @@ import android.widget.Toast;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
@@ -162,6 +165,7 @@ SharedPreferences.Editor ed;
                         boolean bool = false;
                         SharedPreferences sh = getSharedPreferences("0",0);
                         SharedPreferences.Editor ed;
+                        String str = desires.getText().toString();
                         Intent in_clock = new Intent(AlarmClock.ACTION_SET_ALARM);
                         switch (item.getItemId()){
                             case R.id.menu_next:
@@ -171,7 +175,7 @@ SharedPreferences.Editor ed;
                                 dateFormat = new SimpleDateFormat("mm");
                                 String minutesStr = dateFormat.format(new Date());
                                 int minutes = Integer.parseInt(minutesStr);
-                                in_clock.putExtra(AlarmClock.EXTRA_MESSAGE,"Напомнить про желание: "+desires.getText().toString());
+                                in_clock.putExtra(AlarmClock.EXTRA_MESSAGE,str);
                                 in_clock.putExtra(AlarmClock.EXTRA_HOUR,hour);
                                 in_clock.putExtra(AlarmClock.EXTRA_MINUTES,minutes);
                                 startActivity(in_clock);

@@ -3,6 +3,7 @@ package com.example.yourdesires;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.animation.Animation;
@@ -22,6 +23,11 @@ ImageView img;
             @Override
             public void run() {
                 Intent in = new Intent(SplachScreenActivity.this,MainActivity.class);
+                SharedPreferences sh = getSharedPreferences("0",0);
+                SharedPreferences.Editor ed;
+                ed = sh.edit();
+                ed.putString("proverka","true");
+                ed.apply();
                 startActivity(in);
                 finish();
             }
