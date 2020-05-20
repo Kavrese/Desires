@@ -121,6 +121,36 @@ public class MainActivity extends AppCompatActivity{
         list = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         desiresText = findViewById(R.id.text_plus);
+        searchText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(searchType.equals("status")){
+                    PopupMenu search_status = new PopupMenu(v.getContext(),v);
+                    search_status.inflate(R.menu.search_status_menu);
+                    search_status.show();
+                    search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()){
+                                case R.id.menu_work_search:
+                                    searchText.setText(R.string.status_1);
+                                    break;
+                                case R.id.menu_great_search:
+                                    searchText.setText(R.string.status_2);
+                                    break;
+                                case R.id.menu_time_search:
+                                    searchText.setText(R.string.status_4);
+                                    break;
+                                case R.id.menu_sleep_search:
+                                    searchText.setText(R.string.status_3);
+                                    break;
+                            }
+                            return false;
+                        }
+                    });
+                }
+            }
+        });
         sbros.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -548,7 +578,7 @@ public class MainActivity extends AppCompatActivity{
                 for(int i= 0;i<list.size();i++){
                     int num = 0;
                     switch (pole){
-                        case "В ожидание":
+                        case "В ожидании":
                             num = 1;
                         break;
                         case "Отложено на время":
