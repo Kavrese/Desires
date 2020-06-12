@@ -123,6 +123,8 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                         .set(Lost_Table.status.is(1))
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
                                         .execute();
+
+
                                 bool = true;
                                 break;
                             case R.id.menu_great:
@@ -153,7 +155,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 bool = true;
                                 break;
                             case R.id.menu_delete:
-                                SQLite.delete(Lost.class)
+                                  SQLite.delete(Lost.class)
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
                                         .execute();
                                 arrayList.remove(position);

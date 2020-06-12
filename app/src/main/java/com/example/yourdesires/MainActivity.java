@@ -6,9 +6,12 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -29,7 +32,9 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
+import com.raizlabs.android.dbflow.sql.language.Operator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -42,6 +47,7 @@ public class MainActivity extends AppCompatActivity{
     boolean back_presed = false;
     boolean light = true;
     boolean searchB = false;
+    boolean text_sear = false;
     String searchType;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
@@ -182,6 +188,7 @@ public class MainActivity extends AppCompatActivity{
                             case R.id.menu_filter3:
                                 searchText.setHint(R.string.status_filter_str);
                                 searchType = "status";
+                                searchText.setText("");
                                 switchFilter(searchType);
                                 break;
                         }
@@ -228,6 +235,7 @@ public class MainActivity extends AppCompatActivity{
                     listL.get(i).getStatus(),String.valueOf(listL.get(i).getTag1()),
                     String.valueOf(listL.get(i).getTag2()),String.valueOf(listL.get(i).getData()),String.valueOf(listL.get(i).getDesires()),light,searchB,position));
         }
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new DesiresAdapter(list);
         recyclerView.setAdapter(adapter);
@@ -256,6 +264,52 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
+        final PopupMenu search_status = new PopupMenu(MainActivity.this,searchText);
+        search_status.inflate(R.menu.search_status_menu);
+        searchText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                String str = searchText.getText().toString();
+                if(str.equals(getResources().getString(R.string.status_1)) && str.equals(getResources().getString(R.string.status_2)) && str.equals(getResources().getString(R.string.status_3))&&str.equals(getResources().getString(R.string.status_4))){
+                    text_sear = true;
+                }
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if(searchType.equals("status")) {
+                    if (!searchText.getText().toString().equals("") && !text_sear) {
+                        searchText.setText("");
+                    }
+                    search_status.show();
+                    search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.menu_work_search:
+                                    searchText.setText(R.string.status_1);
+                                    break;
+                                case R.id.menu_great_search:
+                                    searchText.setText(R.string.status_2);
+                                    break;
+                                case R.id.menu_time_search:
+                                    searchText.setText(R.string.status_4);
+                                    break;
+                                case R.id.menu_sleep_search:
+                                    searchText.setText(R.string.status_3);
+                                    break;
+                            }
+                            text_sear = true;
+                            return true;
+                        }
+                    });
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
         rgb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -266,6 +320,7 @@ public class MainActivity extends AppCompatActivity{
             }
         });
         getIntentMet();
+        getOrSetDataBase("num media","0","0","0","0",pos,"0",1);
         if(sh.getString("color","light").equals("light")){
             switchColor("light");
         }else{

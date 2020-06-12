@@ -1,5 +1,7 @@
 package com.example.yourdesires;
 
+import android.net.Uri;
+
 import java.util.ArrayList;
 
 public class Desires {

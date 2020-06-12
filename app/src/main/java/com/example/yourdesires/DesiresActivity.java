@@ -7,7 +7,10 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -16,9 +19,14 @@ import android.app.usage.UsageEvents;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.os.StrictMode;
 import android.provider.AlarmClock;
 import android.provider.CalendarContract;
+import android.provider.ContactsContract;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,6 +37,8 @@ import android.widget.PopupMenu;
 import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -42,19 +52,28 @@ int status,pos;
 TextView data,time_des,time_des2,text;
 EditText op,desires,tag1,tag2;
 ImageView statusColor,back,plus,scrap;
-ImageView menu;
+ImageView menu,camera;
 androidx.appcompat.widget.Toolbar toolbar;
-LinearLayout lin,lin_tag,lin_time;
+LinearLayout lin,lin_tag,lin_time,lin_media;
 SharedPreferences sh;
 SharedPreferences.Editor ed;
+RecyclerView rec;
+Uri outputfileURI;
+ArrayList<Media> arrayListMedia = new ArrayList<>();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
+        camera = findViewById(R.id.camera);
+        rec = findViewById(R.id.recycler_media);
+        MediaAdapter adapter = new MediaAdapter(arrayListMedia);
+        rec.setAdapter(adapter);
+        rec.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
         sh = getSharedPreferences("0",0);
         lin = findViewById(R.id.lin_des);
         lin_tag = findViewById(R.id.lin_tag);
         lin_time = findViewById(R.id.lin_time);
+        lin_media = findViewById(R.id.lin_media);
         text = findViewById(R.id.text);
         toolbar = findViewById(R.id.des_toolbar);
         command = "new data";
@@ -207,8 +226,39 @@ SharedPreferences.Editor ed;
         if(!tag2.getText().toString().equals("")){
             scrap.setVisibility(View.VISIBLE);
         }
+        camera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();//Без этого камера не запускается
+                StrictMode.setVmPolicy(builder.build());                                //
+                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}; //Массив с разрешениями
+                requestPermissions(permissions,1);  //Запрашиваем эти разрешения
+                String name = createNameFile();
+                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/",name+".jpg");
+                outputfileURI = Uri.fromFile(file);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
+                startActivityForResult(intent,1);
+            }
+        });
+        loadMediaFile();
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1 && resultCode == RESULT_OK) {
+            arrayListMedia.add(new Media(outputfileURI));
+            rec.getAdapter().notifyDataSetChanged();
+            rec.setVisibility(View.VISIBLE);
+        }
+    }
+
+    public String createNameFile(){
+        DateFormat db = new SimpleDateFormat("ddMMyyyyHHmmss");
+        String dateText = db.format(new Date());
+        return dateText;
+    }
 
     private void inputIntent(){
         Intent in = new Intent(DesiresActivity.this,MainActivity.class);
@@ -260,6 +310,17 @@ SharedPreferences.Editor ed;
                 break;
         }
     }
+    private void loadMediaFile (){
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/" );
+        File[] listOfFiles = file.listFiles();
+        if(listOfFiles != null) {
+            for (int i = 0; i < listOfFiles.length; i++) {
+                arrayListMedia.add(new Media(Uri.fromFile(listOfFiles[i])));
+            }
+            rec.getAdapter().notifyDataSetChanged();
+            rec.setVisibility(View.VISIBLE);
+        }
+    }
     private void switchColor (String color){
         if(color.equals("light")){
             toolbar.setBackgroundColor(getResources().getColor(R.color.white));
@@ -268,6 +329,7 @@ SharedPreferences.Editor ed;
             lin.setBackgroundColor(getResources().getColor(R.color.white_back));
             lin_tag.setBackgroundResource(R.drawable.maket_block);
             lin_time.setBackgroundResource(R.drawable.maket_block);
+            lin_media.setBackgroundResource(R.drawable.maket_block);
             text.setTextColor(getResources().getColor(R.color.dark));
             op.setTextColor(getResources().getColor(R.color.dark));
             op.setBackgroundResource(R.drawable.maket_block);
@@ -289,6 +351,7 @@ SharedPreferences.Editor ed;
             desires.setBackgroundResource(R.color.dark_2);
             lin.setBackgroundColor(getResources().getColor(R.color.dark_back));
             lin_tag.setBackgroundResource(R.drawable.maket_block_dark);
+            lin_media.setBackgroundResource(R.drawable.maket_block_dark);
             lin_time.setBackgroundResource(R.drawable.maket_block_dark);
             text.setTextColor(getResources().getColor(R.color.white));
             op.setTextColor(getResources().getColor(R.color.white));

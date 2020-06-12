@@ -1,5 +1,6 @@
 package com.example.yourdesires.model;
 
+import android.net.Uri;
 import android.widget.Toast;
 
 import androidx.core.view.accessibility.AccessibilityViewCommand;
@@ -11,6 +12,7 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.raizlabs.android.dbflow.structure.BaseModel;
 
 import java.sql.Blob;
+import java.util.ArrayList;
 import java.util.List;
 
 @Table(database = MyDataBase.class)

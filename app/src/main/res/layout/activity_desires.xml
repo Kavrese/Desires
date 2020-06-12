@@ -87,7 +87,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        android:layout_weight="40"
+        android:layout_weight="30"
         android:background="@drawable/maket_block"
         android:gravity="left"
         android:hint="Описание"
@@ -97,6 +97,39 @@
         android:paddingTop="15dp"
         android:paddingRight="15dp"
         android:paddingBottom="15dp" />
+
+    <LinearLayout
+        android:id="@+id/lin_media"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="10"
+        android:background="@drawable/maket_block"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:weightSum="5">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_media"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="10dp"
+            android:layout_weight="4"
+            android:visibility="gone" />
+
+        <ImageView
+            android:id="@+id/camera"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            app:srcCompat="@android:drawable/ic_menu_camera" />
+
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/lin_tag"
