@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_photo"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="Фото"/>
+    <item
+        android:id="@+id/gallery_menu"
+        android:icon="@android:drawable/gallery_thumb"
+        android:title="Галерея" />
+    <item
+        android:id="@+id/audio_menu"
+        android:icon="@android:drawable/ic_menu_camera"
+        android:title="Аудио"/>
+    <item
+        android:id="@+id/video_menu"
+        android:icon="@android:drawable/presence_video_away"
+        android:title="Видео"/>
+</menu>

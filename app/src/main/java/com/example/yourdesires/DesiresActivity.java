@@ -2,21 +2,10 @@ package com.example.yourdesires;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
-import androidx.core.app.NotificationManagerCompat;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
-import android.app.AlertDialog;
-import android.app.Dialog;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.app.usage.UsageEvents;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -24,17 +13,13 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.AlarmClock;
-import android.provider.CalendarContract;
-import android.provider.ContactsContract;
 import android.provider.MediaStore;
-import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
-import android.widget.ShareActionProvider;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,9 +27,7 @@ import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.Objects;
 
 public class DesiresActivity extends AppCompatActivity {
 String command,tag1S,tag2S;
@@ -52,7 +35,7 @@ int status,pos;
 TextView data,time_des,time_des2,text;
 EditText op,desires,tag1,tag2;
 ImageView statusColor,back,plus,scrap;
-ImageView menu,camera;
+ImageView menu,add_media;
 androidx.appcompat.widget.Toolbar toolbar;
 LinearLayout lin,lin_tag,lin_time,lin_media;
 SharedPreferences sh;
@@ -64,7 +47,7 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
-        camera = findViewById(R.id.camera);
+        add_media = findViewById(R.id.add_media);
         rec = findViewById(R.id.recycler_media);
         MediaAdapter adapter = new MediaAdapter(arrayListMedia);
         rec.setAdapter(adapter);
@@ -226,21 +209,35 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         if(!tag2.getText().toString().equals("")){
             scrap.setVisibility(View.VISIBLE);
         }
-        camera.setOnClickListener(new View.OnClickListener() {
+        add_media.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();//Без этого камера не запускается
-                StrictMode.setVmPolicy(builder.build());                                //
-                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}; //Массив с разрешениями
-                requestPermissions(permissions,1);  //Запрашиваем эти разрешения
-                String name = createNameFile();
-                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/",name+".jpg");
-                outputfileURI = Uri.fromFile(file);
-                intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
-                startActivityForResult(intent,1);
+                PopupMenu media_menu_pop = new PopupMenu(v.getContext(),v);
+                media_menu_pop.inflate(R.menu.media_menu);
+                media_menu_pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.menu_photo:
+                                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();//Без этого камера не запускается
+                                StrictMode.setVmPolicy(builder.build());                                //
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                                String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}; //Массив с разрешениями
+                                requestPermissions(permissions,1);  //Запрашиваем эти разрешения
+                                String name = createNameFile();
+                                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/",name+".jpg");
+                                outputfileURI = Uri.fromFile(file);
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
+                                startActivityForResult(intent,1);
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                media_menu_pop.show();
             }
         });
+
         loadMediaFile();
     }
 
