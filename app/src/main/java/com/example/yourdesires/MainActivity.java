@@ -6,7 +6,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
@@ -32,9 +31,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
-import com.raizlabs.android.dbflow.sql.language.Operator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-import com.raizlabs.android.dbflow.sql.language.Select;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -338,6 +335,11 @@ public class MainActivity extends AppCompatActivity{
         search = findViewById(R.id.search);
         filter = findViewById(R.id.filter);
         desiresText = findViewById(R.id.text_plus);
+        LinearLayout button_sheet = findViewById(R.id.bottom_sheet);
+        TextView text_desires_sheet = findViewById(R.id.name_desires_botton_sheet);
+        EditText op = findViewById(R.id.op);
+        EditText tag1Text = findViewById(R.id.tag1_b);
+        EditText tag2Text = findViewById(R.id.tag2_b);
         switch (color){
             case "dark":
                 text_first.setTextColor(getResources().getColor(R.color.white));
@@ -350,6 +352,11 @@ public class MainActivity extends AppCompatActivity{
                 desiresText.setTextColor(getResources().getColor(R.color.white_text));
                 getWindow().setStatusBarColor(getResources().getColor(R.color.dark_3));
                 plus.setImageResource(R.drawable.plus_light);
+                button_sheet.setBackgroundResource(R.drawable.maket_butto_sheet_dark);
+                text_desires_sheet.setTextColor(getResources().getColor(R.color.white));
+                op.setTextColor(getResources().getColor(R.color.white));
+                tag1Text.setTextColor(getResources().getColor(R.color.white));
+                tag2Text.setTextColor(getResources().getColor(R.color.white));
                 light = false;
                 switchFilter(searchType);
                 break;
@@ -364,6 +371,11 @@ public class MainActivity extends AppCompatActivity{
                 getWindow().setStatusBarColor(getResources().getColor(R.color.colorPrimaryDark));
                 desiresText.setTextColor(getResources().getColor(R.color.dark));
                 plus.setImageResource(R.drawable.plus);
+                button_sheet.setBackgroundResource(R.drawable.maket_butto_sheet);
+                text_desires_sheet.setTextColor(getResources().getColor(R.color.dark));
+                op.setTextColor(getResources().getColor(R.color.dark));
+                tag1Text.setTextColor(getResources().getColor(R.color.dark));
+                tag2Text.setTextColor(getResources().getColor(R.color.dark));
                 light = true;
                 switchFilter(searchType);
                 break;
