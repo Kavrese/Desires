@@ -37,7 +37,7 @@ import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity {
 String command,tag1S,tag2S;
-int status,pos,id_media;
+int status,pos;
 TextView data,time_des,time_des2,text;
 EditText op,desires,tag1,tag2;
 ImageView statusColor,back,plus,scrap;
@@ -84,16 +84,14 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         switchColor(getIntent().getStringExtra("color"));
         data.setText(getIntent().getStringExtra("data"));
         status = getIntent().getIntExtra("status",1);
-        if(tag2S.equals("")){
+        if(tag2S.equals("") || tag2S.equals("no")){
             hideTag2();
         }
-        if(tag1S.equals("no")){
+        if(tag1S.equals("no") || tag1S.equals("")){
             tag1.setText(tag2S);
             tag2.setText("");
             hideTag2();
-        }else if (tag2S.equals("no")){
-            hideTag2();
-        } else {
+        }else {
             tag1.setText(tag1S);
             tag2.setText(tag2S);
         }

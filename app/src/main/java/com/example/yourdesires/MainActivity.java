@@ -11,7 +11,6 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
-import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,15 +29,12 @@ import android.widget.Toast;
 
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
-import com.example.yourdesires.model.MediaLost;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
-
-import org.w3c.dom.Text;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -652,7 +648,6 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-
     public void remove (){
         desiresText.setText("");
         this.tag1.setText("");
@@ -661,7 +656,6 @@ public class MainActivity extends AppCompatActivity{
         onFirstIMG();
         desiresText.setEnabled(true);
     }
-
     @Override
     public void onBackPressed() {
         if(!back_presed){
