@@ -280,6 +280,7 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
             arrayListMedia.add(new Media(outputfileURI));
             rec.getAdapter().notifyDataSetChanged();
             rec.setVisibility(View.VISIBLE);
+
             uploadUriMedia(outputfileURI);
         }
     }

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/dialog_lin"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
@@ -13,6 +15,7 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="Настройки"
+        android:textColor="#000000"
         android:textSize="24sp"
         android:textStyle="bold" />
 
@@ -26,7 +29,7 @@
         android:weightSum="2">
 
         <Switch
-            android:id="@+id/file_switch"
+            android:id="@+id/bd_switch"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="15dp"
@@ -34,22 +37,62 @@
             android:layout_marginRight="15dp"
             android:layout_weight="1"
             android:background="@drawable/maket_up"
+            android:checked="true"
+            android:paddingTop="5dp"
             android:paddingBottom="5dp"
-            android:text="Загружать медиа из файловой системы     "
+            android:text="Сохранять медиа в базу данных"
             android:textSize="16sp" />
 
         <Switch
-            android:id="@+id/bd_switch"
+            android:id="@+id/file_switch"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_marginLeft="15dp"
             android:layout_marginRight="15dp"
-            android:layout_marginBottom="15dp"
+            android:layout_marginBottom="10dp"
             android:layout_weight="1"
-            android:checked="true"
+            android:checked="false"
             android:paddingTop="5dp"
+            android:paddingBottom="5dp"
             android:text="Загружать медиа из базы данных"
             android:textSize="16sp" />
+
+        <LinearLayout
+            android:id="@+id/lin_alert"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginLeft="15dp"
+            android:layout_marginRight="5dp"
+            android:layout_marginBottom="5dp"
+            android:layout_weight="1"
+            android:background="@drawable/maket_left"
+            android:gravity="left|top"
+            android:orientation="horizontal"
+            android:visibility="gone"
+            android:weightSum="10">
+
+            <ImageView
+                android:id="@+id/alert"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="10dp"
+                android:layout_marginRight="10dp"
+                android:layout_weight="1"
+                app:srcCompat="@drawable/alert" />
+
+            <TextView
+                android:id="@+id/text_alert"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="9"
+                android:autoSizeTextType="uniform"
+                android:gravity="center|fill_horizontal"
+                android:paddingLeft="5dp"
+                android:paddingRight="5dp"
+                android:text="Некоторые медиа файлы недоступны, т.к. их нет в базе данных. Если вы хотите вернуть их - кликните по этому сообщению"
+                android:textColor="#000000" />
+        </LinearLayout>
+
     </LinearLayout>
 
 </LinearLayout>

@@ -237,6 +237,5 @@
 
     <include
         layout="@layout/button_sheet"
-        android:visibility="visible"
-        tools:visibility="invisible" />
+        tools:visibility="visible" />
 </com.google.android.material.circularreveal.coordinatorlayout.CircularRevealCoordinatorLayout>

@@ -11,6 +11,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
+import android.text.Layout;
 import android.text.TextWatcher;
 import android.view.MenuItem;
 import android.view.View;
@@ -37,6 +38,8 @@ import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import org.w3c.dom.Text;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -49,7 +52,9 @@ public class MainActivity extends AppCompatActivity{
     boolean light = true;
     boolean searchB = false;
     boolean text_sear = false;
-    boolean isFile = false;
+    boolean saveBD = true;
+    boolean loadBD = false;
+    boolean noAlert = false;
     String searchType;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
@@ -70,7 +75,7 @@ public class MainActivity extends AppCompatActivity{
     SharedPreferences.Editor ed;
     FloatingActionButton sbros;
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FlowManager.init(new FlowConfig.Builder(this).build());
@@ -338,55 +343,87 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 final Switch bd = dialog_setting.findViewById(R.id.bd_switch);
                 final Switch file = dialog_setting.findViewById(R.id.file_switch);
-                if(sh.getBoolean("isFile",false)){
-                    bd.setChecked(false);
-                    file.setChecked(true);
-                    isFile = true;
-                }else{
-                    bd.setChecked(true);
-                    file.setChecked(false);
-                    isFile = false;
+                final LinearLayout alert = dialog_setting.findViewById(R.id.lin_alert);
+                TextView alertText = dialog_setting.findViewById(R.id.text_alert);
+                loadBooleans();
+                bd.setChecked(saveBD);
+                file.setChecked(loadBD);
+                if(!loadBD && !saveBD) {
+                    file.setTextColor(getResources().getColor(R.color.grey));
+                }else if(!noAlert && saveBD && loadBD){
+                    alert.setVisibility(View.VISIBLE);
                 }
+                alertText.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        noAlert = true;
+                        saveBooleans(saveBD,loadBD,noAlert);
+                        alert.setVisibility(View.GONE);
+                    }
+                });
                 bd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if(bd.isChecked()){
-                            file.setChecked(false);
-                            isFile = false;
+                        if(isChecked){
+                            saveBD = true;
+                            setActivTextColor(file);
                         }else{
-                            file.setChecked(true);
-                            isFile = true;
+                            saveBD = false;
+                            file.setTextColor(getResources().getColor(R.color.grey));
+                            file.setChecked(false);
                         }
-                        ed = sh.edit();
-                        ed.putBoolean("isFile",isFile);
-                        ed.apply();
+                        saveBooleans(saveBD,loadBD,noAlert);
                     }
                 });
+
                 file.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                        if(file.isChecked()){
-                            bd.setChecked(false);
-                            isFile = true;
+                        if(isChecked && saveBD){
+                            loadBD = true;
+                            if(!noAlert) {
+                                alert.setVisibility(View.VISIBLE);
+                            }
                         }else{
-                            bd.setChecked(true);
-                            isFile = false;
+                            file.setChecked(false);
+                            alert.setVisibility(View.GONE);
+                            loadBD = false;
                         }
-                        ed = sh.edit();
-                        ed.putBoolean("isFile",isFile);
-                        ed.apply();
+                        saveBooleans(saveBD,loadBD,noAlert);
                     }
                 });
                 dialog_setting.show();
             }
         });
     }
+    private void setActivTextColor (Switch v){
+        if(light){
+            v.setTextColor(getResources().getColor(R.color.dark));
+        }else{
+            v.setTextColor(getResources().getColor(R.color.white));
+        }
+    }
+    private void saveBooleans (boolean saveBD,boolean loadBD,boolean noAlert){
+        ed = sh.edit();
+        ed.putBoolean("saveBD",saveBD);
+        ed.putBoolean("loadBD",loadBD);
+        ed.putBoolean("noAlert",noAlert);
+        ed.apply();
+    }
+    private void loadBooleans (){
+       saveBD = sh.getBoolean("saveBD",true);
+       loadBD = sh.getBoolean("loadBD",false);
+       noAlert = sh.getBoolean("noAlert",false);
+    }
     public void switchColor (String color){
+        LinearLayout lin_alert = dialog_setting.findViewById(R.id.lin_alert);
         LinearLayout dialog_lin = dialog_setting.findViewById(R.id.dialog_lin);
         LinearLayout lin_file = dialog_setting.findViewById(R.id.lin_file);
         Switch bd = dialog_setting.findViewById(R.id.bd_switch);
         Switch file = dialog_setting.findViewById(R.id.file_switch);
         TextView settingsText = dialog_setting.findViewById(R.id.settingsText);
+        TextView text_alert = dialog_setting.findViewById(R.id.text_alert);
+        ImageView alert = dialog_setting.findViewById(R.id.alert);
         text_first = findViewById(R.id.text_first);
         plus = findViewById(R.id.plus);
         con = findViewById(R.id.con);
@@ -403,11 +440,14 @@ public class MainActivity extends AppCompatActivity{
         EditText tag2Text = findViewById(R.id.tag2_b);
         switch (color){
             case "dark":
+                alert.setImageResource(R.drawable.alert_light);
+                text_alert.setTextColor(getResources().getColor(R.color.white));
+                lin_alert.setBackgroundResource(R.drawable.maket_left_light);
                 dialog_lin.setBackgroundColor(getResources().getColor(R.color.dark));
                 settingsText.setTextColor(getResources().getColor(R.color.white));
                 lin_file.setBackgroundResource(R.drawable.maket_block_dark);
                 bd.setTextColor(getResources().getColor(R.color.white));
-                file.setBackgroundResource(R.drawable.maket_up_dark);
+                bd.setBackgroundResource(R.drawable.maket_up_dark);
                 file.setTextColor(getResources().getColor(R.color.white));
                 settings.setImageResource(R.drawable.settings_light);
                 text_first.setTextColor(getResources().getColor(R.color.white));
@@ -429,11 +469,14 @@ public class MainActivity extends AppCompatActivity{
                 switchFilter(searchType);
                 break;
             case "light":
+                alert.setImageResource(R.drawable.alert);
+                text_alert.setTextColor(getResources().getColor(R.color.dark));
+                lin_alert.setBackgroundResource(R.drawable.maket_left);
                 dialog_lin.setBackgroundColor(getResources().getColor(R.color.white));
                 settingsText.setTextColor(getResources().getColor(R.color.dark));
                 lin_file.setBackgroundResource(R.drawable.maket_block);
                 bd.setTextColor(getResources().getColor(R.color.dark));
-                file.setBackgroundResource(R.drawable.maket_up);
+                bd.setBackgroundResource(R.drawable.maket_up);
                 file.setTextColor(getResources().getColor(R.color.dark));
                 settings.setImageResource(R.drawable.settings);
                 text_first.setTextColor(getResources().getColor(R.color.dark));
