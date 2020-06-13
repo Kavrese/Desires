@@ -23,15 +23,21 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.yourdesires.model.Lost;
+import com.example.yourdesires.model.Lost_Table;
+import com.example.yourdesires.model.MediaLost;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
+
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity {
 String command,tag1S,tag2S;
-int status,pos;
+int status,pos,id_media;
 TextView data,time_des,time_des2,text;
 EditText op,desires,tag1,tag2;
 ImageView statusColor,back,plus,scrap;
@@ -240,6 +246,32 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
 
         loadMediaFile();
     }
+    private void uploadUriMedia(Uri uri){
+        String str = uri.toString();
+        int id_desires = searchIDDesires();
+        int id_media = getNumFileMedia();   //Получаем кол-во существующих медиа файлов
+        id_media++; //Добавляем +1 - это новый файл
+        MediaLost mediaLost = new MediaLost();
+        mediaLost.setId_desires(id_desires);
+        mediaLost.setMedia_id(id_media);
+        mediaLost.setUri(str);
+        mediaLost.save();
+    }
+    private int searchIDDesires(){      //Метод поиска id желания по названию
+        Lost Lost = SQLite.select()
+        .from(Lost.class)
+        .where(Lost_Table.desires.is(desires.getText().toString()))
+        .querySingle();
+        int id = Lost.getId();
+        return id;
+    }
+    private int getNumFileMedia (){
+        List<MediaLost> list;
+        list = SQLite.select()
+                .from(MediaLost.class)
+                .queryList();
+        return list.size();
+    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -248,6 +280,7 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
             arrayListMedia.add(new Media(outputfileURI));
             rec.getAdapter().notifyDataSetChanged();
             rec.setVisibility(View.VISIBLE);
+            uploadUriMedia(outputfileURI);
         }
     }
 

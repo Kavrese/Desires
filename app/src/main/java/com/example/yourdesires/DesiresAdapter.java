@@ -17,6 +17,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
+import com.example.yourdesires.model.MediaLost;
+import com.example.yourdesires.model.MediaLost_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.util.ArrayList;
@@ -155,11 +157,19 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 bool = true;
                                 break;
                             case R.id.menu_delete:
+                                Lost Lost = SQLite.select()
+                                        .from(Lost.class)
+                                        .where(Lost_Table.desires.is(holder.name.getText().toString()))
+                                        .querySingle();
+                                int id = Lost.getId();
                                   SQLite.delete(Lost.class)
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
                                         .execute();
                                 arrayList.remove(position);
                                 notifyDataSetChanged();
+                                    SQLite.delete(MediaLost.class)
+                                            .where(MediaLost_Table.id_desires.is(id))
+                                            .execute();
                                 bool = true;
                                 break;
                         }

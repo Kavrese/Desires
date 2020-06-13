@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -17,15 +18,18 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
+import com.example.yourdesires.model.MediaLost;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -45,6 +49,7 @@ public class MainActivity extends AppCompatActivity{
     boolean light = true;
     boolean searchB = false;
     boolean text_sear = false;
+    boolean isFile = false;
     String searchType;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
@@ -52,12 +57,13 @@ public class MainActivity extends AppCompatActivity{
     ArrayList<Desires> listSearch;
     ArrayList<Integer> position;
     EditText desiresText,searchText;
+    Dialog dialog_setting;
     LinearLayout bottonSheet,lin;
     BottomSheetBehavior bottomSheetBehavior;
     TextView name_botton_sheet,text_first,text_start;
     EditText tag1,tag2,op;
     Button save,next_start;
-    ImageView backIMG,filter,search,rgb,plus;
+    ImageView backIMG,filter,search,rgb,plus,settings;
     LinearLayout con,lin_next;
     androidx.appcompat.widget.Toolbar up,dawn;
     SharedPreferences sh;
@@ -70,6 +76,7 @@ public class MainActivity extends AppCompatActivity{
         FlowManager.init(new FlowConfig.Builder(this).build());
         listSearch = new ArrayList<>();
         position = new ArrayList<>();
+        settings = findViewById(R.id.settings);
         text_start = findViewById(R.id.text_next_start);
         lin_next = findViewById(R.id.lin_next_start);
         next_start = findViewById(R.id.button_next_start);
@@ -101,6 +108,8 @@ public class MainActivity extends AppCompatActivity{
         ed.apply();
         sbros = findViewById(R.id.sbros);
         sbros.hide();
+        dialog_setting = new Dialog(this);
+        dialog_setting.setContentView(R.layout.dialog_settings_maket);
         rgb = findViewById(R.id.rgb);
         up = findViewById(R.id.up_toolbar);
         con = findViewById(R.id.con);
@@ -324,8 +333,60 @@ public class MainActivity extends AppCompatActivity{
             switchColor("dark");
         }
         onFirstIMG();
+        settings.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Switch bd = dialog_setting.findViewById(R.id.bd_switch);
+                final Switch file = dialog_setting.findViewById(R.id.file_switch);
+                if(sh.getBoolean("isFile",false)){
+                    bd.setChecked(false);
+                    file.setChecked(true);
+                    isFile = true;
+                }else{
+                    bd.setChecked(true);
+                    file.setChecked(false);
+                    isFile = false;
+                }
+                bd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if(bd.isChecked()){
+                            file.setChecked(false);
+                            isFile = false;
+                        }else{
+                            file.setChecked(true);
+                            isFile = true;
+                        }
+                        ed = sh.edit();
+                        ed.putBoolean("isFile",isFile);
+                        ed.apply();
+                    }
+                });
+                file.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if(file.isChecked()){
+                            bd.setChecked(false);
+                            isFile = true;
+                        }else{
+                            bd.setChecked(true);
+                            isFile = false;
+                        }
+                        ed = sh.edit();
+                        ed.putBoolean("isFile",isFile);
+                        ed.apply();
+                    }
+                });
+                dialog_setting.show();
+            }
+        });
     }
     public void switchColor (String color){
+        LinearLayout dialog_lin = dialog_setting.findViewById(R.id.dialog_lin);
+        LinearLayout lin_file = dialog_setting.findViewById(R.id.lin_file);
+        Switch bd = dialog_setting.findViewById(R.id.bd_switch);
+        Switch file = dialog_setting.findViewById(R.id.file_switch);
+        TextView settingsText = dialog_setting.findViewById(R.id.settingsText);
         text_first = findViewById(R.id.text_first);
         plus = findViewById(R.id.plus);
         con = findViewById(R.id.con);
@@ -342,6 +403,13 @@ public class MainActivity extends AppCompatActivity{
         EditText tag2Text = findViewById(R.id.tag2_b);
         switch (color){
             case "dark":
+                dialog_lin.setBackgroundColor(getResources().getColor(R.color.dark));
+                settingsText.setTextColor(getResources().getColor(R.color.white));
+                lin_file.setBackgroundResource(R.drawable.maket_block_dark);
+                bd.setTextColor(getResources().getColor(R.color.white));
+                file.setBackgroundResource(R.drawable.maket_up_dark);
+                file.setTextColor(getResources().getColor(R.color.white));
+                settings.setImageResource(R.drawable.settings_light);
                 text_first.setTextColor(getResources().getColor(R.color.white));
                 up.setBackgroundResource(R.color.dark_2);
                 dawn.setBackgroundResource(R.color.dark_2);
@@ -361,6 +429,13 @@ public class MainActivity extends AppCompatActivity{
                 switchFilter(searchType);
                 break;
             case "light":
+                dialog_lin.setBackgroundColor(getResources().getColor(R.color.white));
+                settingsText.setTextColor(getResources().getColor(R.color.dark));
+                lin_file.setBackgroundResource(R.drawable.maket_block);
+                bd.setTextColor(getResources().getColor(R.color.dark));
+                file.setBackgroundResource(R.drawable.maket_up);
+                file.setTextColor(getResources().getColor(R.color.dark));
+                settings.setImageResource(R.drawable.settings);
                 text_first.setTextColor(getResources().getColor(R.color.dark));
                 up.setBackgroundResource(R.drawable.maket_up);
                 dawn.setBackgroundResource(R.drawable.maket_dawn);
