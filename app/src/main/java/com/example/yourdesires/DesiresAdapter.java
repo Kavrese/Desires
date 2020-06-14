@@ -2,6 +2,7 @@ package com.example.yourdesires;
 
 import android.content.Context;
 import android.content.Intent;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 
 public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresViewHolder> {
     ArrayList<Desires> arrayList;
+    Context wrapper;
     public DesiresAdapter (ArrayList<Desires> arrayList){
         this.arrayList = arrayList;
     }
@@ -54,6 +56,8 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     }
     @Override
     public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
+        wrapper = holder.itemView.getContext();             //Берём контекст
+        wrapper = getWrapperStyle(wrapper,arrayList.get(position).getLight());      //Модернизируем этот же контекст
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -110,8 +114,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         holder.menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
-                Context con = v.getContext();
-                PopupMenu popupMenu = new PopupMenu(con,v);
+                PopupMenu popupMenu = new PopupMenu(wrapper,v);
                 popupMenu.inflate(R.menu.status_menu);
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -199,5 +202,14 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     @Override
     public int getItemCount() {
         return arrayList.size();
+    }
+
+    private Context getWrapperStyle (Context wrapper,boolean light){
+        if(light){
+            wrapper = new ContextThemeWrapper(wrapper,R.style.Pop_menu_light);
+        }else{
+            wrapper = new ContextThemeWrapper(wrapper,R.style.Pop_menu_dark);
+        }
+        return wrapper;
     }
 }

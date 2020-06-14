@@ -8,4 +8,13 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
+    <style name="Pop_menu_dark" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">@color/white</item>
+        <item name="android:itemBackground">@color/dark_2</item>
+    </style>
+
+    <style name="Pop_menu_light" parent="Theme.AppCompat.Light.DarkActionBar">
+        <item name="android:textColor">@color/dark</item>
+        <item name="android:itemBackground">@color/white</item>
+    </style>
 </resources>

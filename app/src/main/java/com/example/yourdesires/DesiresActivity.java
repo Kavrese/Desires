@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
@@ -14,6 +15,7 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.AlarmClock;
 import android.provider.MediaStore;
+import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -36,6 +38,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity {
+boolean light;
 String command,tag1S,tag2S;
 int status,pos;
 TextView data,time_des,time_des2,text;
@@ -49,6 +52,7 @@ SharedPreferences.Editor ed;
 RecyclerView rec;
 Uri outputfileURI;
 ArrayList<Media> arrayListMedia = new ArrayList<>();
+Context wrapper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -81,9 +85,10 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         op.setText(getIntent().getStringExtra("op"));
         tag1S = getIntent().getStringExtra("tag1");
         tag2S = getIntent().getStringExtra("tag2");
-        switchColor(getIntent().getStringExtra("color"));
         data.setText(getIntent().getStringExtra("data"));
         status = getIntent().getIntExtra("status",1);
+        light = switchColor(getIntent().getStringExtra("color"));
+        wrapper = getWrapperStyle(wrapper);
         if(tag2S.equals("") || tag2S.equals("no")){
             hideTag2();
             tag1.setText(tag1S);
@@ -109,7 +114,7 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PopupMenu pop = new PopupMenu(v.getContext(),v);
+                PopupMenu pop = new PopupMenu(wrapper,v);
                 pop.inflate(R.menu.status_menu);
                 pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -165,7 +170,7 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         time_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PopupMenu pop_time_des1 = new PopupMenu(v.getContext(),v);
+                PopupMenu pop_time_des1 = new PopupMenu(wrapper,v);
                 pop_time_des1.inflate(R.menu.menu_time_des_1);
                 pop_time_des1.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -218,7 +223,7 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         add_media.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                PopupMenu media_menu_pop = new PopupMenu(v.getContext(),v);
+                PopupMenu media_menu_pop = new PopupMenu(wrapper,v);
                 media_menu_pop.inflate(R.menu.media_menu);
                 media_menu_pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -352,7 +357,8 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
             rec.setVisibility(View.VISIBLE);
         }
     }
-    private void switchColor (String color){
+    private boolean switchColor (String color){
+        boolean light = true;
         if(color.equals("light")){
             toolbar.setBackgroundColor(getResources().getColor(R.color.white));
             desires.setTextColor(getResources().getColor(R.color.dark));
@@ -376,6 +382,7 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
             plus.setImageResource(R.drawable.plus);
             menu.setImageResource(R.drawable.menu_toolbar);
             scrap.setImageResource(R.drawable.mys);
+            light = true;
         }else if (color.equals("dark")){
             toolbar.setBackgroundColor(getResources().getColor(R.color.dark_2));
             desires.setTextColor(getResources().getColor(R.color.white));
@@ -402,7 +409,9 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
             plus.setImageResource(R.drawable.plus_light);
             menu.setImageResource(R.drawable.tri_light);
             scrap.setImageResource(R.drawable.trash_light);
+            light =false;
         }
+        return light;
     }
     private void showTag2 (){
         tag2.setVisibility(View.VISIBLE);
@@ -413,5 +422,13 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         tag2.setVisibility(View.GONE);
         plus.setVisibility(View.VISIBLE);
         scrap.setVisibility(View.GONE);
+    }
+    private Context getWrapperStyle (Context wrapper){
+        if(light){
+            wrapper = new ContextThemeWrapper(text.getContext(),R.style.Pop_menu_light);
+        }else{
+            wrapper = new ContextThemeWrapper(text.getContext(),R.style.Pop_menu_dark);
+        }
+        return wrapper;
     }
 }

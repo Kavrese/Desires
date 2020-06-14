@@ -14,6 +14,7 @@ import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.text.format.DateUtils;
+import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -74,11 +75,13 @@ public class MainActivity extends AppCompatActivity{
     SharedPreferences sh;
     SharedPreferences.Editor ed;
     FloatingActionButton sbros;
+    Context wrapper;
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         FlowManager.init(new FlowConfig.Builder(this).build());
+        wrapper = getWrapperStyle(wrapper);
         listSearch = new ArrayList<>();
         position = new ArrayList<>();
         fake = findViewById(R.id.fake);
@@ -143,7 +146,7 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 if(searchType.equals("status")){
-                    PopupMenu search_status = new PopupMenu(v.getContext(),v);
+                    PopupMenu search_status = new PopupMenu(wrapper,v);
                     search_status.inflate(R.menu.search_status_menu);
                     search_status.show();
                     search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -183,7 +186,7 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 fake.requestFocus();
                 hiddenKeyboardEditText(searchText,1);
-                PopupMenu popupMenu2 = new PopupMenu(v.getContext(),v);
+                PopupMenu popupMenu2 = new PopupMenu(wrapper,v);
                 popupMenu2.inflate(R.menu.filter_menu);
                 popupMenu2.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
@@ -243,7 +246,7 @@ public class MainActivity extends AppCompatActivity{
                             .show();
                     fake.requestFocus();
                 }else if(hasFocus && searchType.equals("status")){
-                    final PopupMenu search_status = new PopupMenu(MainActivity.this,searchText);
+                    final PopupMenu search_status = new PopupMenu(wrapper,searchText);
                     search_status.inflate(R.menu.search_status_menu);
                                 search_status.show();
                                 search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -431,6 +434,14 @@ public class MainActivity extends AppCompatActivity{
        loadBD = sh.getBoolean("loadBD",false);
        noAlert = sh.getBoolean("noAlert",false);
     }
+    private Context getWrapperStyle (Context wrapper){
+        if(light){
+            wrapper = new ContextThemeWrapper(getApplicationContext(),R.style.Pop_menu_light);
+        }else{
+            wrapper = new ContextThemeWrapper(getApplicationContext(),R.style.Pop_menu_dark);
+        }
+        return wrapper;
+    }
     public void switchColor (String color){
         LinearLayout lin_alert = dialog_setting.findViewById(R.id.lin_alert);
         LinearLayout dialog_lin = dialog_setting.findViewById(R.id.dialog_lin);
@@ -518,6 +529,7 @@ public class MainActivity extends AppCompatActivity{
         ed.putString("color",color);
         ed.apply();
         editMaketRecyclerView(light,list);
+        wrapper = getWrapperStyle(wrapper);
     }
     public void editMaketRecyclerView (boolean light,ArrayList<Desires> list){
             for(int i = 0;i<list.size();i++){
