@@ -66,6 +66,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
             public void onClick(View v) {
                 Dialog dialog = new Dialog(holder.img.getContext());
                 dialog.setContentView(R.layout.dialog_maket);
+                dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
                 ImageView img = dialog.findViewById(R.id.img);
                 Picasso.get()
                         .load(arrayList.get(position).getImg())

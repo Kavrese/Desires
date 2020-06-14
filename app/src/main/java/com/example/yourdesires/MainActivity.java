@@ -119,6 +119,7 @@ public class MainActivity extends AppCompatActivity{
         sbros.hide();
         dialog_setting = new Dialog(this);
         dialog_setting.setContentView(R.layout.dialog_settings_maket);
+        dialog_setting.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         rgb = findViewById(R.id.rgb);
         up = findViewById(R.id.up_toolbar);
         con = findViewById(R.id.con);
