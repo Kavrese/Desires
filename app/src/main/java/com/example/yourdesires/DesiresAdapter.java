@@ -2,6 +2,7 @@ package com.example.yourdesires;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Environment;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -22,6 +23,10 @@ import com.example.yourdesires.model.MediaLost;
 import com.example.yourdesires.model.MediaLost_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import org.apache.commons.io.FileUtils;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresViewHolder> {
@@ -164,15 +169,21 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                         .from(Lost.class)
                                         .where(Lost_Table.desires.is(holder.name.getText().toString()))
                                         .querySingle();
-                                int id = Lost.getId();
-                                  SQLite.delete(Lost.class)
+                                int id = Lost.getId();          //Определяем id желания и дальше удаляем
+                                SQLite.delete(Lost.class)           //Удаление в основной таблице
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
                                         .execute();
                                 arrayList.remove(position);
                                 notifyDataSetChanged();
-                                    SQLite.delete(MediaLost.class)
+                                    SQLite.delete(MediaLost.class)   //Удаление в медиа таблице
                                             .where(MediaLost_Table.id_desires.is(id))
                                             .execute();
+                                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+holder.name.getText().toString()+"/" );
+                                try {
+                                    FileUtils.deleteDirectory(file);
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                                 bool = true;
                                 break;
                         }

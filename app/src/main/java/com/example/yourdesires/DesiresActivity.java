@@ -284,6 +284,7 @@ Context wrapper;
         List<MediaLost> list;
         list = SQLite.select()
                 .from(MediaLost.class)
+                .where(MediaLost_Table.id_desires.is(searchIDDesires()))
                 .queryList();
         return list.size();
     }
