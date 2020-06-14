@@ -224,7 +224,6 @@ public class MainActivity extends AppCompatActivity{
         searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
-                Toast.makeText(MainActivity.this, "focus " + hasFocus, Toast.LENGTH_SHORT).show();
                 if(searchType.equals("date") && hasFocus){
                     final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
                     final Calendar dateAndTime= Calendar.getInstance();
@@ -808,6 +807,14 @@ public class MainActivity extends AppCompatActivity{
                             buffer.add(list.get(i));
                             position.add(i);
                         }
+                    }
+                }
+                break;
+            case "date":
+                for(int i= 0;i<list.size();i++){
+                    if(list.get(i).getData().equals(pole)){
+                        buffer.add(list.get(i));
+                        position.add(i);
                     }
                 }
                 break;
