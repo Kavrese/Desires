@@ -91,7 +91,7 @@
                 android:gravity="center|fill_horizontal"
                 android:paddingLeft="5dp"
                 android:paddingRight="5dp"
-                android:text="Некоторые медиа файлы недоступны, т.к. их нет в базе данных. Если вы хотите вернуть их - кликните по этому сообщению"
+                android:text="Некоторые медиа файлы возможно будут недоступны, т.к. их нет в базе данных. Если вы хотите вернуть их - кликните по этому сообщению"
                 android:textColor="#000000" />
         </LinearLayout>
 

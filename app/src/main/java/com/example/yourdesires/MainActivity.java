@@ -407,6 +407,7 @@ public class MainActivity extends AppCompatActivity{
                             file.setChecked(false);
                             alert.setVisibility(View.GONE);
                             loadBD = false;
+                            noAlert = false;
                         }
                         saveBooleans(saveBD,loadBD,noAlert);
                     }

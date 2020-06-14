@@ -212,4 +212,5 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         }
         return wrapper;
     }
+
 }

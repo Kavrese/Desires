@@ -28,6 +28,7 @@ import android.widget.Toast;
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
 import com.example.yourdesires.model.MediaLost;
+import com.example.yourdesires.model.MediaLost_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
 import java.io.File;
@@ -38,7 +39,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity {
-boolean light;
+boolean light,loadDB,saveBD;
 String command,tag1S,tag2S;
 int status,pos;
 TextView data,time_des,time_des2,text;
@@ -83,6 +84,8 @@ Context wrapper;
         desires = findViewById(R.id.name);
         desires.setText(getIntent().getStringExtra("name"));
         op.setText(getIntent().getStringExtra("op"));
+        saveBD = sh.getBoolean("saveBD",true);
+        loadDB = sh.getBoolean("loadBD",false);
         tag1S = getIntent().getStringExtra("tag1");
         tag2S = getIntent().getStringExtra("tag2");
         data.setText(getIntent().getStringExtra("data"));
@@ -248,10 +251,17 @@ Context wrapper;
                 media_menu_pop.show();
             }
         });
+        if(sh.getBoolean("noAlert",false)){
+            synchronizedLocalMediaAndBD();
+        }
+        if(!loadDB) {
+            loadMediaFile();
+        }else{
+            loadMediaFileBD();
+        }
 
-        loadMediaFile();
     }
-    private void uploadUriMedia(Uri uri){
+    private void uploadUriMedia(Uri uri){       //Сохранение медиа файлов в бд
         String str = uri.toString();
         int id_desires = searchIDDesires();
         int id_media = getNumFileMedia();   //Получаем кол-во существующих медиа файлов
@@ -270,7 +280,7 @@ Context wrapper;
         int id = Lost.getId();
         return id;
     }
-    private int getNumFileMedia (){
+    private int getNumFileMedia (){     //Метод получения кол-во файлов в бд
         List<MediaLost> list;
         list = SQLite.select()
                 .from(MediaLost.class)
@@ -285,8 +295,9 @@ Context wrapper;
             arrayListMedia.add(new Media(outputfileURI));
             rec.getAdapter().notifyDataSetChanged();
             rec.setVisibility(View.VISIBLE);
-
-            uploadUriMedia(outputfileURI);
+            if(saveBD) {
+                uploadUriMedia(outputfileURI);
+            }
         }
     }
 
@@ -346,15 +357,95 @@ Context wrapper;
                 break;
         }
     }
-    private void loadMediaFile (){
+    private void loadMediaFile (){                  //Загрузка медиа файлов из файловой системы
+       List<Uri> listOfFiles = getAllFile();
+       if(listOfFiles != null) {
+           for (int i = 0; i < listOfFiles.size(); i++) {
+               arrayListMedia.add(new Media(listOfFiles.get(i)));
+           }
+           rec.getAdapter().notifyDataSetChanged();
+           rec.setVisibility(View.VISIBLE);
+       }
+    }
+    private int getNumMediaFileLocal (){        // //Метод получения кол-во файлов из файловой системы
         File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/" );
         File[] listOfFiles = file.listFiles();
         if(listOfFiles != null) {
-            for (int i = 0; i < listOfFiles.length; i++) {
-                arrayListMedia.add(new Media(Uri.fromFile(listOfFiles[i])));
+            return listOfFiles.length;
+        }
+        return 0;
+    }
+    private void loadMediaFileBD (){            //Загрузка медиа файлов с бд
+        int id_desires = searchIDDesires();
+        List<MediaLost> mediaLost = SQLite.select()
+                .from(MediaLost.class)
+                .where(MediaLost_Table.id_desires.is(id_desires))
+                .queryList();
+        if(mediaLost != null) {
+            for (int i = 0; i < mediaLost.size(); i++) {
+                arrayListMedia.add(new Media(Uri.parse(mediaLost.get(i).getUri())));
+                rec.getAdapter().notifyDataSetChanged();
+                rec.setVisibility(View.VISIBLE);
             }
-            rec.getAdapter().notifyDataSetChanged();
-            rec.setVisibility(View.VISIBLE);
+        }
+    }
+    private List<Uri> getAllFileBD (){  //Метод получения всех медиа файлов в бд
+        int id_desires = searchIDDesires();
+        List<Uri> URIsBD = new ArrayList<>();
+        List<MediaLost> mediaLost = SQLite.select()
+                .from(MediaLost.class)
+                .where(MediaLost_Table.id_desires.is(id_desires))
+                .queryList();
+        for (int i = 0;i<mediaLost.size();i++){
+            URIsBD.add(Uri.parse(mediaLost.get(i).getUri()));
+        }
+        return URIsBD;
+    }
+    private List<Uri> getAllFile (){   //Метод получения всех медиа файлов в корне
+        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/" );
+        File[] files = file.listFiles();
+        List<Uri> URIsLocal = new ArrayList<>();
+        if(files != null ) {
+            for (int i = 0; i < files.length; i++) {
+                URIsLocal.add(Uri.fromFile(files[i]));
+            }
+            return  URIsLocal;
+        }
+        return null;
+    }
+    private void synchronizedLocalMediaAndBD(){
+        int bd_file = getNumFileMedia();
+        int local_file = getNumMediaFileLocal();
+        List<Uri> bd = getAllFileBD();
+        List<Uri> local = getAllFile();
+        List<Uri> no = new ArrayList<>();
+        if(bd_file < local_file  && local.size() != 0 ){
+
+            for(int i = 0;i<local.size();i++){
+                for(int k = 0;k<bd.size();k++){
+                    if(String.valueOf(local.get(i)).equals(String.valueOf(bd.get(k)))){
+                        break;
+                    }else{
+                        no.add(local.get(i));       //Лист с отсутсвующями медиа файлами в бд
+                    }
+                }
+            }
+            if(bd_file == 0 && local_file != 0){
+                for (int i =0;i<local_file;i++){
+                    no.add(local.get(i));
+                }
+            }
+            for(int i = 0;i<no.size();i++){     //Сохраняем недостающие файлы в бд
+                int id = getNumFileMedia();
+                id++;
+                MediaLost mediaLost = new MediaLost();
+                mediaLost.setMedia_id(id);
+                mediaLost.setId_desires(searchIDDesires());
+                mediaLost.setUri(no.get(i).toString());
+                mediaLost.save();
+            }
+        }else if(bd_file > local_file){
+            Toast.makeText(wrapper, "Error: В БД больше файлов", Toast.LENGTH_SHORT).show();
         }
     }
     private boolean switchColor (String color){
