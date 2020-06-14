@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -12,6 +13,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
@@ -19,6 +21,7 @@ import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CompoundButton;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -39,6 +42,7 @@ import com.raizlabs.android.dbflow.sql.language.SQLite;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -57,7 +61,7 @@ public class MainActivity extends AppCompatActivity{
     ArrayList<Desires> list;
     ArrayList<Desires> listSearch;
     ArrayList<Integer> position;
-    EditText desiresText,searchText;
+    EditText desiresText,searchText,fake;
     Dialog dialog_setting;
     LinearLayout bottonSheet,lin;
     BottomSheetBehavior bottomSheetBehavior;
@@ -77,6 +81,7 @@ public class MainActivity extends AppCompatActivity{
         FlowManager.init(new FlowConfig.Builder(this).build());
         listSearch = new ArrayList<>();
         position = new ArrayList<>();
+        fake = findViewById(R.id.fake);
         settings = findViewById(R.id.settings);
         text_start = findViewById(R.id.text_next_start);
         lin_next = findViewById(R.id.lin_next_start);
@@ -176,6 +181,8 @@ public class MainActivity extends AppCompatActivity{
         filter.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                fake.requestFocus();
+                hiddenKeyboardEditText(searchText,1);
                 PopupMenu popupMenu2 = new PopupMenu(v.getContext(),v);
                 popupMenu2.inflate(R.menu.filter_menu);
                 popupMenu2.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -185,16 +192,25 @@ public class MainActivity extends AppCompatActivity{
                             case R.id.menu_filter1:
                                 searchText.setHint(R.string.name_filter_str);
                                 searchType = "name";
+                                searchText.setText("");
                                 switchFilter(searchType);
                                 break;
                             case R.id.menu_filter2:
                                 searchText.setHint(R.string.tag_filter_str);
                                 searchType = "tag";
+                                searchText.setText("");
                                 switchFilter(searchType);
                                 break;
                             case R.id.menu_filter3:
                                 searchText.setHint(R.string.status_filter_str);
                                 searchType = "status";
+                                searchText.setText("");
+                                hiddenKeyboardEditText(searchText,0);
+                                switchFilter(searchType);
+                                break;
+                            case R.id.menu_filter4:
+                                searchText.setHint(R.string.data_filter_str);
+                                searchType = "date";
                                 searchText.setText("");
                                 switchFilter(searchType);
                                 break;
@@ -203,6 +219,56 @@ public class MainActivity extends AppCompatActivity{
                     }
                 });
                 popupMenu2.show();
+            }
+        });
+        searchText.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                Toast.makeText(MainActivity.this, "focus " + hasFocus, Toast.LENGTH_SHORT).show();
+                if(searchType.equals("date") && hasFocus){
+                    final SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy");
+                    final Calendar dateAndTime= Calendar.getInstance();
+                    hiddenKeyboardEditText(searchText,0);
+                    new DatePickerDialog(MainActivity.this, new DatePickerDialog.OnDateSetListener() {
+                        @Override
+                        public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                            dateAndTime.set(Calendar.YEAR, year);
+                            dateAndTime.set(Calendar.MONTH, month);
+                            dateAndTime.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                            searchText.setText(simpleDateFormat.format(dateAndTime.getTime()));
+                        }
+                    },
+                            dateAndTime.get(Calendar.YEAR),
+                            dateAndTime.get(Calendar.MONTH),
+                            dateAndTime.get(Calendar.DAY_OF_MONTH))
+                            .show();
+                    fake.requestFocus();
+                }else if(hasFocus && searchType.equals("status")){
+                    final PopupMenu search_status = new PopupMenu(MainActivity.this,searchText);
+                    search_status.inflate(R.menu.search_status_menu);
+                                search_status.show();
+                                search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                                    @Override
+                                    public boolean onMenuItemClick(MenuItem item) {
+                                        switch (item.getItemId()) {
+                                            case R.id.menu_work_search:
+                                                searchText.setText(R.string.status_1);
+                                                break;
+                                            case R.id.menu_great_search:
+                                                searchText.setText(R.string.status_2);
+                                                break;
+                                            case R.id.menu_time_search:
+                                                searchText.setText(R.string.status_4);
+                                                break;
+                                            case R.id.menu_sleep_search:
+                                                searchText.setText(R.string.status_3);
+                                                break;
+                                        }
+                                        return true;
+                                    }
+                                });
+                            }
+
             }
         });
         save.setOnClickListener(new View.OnClickListener() {
@@ -271,52 +337,7 @@ public class MainActivity extends AppCompatActivity{
                 }
             }
         });
-        final PopupMenu search_status = new PopupMenu(MainActivity.this,searchText);
-        search_status.inflate(R.menu.search_status_menu);
-        searchText.addTextChangedListener(new TextWatcher() {
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                String str = searchText.getText().toString();
-                if(str.equals(getResources().getString(R.string.status_1)) && str.equals(getResources().getString(R.string.status_2)) && str.equals(getResources().getString(R.string.status_3))&&str.equals(getResources().getString(R.string.status_4))){
-                    text_sear = true;
-                }
-            }
 
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(searchType.equals("status")) {
-                    if (!searchText.getText().toString().equals("") && !text_sear) {
-                        searchText.setText("");
-                    }
-                    search_status.show();
-                    search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                        @Override
-                        public boolean onMenuItemClick(MenuItem item) {
-                            switch (item.getItemId()) {
-                                case R.id.menu_work_search:
-                                    searchText.setText(R.string.status_1);
-                                    break;
-                                case R.id.menu_great_search:
-                                    searchText.setText(R.string.status_2);
-                                    break;
-                                case R.id.menu_time_search:
-                                    searchText.setText(R.string.status_4);
-                                    break;
-                                case R.id.menu_sleep_search:
-                                    searchText.setText(R.string.status_3);
-                                    break;
-                            }
-                            text_sear = true;
-                            return true;
-                        }
-                    });
-                }
-            }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-            }
-        });
         rgb.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -558,6 +579,9 @@ public class MainActivity extends AppCompatActivity{
                 case "status":
                     filter.setImageResource(R.drawable.tool_status_light);
                     break;
+                case "date":
+                    filter.setImageResource(R.drawable.tool_date_light);
+                    break;
                 case "def":
                     filter.setImageResource(R.drawable.tool_light);
                     break;
@@ -572,6 +596,9 @@ public class MainActivity extends AppCompatActivity{
                     break;
                 case "status":
                     filter.setImageResource(R.drawable.tool_status);
+                    break;
+                case "date":
+                    filter.setImageResource(R.drawable.tool_date);
                     break;
                 case "def":
                     filter.setImageResource(R.drawable.filter);
@@ -732,6 +759,10 @@ public class MainActivity extends AppCompatActivity{
     public void hiddenKeyboard(){
         InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
         imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(),InputMethodManager.HIDE_NOT_ALWAYS);
+    }
+    private void hiddenKeyboardEditText (EditText text, int mode){
+        text.setInputType(mode);
+        text.setTextIsSelectable(true);
     }
 
     public ArrayList<Desires> onSearch (ArrayList<Desires> list,String command,String pole){

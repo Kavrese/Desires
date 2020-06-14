@@ -86,14 +86,16 @@ ArrayList<Media> arrayListMedia = new ArrayList<>();
         status = getIntent().getIntExtra("status",1);
         if(tag2S.equals("") || tag2S.equals("no")){
             hideTag2();
-        }
-        if(tag1S.equals("no") || tag1S.equals("")){
-            tag1.setText(tag2S);
-            tag2.setText("");
-            hideTag2();
-        }else {
             tag1.setText(tag1S);
-            tag2.setText(tag2S);
+        }else {
+            if (tag1S.equals("no") || tag1S.equals("")) {
+                tag1.setText(tag2S);
+                tag2.setText("");
+                hideTag2();
+            } else {
+                tag1.setText(tag1S);
+                tag2.setText(tag2S);
+            }
         }
 
         statusColor = findViewById(R.id.statusColor);

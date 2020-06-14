@@ -5,6 +5,7 @@
     <string name="tag_filter_str">Поиск по тэгам</string>
     <string name="name_filter_str">Поиск по заголовку желания</string>
     <string name="status_filter_str">Поиск по статусу</string>
+    <string name="data_filter_str">Поиск по дате</string>
 
     <string name="status_1">В ожидании</string>
     <string name="status_2">Выполнено</string>

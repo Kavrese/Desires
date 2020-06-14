@@ -8,4 +8,7 @@
 
     <item android:id="@+id/menu_filter3"
         android:title="@string/status_filter_str"/>
+
+    <item android:id="@+id/menu_filter4"
+        android:title="@string/data_filter_str"/>
 </menu>
