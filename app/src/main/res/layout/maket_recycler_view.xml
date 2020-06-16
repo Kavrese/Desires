@@ -29,19 +29,74 @@
         android:orientation="vertical"
         android:weightSum="2">
 
-        <TextView
-            android:id="@+id/name_desires"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
-            android:ellipsize="end"
-            android:gravity="center|left"
-            android:maxLines="1"
-            android:singleLine="true"
-            android:text="TextView"
-            android:textColor="@color/dark"
-            android:textColorHint="@color/grey"
-            android:textSize="20sp" />
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <TextView
+                android:id="@+id/name_desires"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="7.5"
+                android:ellipsize="end"
+                android:gravity="center|left"
+                android:maxLines="1"
+                android:singleLine="true"
+                android:text="TextView"
+                android:textColor="@color/dark"
+                android:textColorHint="@color/grey"
+                android:textSize="20sp" />
+
+            <LinearLayout
+                android:id="@+id/lin_media_cup"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginRight="5dp"
+                android:layout_weight="2.5"
+                android:gravity="right"
+                android:orientation="horizontal"
+                android:visibility="visible"
+                android:weightSum="4">
+
+                <ImageView
+                    android:id="@+id/cup_img"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/photo" />
+
+                <ImageView
+                    android:id="@+id/cup_video"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/video" />
+
+                <ImageView
+                    android:id="@+id/cup_audio"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginRight="5dp"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/music" />
+
+                <ImageView
+                    android:id="@+id/cup_bell"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:visibility="gone"
+                    app:srcCompat="@drawable/bell" />
+            </LinearLayout>
+        </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"

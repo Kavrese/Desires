@@ -28,17 +28,19 @@ import org.apache.commons.io.FileUtils;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresViewHolder> {
     ArrayList<Desires> arrayList;
     Context wrapper;
+    private DesiresViewHolder holder;
     public DesiresAdapter (ArrayList<Desires> arrayList){
         this.arrayList = arrayList;
     }
 
     public class DesiresViewHolder extends RecyclerView.ViewHolder {
         TextView name,tag1,tag2,data;
-        ImageView statusIMG,menu;
+        ImageView statusIMG,menu,cup_img,cup_audio,cup_bell,cup_video;
         LinearLayout lin;
         public DesiresViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -49,6 +51,10 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             data = itemView.findViewById(R.id.data);
             menu = itemView.findViewById(R.id.menu);
             lin = itemView.findViewById(R.id.lin);
+            cup_img = itemView.findViewById(R.id.cup_img);
+            cup_audio = itemView.findViewById(R.id.cup_audio);
+            cup_bell = itemView.findViewById(R.id.cup_bell);
+            cup_video = itemView.findViewById(R.id.cup_video);
         }
     }
 
@@ -61,6 +67,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     }
     @Override
     public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
+        this.holder = holder;
         wrapper = holder.itemView.getContext();             //Берём контекст
         wrapper = getWrapperStyle(wrapper,arrayList.get(position).getLight());      //Модернизируем этот же контекст
         holder.itemView.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +123,12 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                 holder.statusIMG.setImageResource(R.color.red);
                 break;
         }
+        if(getCupInfo("img"))
+            holder.cup_img.setVisibility(View.VISIBLE);
+        if(getCupInfo("audio"))
+            holder.cup_audio.setVisibility(View.VISIBLE);
+        if(getCupInfo("video"))
+            holder.cup_video.setVisibility(View.VISIBLE);
         holder.menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -133,8 +146,6 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                         .set(Lost_Table.status.is(1))
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
                                         .execute();
-
-
                                 bool = true;
                                 break;
                             case R.id.menu_great:
@@ -200,6 +211,10 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             holder.tag1.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.grey));
             holder.tag2.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.grey));
             holder.data.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.dark));
+            holder.cup_img.setImageResource(R.drawable.photo);
+            holder.cup_audio.setImageResource(R.drawable.music);
+            holder.cup_video.setImageResource(R.drawable.video);
+            holder.cup_bell.setImageResource(R.drawable.bell);
         }else{
             holder.lin.setBackgroundResource(R.drawable.maket_back_recycler_view_dark);
             holder.menu.setImageResource(R.drawable.open_menu_light);
@@ -207,6 +222,10 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             holder.tag1.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white_text));
             holder.tag2.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white_text));
             holder.data.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white));
+            holder.cup_img.setImageResource(R.drawable.photo_light);
+            holder.cup_audio.setImageResource(R.drawable.music_light);
+            holder.cup_video.setImageResource(R.drawable.video_light);
+            holder.cup_bell.setImageResource(R.drawable.bell_light);
         }
     }
 
@@ -222,6 +241,48 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             wrapper = new ContextThemeWrapper(wrapper,R.style.Pop_menu_dark);
         }
         return wrapper;
+    }
+
+    private boolean getCupInfo (String cup){
+        Lost lost = SQLite.select()
+                .from(Lost.class)
+                .where(Lost_Table.desires.is(holder.name.getText().toString()))
+                .querySingle();
+        int id = lost.getId();      //id желания
+        switch (cup){
+            case "img":
+                List<MediaLost> mediaLostImg = SQLite.select()
+                        .from(MediaLost.class)
+                        .where(MediaLost_Table.id_desires.is(id))
+                        .and(MediaLost_Table.type.is("img"))
+                        .queryList();
+                if(mediaLostImg.size() != 0)
+                    return true;
+                else
+                    return false;
+            case "audio":
+                List<MediaLost> mediaLostAudio = SQLite.select()
+                        .from(MediaLost.class)
+                        .where(MediaLost_Table.id_desires.is(id))
+                        .and(MediaLost_Table.type.is("audio"))
+                        .queryList();
+                if(mediaLostAudio.size() != 0)
+                    return true;
+                else
+                    return false;
+            case "video":
+                List<MediaLost> mediaLostVideo = SQLite.select()
+                        .from(MediaLost.class)
+                        .where(MediaLost_Table.id_desires.is(id))
+                        .and(MediaLost_Table.type.is("video"))
+                        .queryList();
+                if(mediaLostVideo.size() != 0)
+                    return true;
+                else
+                    return false;
+
+        }
+        return false;
     }
 
 }

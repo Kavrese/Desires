@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.FileUtils;
 import android.os.StrictMode;
 import android.provider.AlarmClock;
 import android.provider.MediaStore;
@@ -29,9 +30,19 @@ import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
 import com.example.yourdesires.model.MediaLost;
 import com.example.yourdesires.model.MediaLost_Table;
+import com.raizlabs.android.dbflow.sql.language.Operator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -244,6 +255,11 @@ Context wrapper;
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
                                 startActivityForResult(intent,1);
                                 break;
+                            case R.id.gallery_menu:
+                                Intent inGallery = new Intent(Intent.ACTION_PICK);
+                                inGallery.setType("image/*");
+                                startActivityForResult(inGallery,2);
+                                break;
                         }
                         return false;
                     }
@@ -261,7 +277,7 @@ Context wrapper;
         }
 
     }
-    private void uploadUriMedia(Uri uri){       //Сохранение медиа файлов в бд
+    private void uploadUriMedia(Uri uri,String type){       //Сохранение медиа файлов в бд
         String str = uri.toString();
         int id_desires = searchIDDesires();
         int id_media = getNumFileMedia();   //Получаем кол-во существующих медиа файлов
@@ -270,6 +286,7 @@ Context wrapper;
         mediaLost.setId_desires(id_desires);
         mediaLost.setMedia_id(id_media);
         mediaLost.setUri(str);
+        mediaLost.setType(type);
         mediaLost.save();
     }
     private int searchIDDesires(){      //Метод поиска id желания по названию
@@ -297,11 +314,17 @@ Context wrapper;
             rec.getAdapter().notifyDataSetChanged();
             rec.setVisibility(View.VISIBLE);
             if(saveBD) {
-                uploadUriMedia(outputfileURI);
+                uploadUriMedia(outputfileURI,"img");
             }
         }
-    }
+        if(requestCode == 2 && resultCode == RESULT_OK){
+ /*           Uri uriGallery = data.getData();
+            File imgGallery = new File(uriGallery.toString());
+            File imgFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Желание/"+desires.getText().toString()+"/",createNameFile()+".jpg");
+*/
+        }
 
+    }
     public String createNameFile(){
         DateFormat db = new SimpleDateFormat("ddMMyyyyHHmmss");
         String dateText = db.format(new Date());

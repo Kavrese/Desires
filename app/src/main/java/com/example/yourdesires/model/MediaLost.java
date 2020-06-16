@@ -13,6 +13,16 @@ public class MediaLost extends BaseModel {
     int media_id;
     @Column
     String uri;
+    @Column
+    String type;
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 
     public int getMedia_id() {
         return media_id;
