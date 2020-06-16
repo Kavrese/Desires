@@ -6,9 +6,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.media.MediaRecorder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
@@ -33,6 +37,8 @@ import com.example.yourdesires.model.MediaLost_Table;
 import com.raizlabs.android.dbflow.sql.language.Operator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import org.w3c.dom.Text;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -50,7 +56,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity {
-boolean light,loadDB,saveBD;
+boolean light,loadDB,saveBD,recording,playback;
 String command,tag1S,tag2S;
 int status,pos;
 TextView data,time_des,time_des2,text;
@@ -65,10 +71,20 @@ RecyclerView rec;
 Uri outputfileURI;
 ArrayList<Media> arrayListMedia = new ArrayList<>();
 Context wrapper;
+MediaRecorder mediaRecorder;
+int CAMERA_PHOTO = 1;
+int GALLERY = 2;
+int CAMERA_VIDEO = 3;
+int AUDIO = 4;
+Dialog audio_recorder;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
+        mediaRecorder = new MediaRecorder ();
+        audio_recorder = new Dialog(DesiresActivity.this);
+        audio_recorder.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        audio_recorder.setContentView(R.layout.dialog_maket_recorder_audio);
         add_media = findViewById(R.id.add_media);
         rec = findViewById(R.id.recycler_media);
         MediaAdapter adapter = new MediaAdapter(arrayListMedia);
@@ -247,18 +263,20 @@ Context wrapper;
                                 StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();//Без этого камера не запускается
                                 StrictMode.setVmPolicy(builder.build());                                //
                                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                String[] permissions = {Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}; //Массив с разрешениями
-                                requestPermissions(permissions,1);  //Запрашиваем эти разрешения
                                 String name = createNameFile();
                                 File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/",name+".jpg");
                                 outputfileURI = Uri.fromFile(file);
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
-                                startActivityForResult(intent,1);
+                                startActivityForResult(intent,CAMERA_PHOTO);
                                 break;
                             case R.id.gallery_menu:
                                 Intent inGallery = new Intent(Intent.ACTION_PICK);
                                 inGallery.setType("image/*");
-                                startActivityForResult(inGallery,2);
+                                startActivityForResult(inGallery,GALLERY);
+                                break;
+                            case R.id.audio_menu:
+                                editSettingsPlayerRec();
+                                audio_recorder.show();
                                 break;
                         }
                         return false;
@@ -276,6 +294,59 @@ Context wrapper;
             loadMediaFileBD();
         }
 
+    }
+    private void editSettingsPlayerRec (){
+        final ImageView button = audio_recorder.findViewById(R.id.button);
+                if(light)
+                    button.setImageResource(R.drawable.microphone);
+                else
+                    button.setImageResource(R.drawable.microphone_light);
+                    button.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        File outputfile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Желание/" + desires.getText().toString() + "/", createNameFile() + "rec.mp3");
+                        if(!recording && !playback) {
+                            if (light)
+                                button.setImageResource(R.drawable.off);
+                            else
+                                button.setImageResource(R.drawable.off_light);
+
+                            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+                            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+                            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
+                            mediaRecorder.setOutputFile(outputfile);
+                            startRecording();
+                            if(light)
+                                button.setImageResource(R.drawable.pause);
+                            else
+                                button.setImageResource(R.drawable.pause_light);
+                        }else if(recording && !playback){
+                            stopRecording();
+                            audio_recorder.hide();
+                            uploadUriMedia(Uri.fromFile(outputfile),"audio");
+                            arrayListMedia.add(new Media(Uri.fromFile(outputfile)));
+                            rec.getAdapter().notifyDataSetChanged();
+                        }
+                    }
+                });
+        }
+
+    private void startRecording (){
+        try {
+            mediaRecorder.prepare();
+            mediaRecorder.start();
+            recording = true;
+            Toast.makeText(DesiresActivity.this, "Идёт запись", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private void stopRecording (){
+        if(recording){
+            mediaRecorder.stop();
+            mediaRecorder.release();
+            recording = false;
+        }
     }
     private void uploadUriMedia(Uri uri,String type){       //Сохранение медиа файлов в бд
         String str = uri.toString();
@@ -309,7 +380,7 @@ Context wrapper;
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == 1 && resultCode == RESULT_OK) {
+        if (requestCode == CAMERA_PHOTO && resultCode == RESULT_OK) {
             arrayListMedia.add(new Media(outputfileURI));
             rec.getAdapter().notifyDataSetChanged();
             rec.setVisibility(View.VISIBLE);
@@ -317,13 +388,12 @@ Context wrapper;
                 uploadUriMedia(outputfileURI,"img");
             }
         }
-        if(requestCode == 2 && resultCode == RESULT_OK){
+        if(requestCode == GALLERY && resultCode == RESULT_OK){
  /*           Uri uriGallery = data.getData();
             File imgGallery = new File(uriGallery.toString());
             File imgFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Желание/"+desires.getText().toString()+"/",createNameFile()+".jpg");
 */
         }
-
     }
     public String createNameFile(){
         DateFormat db = new SimpleDateFormat("ddMMyyyyHHmmss");
@@ -473,8 +543,14 @@ Context wrapper;
         }
     }
     private boolean switchColor (String color){
+        TextView textMedia = audio_recorder.findViewById(R.id.mediaText);
+        LinearLayout block_media = audio_recorder.findViewById(R.id.block_media);
+        LinearLayout dialog_lin_media = audio_recorder.findViewById(R.id.dialog_lin_media);
         boolean light = true;
         if(color.equals("light")){
+            textMedia.setTextColor(getResources().getColor(R.color.dark));
+            block_media.setBackgroundResource(R.drawable.maket_block);
+            dialog_lin_media.setBackgroundColor(getResources().getColor(R.color.white));
             toolbar.setBackgroundColor(getResources().getColor(R.color.white));
             desires.setTextColor(getResources().getColor(R.color.dark));
             desires.setBackgroundResource(R.drawable.maket_up);
@@ -499,6 +575,9 @@ Context wrapper;
             scrap.setImageResource(R.drawable.mys);
             light = true;
         }else if (color.equals("dark")){
+            textMedia.setTextColor(getResources().getColor(R.color.white));
+            block_media.setBackgroundResource(R.drawable.maket_block_dark);
+            dialog_lin_media.setBackgroundColor(getResources().getColor(R.color.dark));
             toolbar.setBackgroundColor(getResources().getColor(R.color.dark_2));
             desires.setTextColor(getResources().getColor(R.color.white));
             desires.setBackgroundResource(R.color.dark_2);
