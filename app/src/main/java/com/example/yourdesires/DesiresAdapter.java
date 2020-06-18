@@ -247,6 +247,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         return wrapper;
     }
     private boolean getCupInfo (String cup){
+        //Вычесляем id желания
         Lost lost = SQLite.select()
                 .from(Lost.class)
                 .where(Lost_Table.desires.is(holder.name.getText().toString()))
@@ -259,7 +260,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                         .where(MediaLost_Table.id_desires.is(id))
                         .and(MediaLost_Table.type.is("img"))
                         .queryList();
-                if(mediaLostImg.size() != 0)
+                if(mediaLostImg.size() != 0 && getNumThisMediaFolder("img") != 0)
                     return true;
                 else
                     return false;
@@ -269,7 +270,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                         .where(MediaLost_Table.id_desires.is(id))
                         .and(MediaLost_Table.type.is("audio"))
                         .queryList();
-                if(mediaLostAudio.size() != 0)
+                if(mediaLostAudio.size() != 0 && getNumThisMediaFolder("audio") != 0)
                     return true;
                 else
                     return false;
@@ -279,13 +280,50 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                         .where(MediaLost_Table.id_desires.is(id))
                         .and(MediaLost_Table.type.is("video"))
                         .queryList();
-                if(mediaLostVideo.size() != 0)
+                if(mediaLostVideo.size() != 0 && getNumThisMediaFolder("video") != 0)
                     return true;
                 else
                     return false;
 
         }
         return false;
+    }
+
+    private int getNumThisMediaFolder (String mode){
+        int num = 0;
+        File fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Желание/"+holder.name.getText().toString()); //Папка желания
+
+        if(fileDir.listFiles().length == 0 && fileDir.listFiles() == null)     //Если папка пуста возращяем 0
+            return 0;
+        File[] listFile = fileDir.listFiles();
+        switch (mode){
+            case "img":
+                for (int i = 0;i<listFile.length;i++){
+                    String nameFile = listFile[i].getName();        //Берём 1 имя файла и
+                    if(nameFile.contains(".jpg")){                   //Находим в нём .jpg в
+                        num++;
+                    }
+                }
+                break;
+            case "audio":
+                for (int i = 0;i<listFile.length;i++){
+                    String nameFile = listFile[i].getName();
+                    if(nameFile.contains(".mp3")){
+                        num++;
+                    }
+                }
+                break;
+            case "video":
+                for (int i = 0;i<listFile.length;i++){
+                    String nameFile = listFile[i].getName();
+                    if(nameFile.contains(".mp4")){
+                        num++;
+                    }
+                }
+                break;
+
+        }
+        return num;
     }
 
 }

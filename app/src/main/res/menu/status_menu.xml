@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:id="@+id/menu_share"
-        android:title="@string/status_0"/>
     <item
         android:id="@+id/menu_work"
         android:title="@string/status_1"/>
@@ -14,6 +12,8 @@
     <item
         android:id="@+id/menu_sleep"
         android:title="@string/status_3"/>
+    <item android:id="@+id/menu_share"
+        android:title="@string/status_0"/>
     <item
         android:id="@+id/menu_delete"
         android:title="@string/delete"/>

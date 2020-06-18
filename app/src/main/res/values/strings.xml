@@ -17,4 +17,7 @@
     <string name="des_return">При следующем запуске</string>
     <string name="des_next">Завтра</string>
     <string name="des_data">Выбрать дату</string>
+
+    <string name="share_text_1">Моё желание "</string>
+    <string name="share_text_2">" в приложении </string>
 </resources>

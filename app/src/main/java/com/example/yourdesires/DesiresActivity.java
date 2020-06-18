@@ -8,8 +8,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaRecorder;
@@ -23,6 +26,7 @@ import android.provider.MediaStore;
 import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -34,8 +38,11 @@ import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
 import com.example.yourdesires.model.MediaLost;
 import com.example.yourdesires.model.MediaLost_Table;
+import com.google.android.material.snackbar.Snackbar;
 import com.raizlabs.android.dbflow.sql.language.Operator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 
 import org.w3c.dom.Text;
 
@@ -57,8 +64,9 @@ import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity implements View.OnClickListener {
 boolean light,loadDB,saveBD,recording,playback;
-String command,tag1S,tag2S;
+String command,tag1S,tag2S,click_dialog_share;
 int status,pos;
+Button button_share;
 TextView data,time_des,time_des2,text;
 EditText op,desires,tag1,tag2,editText_share;
 ImageView statusColor,back,plus,scrap;
@@ -82,13 +90,27 @@ Dialog audio_recorder,dialog_share;
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
+        desires = findViewById(R.id.name);
+        desires.setText(getIntent().getStringExtra("name"));
+        click_dialog_share = "no";
         dialog_share = new Dialog(DesiresActivity.this);
         dialog_share.setContentView(R.layout.dialog_share_maket);
         dialog_share.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        button_share = dialog_share.findViewById(R.id.button_share);
         img_share = dialog_share.findViewById(R.id.img_share);
         audio_share = dialog_share.findViewById(R.id.audio_share);
         text_share = dialog_share.findViewById(R.id.text_share);
         editText_share = dialog_share.findViewById(R.id.editText_share);
+        final String standard_text_share = getResources().getString(R.string.share_text_1) +"'"+ desires.getText().toString() +"'"+ getResources().getText(R.string.share_text_2) +" "+ getResources().getString(R.string.app_name) + "! Скачай и попробуй тоже google.com";
+        editText_share.setText(standard_text_share);
+        dialog_share.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+                click_dialog_share = "no";
+                editText_share.setVisibility(View.GONE);
+                editText_share.setText(standard_text_share);
+            }
+        });
         mediaRecorder = new MediaRecorder ();
         audio_recorder = new Dialog(DesiresActivity.this);
         audio_recorder.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -116,8 +138,6 @@ Dialog audio_recorder,dialog_share;
         plus = findViewById(R.id.plus);
         back = findViewById(R.id.back);
         menu = findViewById(R.id.menu_tool);
-        desires = findViewById(R.id.name);
-        desires.setText(getIntent().getStringExtra("name"));
         op.setText(getIntent().getStringExtra("op"));
         saveBD = sh.getBoolean("saveBD",true);
         loadDB = sh.getBoolean("loadBD",false);
@@ -214,6 +234,60 @@ Dialog audio_recorder,dialog_share;
                 tag2.setText("");
             }
         });
+        button_share.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                final Intent in = new Intent(Intent.ACTION_SEND);
+                in.putExtra(Intent.EXTRA_SUBJECT,editText_share.getText().toString());
+                switch(click_dialog_share){
+                    case "img":
+                        //Делаем скриншот
+                        final File fileIMG = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/Желание/ScreenAppsDesires/",createNameFile()+".png");
+                        File fileFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/Желание/ScreenAppsDesires/");
+                        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
+                        StrictMode.setVmPolicy(builder.build());
+                        View v1 = getWindow().getDecorView().getRootView();
+                        v1.setDrawingCacheEnabled(true);
+                        final Bitmap bit = Bitmap.createBitmap(v1.getDrawingCache());  //Делаем сам скриншот
+                        v1.setDrawingCacheEnabled(false);
+                        fileFolder.mkdirs();
+                        try {
+                            saveFileScreen(bit,fileIMG);
+                        } catch (IOException e) {
+                            Toast.makeText(DesiresActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                        //Отправляем этот файл
+                        Picasso.get()
+                                .load(Uri.fromFile(fileIMG))
+                                .into(new Target() {
+                                    @Override
+                                    public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+                                        in.setType("image/*");
+                                        Uri uri = Uri.fromFile(fileIMG);
+                                        in.putExtra(Intent.EXTRA_STREAM,uri);
+                                        startActivity(Intent.createChooser(in,"Share"));
+                                        dialog_share.dismiss();
+                                    }
+                                    @Override
+                                    public void onBitmapFailed(Exception e, Drawable errorDrawable) {}
+                                    @Override
+                                    public void onPrepareLoad(Drawable placeHolderDrawable) {}
+                                });
+                        break;
+                    case "text":
+                        in.setType("text/plain");
+                        in.putExtra(Intent.EXTRA_TEXT,editText_share.getText().toString());
+                        startActivity(Intent.createChooser(in,"Share"));
+                        break;
+                    case "audio":
+                        Snackbar.make(v,"soon",Snackbar.LENGTH_SHORT).show();
+                        break;
+                    case "no":
+                        Snackbar.make(v,"Выберите тип share",Snackbar.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
         time_des.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -281,7 +355,7 @@ Dialog audio_recorder,dialog_share;
                                 StrictMode.setVmPolicy(builder.build());                                //
                                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 String name = createNameFile();
-                                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/",name+".jpg");
+                                final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/",name+".jpg");
                                 outputfileURI = Uri.fromFile(file);
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
                                 startActivityForResult(intent,CAMERA_PHOTO);
@@ -311,6 +385,12 @@ Dialog audio_recorder,dialog_share;
             loadMediaFileBD();
         }
 
+    }
+    private void saveFileScreen (Bitmap bit,File fileIMG) throws IOException{
+        FileOutputStream fileOutputStream = new FileOutputStream(fileIMG);  //Указываем путь до файла
+        bit.compress(Bitmap.CompressFormat.PNG,100,fileOutputStream);   //Сохраняем
+        fileOutputStream.flush();
+        fileOutputStream.close();
     }
     private void editSettingsPlayerRec (){
         final ImageView button = audio_recorder.findViewById(R.id.button);
@@ -470,12 +550,16 @@ Dialog audio_recorder,dialog_share;
     }
     private void loadMediaFile (){                  //Загрузка медиа файлов из файловой системы
        List<Uri> listOfFiles = getAllFile();
-       if(listOfFiles != null) {
-           for (int i = 0; i < listOfFiles.size(); i++) {
-               arrayListMedia.add(new Media(listOfFiles.get(i)));
+       if (listOfFiles != null) {
+           if (listOfFiles.size() != 0) {
+               for (int i = 0; i < listOfFiles.size(); i++) {
+                   arrayListMedia.add(new Media(listOfFiles.get(i)));
+               }
+               rec.getAdapter().notifyDataSetChanged();
+               rec.setVisibility(View.VISIBLE);
+           } else {
+               rec.setVisibility(View.GONE);
            }
-           rec.getAdapter().notifyDataSetChanged();
-           rec.setVisibility(View.VISIBLE);
        }
     }
     private int getNumMediaFileLocal (){        // //Метод получения кол-во файлов из файловой системы
@@ -568,6 +652,8 @@ Dialog audio_recorder,dialog_share;
         TextView text_share_static = dialog_share.findViewById(R.id.shareText);
         boolean light = true;
         if(color.equals("light")){
+            button_share.setBackgroundResource(R.drawable.maket_block);
+            button_share.setTextColor(getResources().getColor(R.color.dark));
             dialog_lin_share.setBackgroundColor(getResources().getColor(R.color.white));
             text_share_static.setTextColor(getResources().getColor(R.color.dark));
             block_share.setBackgroundResource(R.drawable.maket_block);
@@ -607,6 +693,8 @@ Dialog audio_recorder,dialog_share;
             scrap.setImageResource(R.drawable.mys);
             light = true;
         }else if (color.equals("dark")){
+            button_share.setBackgroundResource(R.drawable.maket_block_dark);
+            button_share.setTextColor(getResources().getColor(R.color.white));
             dialog_lin_share.setBackgroundColor(getResources().getColor(R.color.dark));
             text_share_static.setTextColor(getResources().getColor(R.color.white));
             block_share.setBackgroundResource(R.drawable.maket_block_dark);
@@ -675,12 +763,39 @@ Dialog audio_recorder,dialog_share;
         switch(v.getId()){
             case R.id.img_share:
                 editText_share.setVisibility(View.GONE);
+                click_dialog_share = "img";
+                img_share.setImageResource(R.drawable.photo_click);
+                if(light){
+                     audio_share.setImageResource(R.drawable.music);
+                     text_share.setImageResource(R.drawable.text);
+                }else{
+                     audio_share.setImageResource(R.drawable.music_light);
+                     text_share.setImageResource(R.drawable.text_light);
+                }
                 break;
             case R.id.audio_share:
                 editText_share.setVisibility(View.GONE);
+                click_dialog_share = "audio";
+                audio_share.setImageResource(R.drawable.music_click);
+                if(light){
+                    img_share.setImageResource(R.drawable.music);
+                    text_share.setImageResource(R.drawable.text);
+                }else{
+                    img_share.setImageResource(R.drawable.photo_light);
+                    text_share.setImageResource(R.drawable.text_light);
+                }
                 break;
             case R.id.text_share:
                 editText_share.setVisibility(View.VISIBLE);
+                click_dialog_share = "text";
+                text_share.setImageResource(R.drawable.text_click);
+                if(light){
+                    img_share.setImageResource(R.drawable.photo);
+                    text_share.setImageResource(R.drawable.text);
+                }else{
+                    img_share.setImageResource(R.drawable.photo_light);
+                    audio_share.setImageResource(R.drawable.music_light);
+                }
                 break;
         }
     }
