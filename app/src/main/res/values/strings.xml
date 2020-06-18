@@ -7,6 +7,7 @@
     <string name="status_filter_str">Поиск по статусу</string>
     <string name="data_filter_str">Поиск по дате</string>
 
+    <string name="status_0">Поделиться</string>
     <string name="status_1">В ожидании</string>
     <string name="status_2">Выполнено</string>
     <string name="status_3">Отложено</string>

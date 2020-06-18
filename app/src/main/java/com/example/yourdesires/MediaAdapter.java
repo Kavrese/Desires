@@ -1,8 +1,10 @@
 package com.example.yourdesires;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
@@ -10,6 +12,7 @@ import android.os.Environment;
 import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -29,21 +32,40 @@ import java.util.ArrayList;
 
 import static android.app.Activity.RESULT_OK;
 
-public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
+public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> implements  View.OnLongClickListener, View.OnTouchListener {
     boolean mediaIsNull = true;
+    boolean isSelects,isSelect,isLongClick;     //isSelects - был ли включен режим выбора  isSelect - есть ли в выборе это желание
     private MediaPlayer mediaPlayer;
     private String type;
     ArrayList<Media> arrayList;
+    ArrayList selected_list = new ArrayList();
     private boolean playing;
+    public SharedPreferences sh;
+    private SharedPreferences.Editor ed;
+    MediaViewHolder holder;
     public MediaAdapter(ArrayList<Media> arrayList){
         this.arrayList = arrayList;
     }
 
+
+    @Override
+    public boolean onLongClick(View v) {
+
+        return false;
+    }
+
+    @Override
+    public boolean onTouch(View v, MotionEvent event) {
+        Toast.makeText(v.getContext(), "up", Toast.LENGTH_SHORT).show();
+        return false;
+    }
+
     public class MediaViewHolder extends RecyclerView.ViewHolder {
-        ImageView img;
+        ImageView img,selected_img;
         public MediaViewHolder(@NonNull View itemView) {
             super(itemView);
             img = itemView.findViewById(R.id.img);
+            selected_img = itemView.findViewById(R.id.selected_img);
         }
     }
 
@@ -52,6 +74,10 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     public MediaViewHolder onCreateViewHolder(@NonNull final ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.maket_recyclerview_media,parent,false);
         final MediaViewHolder mediaViewHolder = new MediaViewHolder(view);
+        sh = mediaViewHolder.img.getContext().getSharedPreferences("0",0);
+        mediaViewHolder.img.setOnLongClickListener(this);
+      //  mediaViewHolder.img.setOnTouchListener(this);
+        holder = mediaViewHolder;
         return mediaViewHolder;
     }
     @Override
@@ -85,52 +111,54 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         holder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(type.equals("img")) {            //Если открытый файл картинка - открываем его на весь экран через диалог
-                    Dialog dialog = new Dialog(holder.img.getContext());
-                    dialog.setContentView(R.layout.dialog_maket);
-                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                    ImageView img = dialog.findViewById(R.id.img);
-                    Picasso.get()       //Загружаем главное изображение
-                            .load(arrayList.get(position).getImg())
-                            .placeholder(android.R.drawable.stat_sys_download)
-                            .error(android.R.drawable.ic_menu_close_clear_cancel)
-                            .into(img);
-                    dialog.show();
-                }else if(type.equals("audio")){         //Если файл аудио - открываем диалог с плеером
-                    Dialog dialog = new Dialog(holder.img.getContext());
-                    dialog.setContentView(R.layout.dialog_maket_recorder_audio);
-                    dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                    final ImageView button = dialog.findViewById(R.id.button);  //Кнопка пуска/паузы
-                    button.setImageResource(R.drawable.resume_light);       //Меняем изображение на пуск
-                    dialog.show();
-                    mediaPlayer = MediaPlayer.create(holder.img.getContext(),uri);      //Создаём Медиа плеер с uri файла
-                    mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {        //По завершению аудио файла
-                        @Override
-                        public void onCompletion(MediaPlayer mp) {
-                            stopRecord(mediaPlayer);        //Останавливаем
-                            button.setImageResource(R.drawable.resume_light);//Меняем картику на пуск
-                            playing = false;
-                        }
-                    });
-                    button.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            if(!playing) {      //Если не играет
-                                playRecord(mediaPlayer);        //Начинаем играть
-                                button.setImageResource(R.drawable.pause_light);//Меняем картику на паузу
-                                playing = true;
-                            }else{
-                                playing = false;
-                                stopRecord(mediaPlayer);        //Останавливаем если играло
+                    //Обычный клик
+                    if (type.equals("img")) {            //Если открытый файл картинка - открываем его на весь экран через диалог
+                        Dialog dialog = new Dialog(holder.img.getContext());
+                        dialog.setContentView(R.layout.dialog_maket);
+                        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                        ImageView img = dialog.findViewById(R.id.img);
+                        Picasso.get()       //Загружаем главное изображение
+                                .load(arrayList.get(position).getImg())
+                                .placeholder(android.R.drawable.stat_sys_download)
+                                .error(android.R.drawable.ic_menu_close_clear_cancel)
+                                .into(img);
+                        dialog.show();
+                    } else if (type.equals("audio")) {         //Если файл аудио - открываем диалог с плеером
+                        Dialog dialog = new Dialog(holder.img.getContext());
+                        dialog.setContentView(R.layout.dialog_maket_recorder_audio);
+                        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                        final ImageView button = dialog.findViewById(R.id.button);  //Кнопка пуска/паузы
+                        button.setImageResource(R.drawable.resume_light);       //Меняем изображение на пуск
+                        dialog.show();
+                        mediaPlayer = MediaPlayer.create(holder.img.getContext(), uri);      //Создаём Медиа плеер с uri файла
+                        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {        //По завершению аудио файла
+                            @Override
+                            public void onCompletion(MediaPlayer mp) {
+                                stopRecord(mediaPlayer);        //Останавливаем
                                 button.setImageResource(R.drawable.resume_light);//Меняем картику на пуск
+                                playing = false;
                             }
-                        }
-                    });
-                }
+                        });
+                        button.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                if (!playing) {      //Если не играет
+                                    playRecord(mediaPlayer);        //Начинаем играть
+                                    button.setImageResource(R.drawable.pause_light);//Меняем картику на паузу
+                                    playing = true;
+                                } else {
+                                    playing = false;
+                                    stopRecord(mediaPlayer);        //Останавливаем если играло
+                                    button.setImageResource(R.drawable.resume_light);//Меняем картику на пуск
+                                }
+                            }
+                        });
+                    }
+
+
             }
         });
     }
-
     @Override
     public int getItemCount() {
         return arrayList.size();

@@ -67,6 +67,10 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     }
     @Override
     public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
+        holder.cup_img.setVisibility(View.GONE);
+        holder.cup_video.setVisibility(View.GONE);
+        holder.cup_audio.setVisibility(View.GONE);
+        holder.cup_bell.setVisibility(View.GONE);
         this.holder = holder;
         wrapper = holder.itemView.getContext();             //Берём контекст
         wrapper = getWrapperStyle(wrapper,arrayList.get(position).getLight());      //Модернизируем этот же контекст
@@ -242,7 +246,6 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         }
         return wrapper;
     }
-
     private boolean getCupInfo (String cup){
         Lost lost = SQLite.select()
                 .from(Lost.class)

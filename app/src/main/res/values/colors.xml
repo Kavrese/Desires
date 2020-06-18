@@ -14,6 +14,7 @@
     <color name="yellow">#FFE500</color>
     <color name="green">#4CAF50</color>
     <color name="blue">#3F51B5</color>
+    <color name="blue_back">#AD4D69FF</color>
     <color name="red">#BC0000</color>
     <color name="orange">#FF9800</color>
     <color name="back_1">#DDDDDD</color>

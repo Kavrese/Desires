@@ -252,28 +252,28 @@ public class MainActivity extends AppCompatActivity{
                 }else if(hasFocus && searchType.equals("status")){
                     final PopupMenu search_status = new PopupMenu(wrapper,searchText);
                     search_status.inflate(R.menu.search_status_menu);
-                                search_status.show();
-                                search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                                    @Override
-                                    public boolean onMenuItemClick(MenuItem item) {
-                                        switch (item.getItemId()) {
-                                            case R.id.menu_work_search:
-                                                searchText.setText(R.string.status_1);
-                                                break;
-                                            case R.id.menu_great_search:
-                                                searchText.setText(R.string.status_2);
-                                                break;
-                                            case R.id.menu_time_search:
-                                                searchText.setText(R.string.status_4);
-                                                break;
-                                            case R.id.menu_sleep_search:
-                                                searchText.setText(R.string.status_3);
-                                                break;
-                                        }
-                                        return true;
-                                    }
-                                });
+                    search_status.show();
+                    search_status.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                        @Override
+                        public boolean onMenuItemClick(MenuItem item) {
+                            switch (item.getItemId()) {
+                                case R.id.menu_work_search:
+                                    searchText.setText(R.string.status_1);
+                                    break;
+                                case R.id.menu_great_search:
+                                    searchText.setText(R.string.status_2);
+                                    break;
+                                case R.id.menu_time_search:
+                                    searchText.setText(R.string.status_4);
+                                    break;
+                                case R.id.menu_sleep_search:
+                                    searchText.setText(R.string.status_3);
+                                    break;
                             }
+                            return true;
+                        }
+                    });
+                }
 
             }
         });
@@ -348,9 +348,9 @@ public class MainActivity extends AppCompatActivity{
             @Override
             public void onClick(View v) {
                 if(light)
-                switchColor("dark");
+                    switchColor("dark");
                 else
-                switchColor("light");
+                    switchColor("light");
             }
         });
         getIntentMet();
@@ -435,9 +435,9 @@ public class MainActivity extends AppCompatActivity{
         ed.apply();
     }
     private void loadBooleans (){
-       saveBD = sh.getBoolean("saveBD",true);
-       loadBD = sh.getBoolean("loadBD",false);
-       noAlert = sh.getBoolean("noAlert",false);
+        saveBD = sh.getBoolean("saveBD",true);
+        loadBD = sh.getBoolean("loadBD",false);
+        noAlert = sh.getBoolean("noAlert",false);
     }
     private Context getWrapperStyle (Context wrapper){
         if(light){
@@ -497,6 +497,7 @@ public class MainActivity extends AppCompatActivity{
                 op.setTextColor(getResources().getColor(R.color.white));
                 tag1Text.setTextColor(getResources().getColor(R.color.white));
                 tag2Text.setTextColor(getResources().getColor(R.color.white));
+                save.setBackgroundResource(R.drawable.maket_button_sheet_dark);
                 light = false;
                 switchFilter(searchType);
                 break;
@@ -526,6 +527,7 @@ public class MainActivity extends AppCompatActivity{
                 op.setTextColor(getResources().getColor(R.color.dark));
                 tag1Text.setTextColor(getResources().getColor(R.color.dark));
                 tag2Text.setTextColor(getResources().getColor(R.color.dark));
+                save.setBackgroundResource(R.drawable.maket_button_sheet);
                 light = true;
                 switchFilter(searchType);
                 break;
@@ -537,10 +539,10 @@ public class MainActivity extends AppCompatActivity{
         wrapper = getWrapperStyle(wrapper);
     }
     public void editMaketRecyclerView (boolean light,ArrayList<Desires> list){
-            for(int i = 0;i<list.size();i++){
-                list.get(i).setLight(light);
-            }
-            recyclerView.getAdapter().notifyDataSetChanged();
+        for(int i = 0;i<list.size();i++){
+            list.get(i).setLight(light);
+        }
+        recyclerView.getAdapter().notifyDataSetChanged();
     }
     public void getIntentMet (){
         String command = getIntent().getStringExtra("command");
@@ -646,8 +648,8 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     private void hiddenFirstIMG (){
-            text_first.setVisibility(View.GONE);
-            recyclerView.setVisibility(View.VISIBLE);
+        text_first.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.VISIBLE);
     }
 
     private void showFirstIMG (){
@@ -681,11 +683,11 @@ public class MainActivity extends AppCompatActivity{
                     if (tag1.equals("")) {
                         tag1 = "no";
                     }
-                        String data = dateFormat.format(new Date());
-                        list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op,light,searchB,position));
-                        recyclerView.getAdapter().notifyDataSetChanged();
-                        bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
-                        getOrSetDataBase("setAll", name, op, tag1, tag2, list.size(), data, 1);
+                    String data = dateFormat.format(new Date());
+                    list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op,light,searchB,position));
+                    recyclerView.getAdapter().notifyDataSetChanged();
+                    bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+                    getOrSetDataBase("setAll", name, op, tag1, tag2, list.size(), data, 1);
 
                 }
             }
@@ -806,7 +808,7 @@ public class MainActivity extends AppCompatActivity{
                     switch (pole){
                         case "В ожидании":
                             num = 1;
-                        break;
+                            break;
                         case "Отложено на время":
                             num = 3;
                             break;

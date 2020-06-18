@@ -55,14 +55,15 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-public class DesiresActivity extends AppCompatActivity {
+public class DesiresActivity extends AppCompatActivity implements View.OnClickListener {
 boolean light,loadDB,saveBD,recording,playback;
 String command,tag1S,tag2S;
 int status,pos;
 TextView data,time_des,time_des2,text;
-EditText op,desires,tag1,tag2;
+EditText op,desires,tag1,tag2,editText_share;
 ImageView statusColor,back,plus,scrap;
 ImageView menu,add_media;
+ImageView img_share,audio_share,text_share;
 androidx.appcompat.widget.Toolbar toolbar;
 LinearLayout lin,lin_tag,lin_time,lin_media;
 SharedPreferences sh;
@@ -76,11 +77,18 @@ int CAMERA_PHOTO = 1;
 int GALLERY = 2;
 int CAMERA_VIDEO = 3;
 int AUDIO = 4;
-Dialog audio_recorder;
+Dialog audio_recorder,dialog_share;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_desires);
+        dialog_share = new Dialog(DesiresActivity.this);
+        dialog_share.setContentView(R.layout.dialog_share_maket);
+        dialog_share.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        img_share = dialog_share.findViewById(R.id.img_share);
+        audio_share = dialog_share.findViewById(R.id.audio_share);
+        text_share = dialog_share.findViewById(R.id.text_share);
+        editText_share = dialog_share.findViewById(R.id.editText_share);
         mediaRecorder = new MediaRecorder ();
         audio_recorder = new Dialog(DesiresActivity.this);
         audio_recorder.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
@@ -138,6 +146,9 @@ Dialog audio_recorder;
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                ed = sh.edit();
+                ed.putInt("size_selected",0);
+                ed.apply();
                 inputIntent();
             }
         });
@@ -151,6 +162,12 @@ Dialog audio_recorder;
                     public boolean onMenuItemClick(MenuItem item) {
                         boolean bool = false;
                         switch (item.getItemId()) {
+                            case R.id.menu_share:
+                                dialog_share.show();
+                                img_share.setOnClickListener(DesiresActivity.this);
+                                audio_share.setOnClickListener(DesiresActivity.this);
+                                text_share.setOnClickListener(DesiresActivity.this);
+                                break;
                             case R.id.menu_work:
                                 editStatusColor(1);
                                 command = "yellow";
@@ -545,9 +562,24 @@ Dialog audio_recorder;
     private boolean switchColor (String color){
         TextView textMedia = audio_recorder.findViewById(R.id.mediaText);
         LinearLayout block_media = audio_recorder.findViewById(R.id.block_media);
+        LinearLayout block_share = dialog_share.findViewById(R.id.lin_share);
         LinearLayout dialog_lin_media = audio_recorder.findViewById(R.id.dialog_lin_media);
+        LinearLayout dialog_lin_share = dialog_share.findViewById(R.id.dialog_lin_share);
+        TextView text_share_static = dialog_share.findViewById(R.id.shareText);
         boolean light = true;
         if(color.equals("light")){
+            dialog_lin_share.setBackgroundColor(getResources().getColor(R.color.white));
+            text_share_static.setTextColor(getResources().getColor(R.color.dark));
+            block_share.setBackgroundResource(R.drawable.maket_block);
+            editText_share.setBackgroundResource(R.drawable.maket_block);
+            editText_share.setTextColor(getResources().getColor(R.color.dark));
+            img_share.setImageResource(R.drawable.photo);
+            audio_share.setImageResource(R.drawable.music);
+            text_share.setImageResource(R.drawable.text);
+            audio_share.setBackgroundResource(R.drawable.maket_left);
+            text_share.setBackgroundResource(R.drawable.maket_left);
+            add_media.setImageResource(R.drawable.clip);
+            rec.setBackgroundResource(R.drawable.maket_right);
             textMedia.setTextColor(getResources().getColor(R.color.dark));
             block_media.setBackgroundResource(R.drawable.maket_block);
             dialog_lin_media.setBackgroundColor(getResources().getColor(R.color.white));
@@ -575,6 +607,18 @@ Dialog audio_recorder;
             scrap.setImageResource(R.drawable.mys);
             light = true;
         }else if (color.equals("dark")){
+            dialog_lin_share.setBackgroundColor(getResources().getColor(R.color.dark));
+            text_share_static.setTextColor(getResources().getColor(R.color.white));
+            block_share.setBackgroundResource(R.drawable.maket_block_dark);
+            editText_share.setBackgroundResource(R.drawable.maket_block_dark);
+            editText_share.setTextColor(getResources().getColor(R.color.white));
+            img_share.setImageResource(R.drawable.photo_light);
+            audio_share.setImageResource(R.drawable.music_light);
+            text_share.setImageResource(R.drawable.text_light);
+            audio_share.setBackgroundResource(R.drawable.maket_left_light);
+            text_share.setBackgroundResource(R.drawable.maket_left_light);
+            add_media.setImageResource(R.drawable.clip_light);
+            rec.setBackgroundResource(R.drawable.maket_right_dark);
             textMedia.setTextColor(getResources().getColor(R.color.white));
             block_media.setBackgroundResource(R.drawable.maket_block_dark);
             dialog_lin_media.setBackgroundColor(getResources().getColor(R.color.dark));
@@ -624,5 +668,20 @@ Dialog audio_recorder;
             wrapper = new ContextThemeWrapper(text.getContext(),R.style.Pop_menu_dark);
         }
         return wrapper;
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()){
+            case R.id.img_share:
+                editText_share.setVisibility(View.GONE);
+                break;
+            case R.id.audio_share:
+                editText_share.setVisibility(View.GONE);
+                break;
+            case R.id.text_share:
+                editText_share.setVisibility(View.VISIBLE);
+                break;
+        }
     }
 }
