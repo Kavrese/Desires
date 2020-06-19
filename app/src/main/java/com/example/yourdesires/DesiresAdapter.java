@@ -3,6 +3,7 @@ package com.example.yourdesires;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -193,7 +194,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                     SQLite.delete(MediaLost.class)   //Удаление в медиа таблице
                                             .where(MediaLost_Table.id_desires.is(id))
                                             .execute();
-                                File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+holder.name.getText().toString()+"/" );
+                                File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+holder.name.getText().toString()+"/" );
                                 try {
                                     FileUtils.deleteDirectory(file);
                                 } catch (IOException e) {
@@ -291,7 +292,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
 
     private int getNumThisMediaFolder (String mode){
         int num = 0;
-        File fileDir = new File(Environment.getExternalStorageDirectory().getAbsolutePath()+ "/Желание/"+holder.name.getText().toString()); //Папка желания
+        File fileDir = new File(Environment.getExternalStorageDirectory()+ "/Desires/"+holder.name.getText().toString()); //Папка желания
 
         if(fileDir.listFiles().length == 0 && fileDir.listFiles() == null)     //Если папка пуста возращяем 0
             return 0;

@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/menu_work"
+        android:id="@+id/menu_work_share"
         android:title="@string/status_1"/>
     <item
-        android:id="@+id/menu_great"
+        android:id="@+id/menu_great_share"
         android:title="@string/status_2"/>
 
-    <item android:id="@+id/menu_time"
+    <item android:id="@+id/menu_time_share"
         android:title="@string/status_4"/>
     <item
-        android:id="@+id/menu_sleep"
+        android:id="@+id/menu_sleep_share"
         android:title="@string/status_3"/>
+    <item android:id="@+id/menu_share"
+        android:title="@string/status_0"/>
     <item
-        android:id="@+id/menu_delete"
+        android:id="@+id/menu_delete_share"
         android:title="@string/delete"/>
 </menu>

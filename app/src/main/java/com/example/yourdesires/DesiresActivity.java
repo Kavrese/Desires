@@ -176,7 +176,7 @@ Dialog audio_recorder,dialog_share;
             @Override
             public void onClick(View v) {
                 PopupMenu pop = new PopupMenu(wrapper,v);
-                pop.inflate(R.menu.status_menu);
+                pop.inflate(R.menu.status_menu_share);
                 pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
@@ -188,27 +188,27 @@ Dialog audio_recorder,dialog_share;
                                 audio_share.setOnClickListener(DesiresActivity.this);
                                 text_share.setOnClickListener(DesiresActivity.this);
                                 break;
-                            case R.id.menu_work:
+                            case R.id.menu_work_share:
                                 editStatusColor(1);
                                 command = "yellow";
                                 bool = true;
                                 break;
-                            case R.id.menu_great:
+                            case R.id.menu_great_share:
                                 editStatusColor(2);
                                 command = "green";
                                 bool = true;
                                 break;
-                            case R.id.menu_time:
+                            case R.id.menu_time_share:
                                 editStatusColor(3);
                                 command = "orange";
                                 bool = true;
                                 break;
-                            case R.id.menu_sleep:
+                            case R.id.menu_sleep_share:
                                 editStatusColor(4);
                                 command = "red";
                                 bool = true;
                                 break;
-                            case R.id.menu_delete:
+                            case R.id.menu_delete_share:
                                 command = "delete";
                                 inputIntent();
                                 bool = true;
@@ -242,8 +242,8 @@ Dialog audio_recorder,dialog_share;
                 switch(click_dialog_share){
                     case "img":
                         //Делаем скриншот
-                        final File fileIMG = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/Желание/ScreenAppsDesires/",createNameFile()+".png");
-                        File fileFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() +"/Желание/ScreenAppsDesires/");
+                        final File fileIMG = new File(Environment.getExternalStorageDirectory() +"/Desires/ScreenAppsDesires/",createNameFile()+".png");
+                        File fileFolder = new File(Environment.getExternalStorageDirectory() +"/Desires/ScreenAppsDesires/");
                         StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
                         StrictMode.setVmPolicy(builder.build());
                         View v1 = getWindow().getDecorView().getRootView();
@@ -355,7 +355,7 @@ Dialog audio_recorder,dialog_share;
                                 StrictMode.setVmPolicy(builder.build());                                //
                                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 String name = createNameFile();
-                                final File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/",name+".jpg");
+                                final File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/",name+".jpg");
                                 outputfileURI = Uri.fromFile(file);
                                 intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
                                 startActivityForResult(intent,CAMERA_PHOTO);
@@ -401,7 +401,7 @@ Dialog audio_recorder,dialog_share;
                     button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        File outputfile = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Желание/" + desires.getText().toString() + "/", createNameFile() + "rec.mp3");
+                        File outputfile = new File(Environment.getExternalStorageDirectory() + "/Desires/" + desires.getText().toString() + "/", createNameFile() + "rec.mp3");
                         if(!recording && !playback) {
                             if (light)
                                 button.setImageResource(R.drawable.off);
@@ -488,7 +488,7 @@ Dialog audio_recorder,dialog_share;
         if(requestCode == GALLERY && resultCode == RESULT_OK){
  /*           Uri uriGallery = data.getData();
             File imgGallery = new File(uriGallery.toString());
-            File imgFolder = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Желание/"+desires.getText().toString()+"/",createNameFile()+".jpg");
+            File imgFolder = new File(Environment.getExternalStorageDirectory() + "/Desires/"+desires.getText().toString()+"/",createNameFile()+".jpg");
 */
         }
     }
@@ -563,7 +563,7 @@ Dialog audio_recorder,dialog_share;
        }
     }
     private int getNumMediaFileLocal (){        // //Метод получения кол-во файлов из файловой системы
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/" );
+        File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/" );
         File[] listOfFiles = file.listFiles();
         if(listOfFiles != null) {
             return listOfFiles.length;
@@ -597,7 +597,7 @@ Dialog audio_recorder,dialog_share;
         return URIsBD;
     }
     private List<Uri> getAllFile (){   //Метод получения всех медиа файлов в корне
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + "Желание"+"/"+desires.getText().toString()+"/" );
+        File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/" );
         File[] files = file.listFiles();
         List<Uri> URIsLocal = new ArrayList<>();
         if(files != null ) {

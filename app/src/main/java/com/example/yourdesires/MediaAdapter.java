@@ -1,38 +1,36 @@
 package com.example.yourdesires;
-
-import android.Manifest;
-import android.annotation.SuppressLint;
+import android.os.Environment;
+import android.view.ContextThemeWrapper;
 import android.app.Dialog;
-import android.content.Intent;
+import android.content.Context;
 import android.content.SharedPreferences;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
-import android.os.Environment;
-import android.os.StrictMode;
-import android.provider.MediaStore;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.PopupMenu;
 import android.widget.Toast;
-
+import android.os.Vibrator;
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.yourdesires.model.MediaLost;
+import com.example.yourdesires.model.MediaLost_Table;
+import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
-import java.io.IOException;
+import java.sql.Wrapper;
 import java.util.ArrayList;
 
-import static android.app.Activity.RESULT_OK;
-
-public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> implements  View.OnLongClickListener, View.OnTouchListener {
+public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> implements  View.OnTouchListener {
+    Context wrapper;
     boolean mediaIsNull = true;
     boolean isSelects,isSelect,isLongClick;     //isSelects - был ли включен режим выбора  isSelect - есть ли в выборе это желание
     private MediaPlayer mediaPlayer;
@@ -43,16 +41,12 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     public SharedPreferences sh;
     private SharedPreferences.Editor ed;
     MediaViewHolder holder;
+    RecyclerView rec;
     public MediaAdapter(ArrayList<Media> arrayList){
         this.arrayList = arrayList;
     }
 
 
-    @Override
-    public boolean onLongClick(View v) {
-
-        return false;
-    }
 
     @Override
     public boolean onTouch(View v, MotionEvent event) {
@@ -75,22 +69,20 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.maket_recyclerview_media,parent,false);
         final MediaViewHolder mediaViewHolder = new MediaViewHolder(view);
         sh = mediaViewHolder.img.getContext().getSharedPreferences("0",0);
-        mediaViewHolder.img.setOnLongClickListener(this);
       //  mediaViewHolder.img.setOnTouchListener(this);
-        holder = mediaViewHolder;
         return mediaViewHolder;
     }
     @Override
     public void onBindViewHolder(@NonNull final MediaViewHolder holder, final int position) {
+        wrapper = getWrapperStyle(wrapper,sh.getString("color","light"));
+        this.holder = holder;
         final Uri uri = arrayList.get(position).getImg();
         final String str = uri.toString();
         //Определяем како-го типа файл
-        if(str.contains(".jpg") && uri != null)
+        if(str.contains(".jpg"))
             type = "img";
-        else if(str.contains(".mp3") && uri != null)
+        else if(str.contains(".mp3"))
             type = "audio";
-
-        if(uri != null )
         if(type.equals("img")){         //Если это изображение - загружаем его на превью
             mediaIsNull = false;
             Picasso.get()
@@ -108,9 +100,54 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
             holder.img.setImageResource(android.R.drawable.ic_menu_camera);
             mediaIsNull = true;
         }
+        holder.img.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Vibrator vibro = (Vibrator) v.getContext().getSystemService(Context.VIBRATOR_SERVICE);
+                assert vibro != null;
+                vibro.vibrate(VibrationEffect.createOneShot(100,VibrationEffect.DEFAULT_AMPLITUDE));    //Вибрируем
+                isLongClick = true;
+                wrapper = holder.itemView.getContext();
+                wrapper = getWrapperStyle(wrapper,sh.getString("color","light"));
+                PopupMenu popupMenu_desires = new PopupMenu(wrapper,v);
+                popupMenu_desires.inflate(R.menu.media_menu_long_click);
+                popupMenu_desires.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId()){
+                            case R.id.menu_delete_media:
+                                Uri uri = arrayList.get(position).getImg();
+                                //Удаляем из бд
+                                notifyDataSetChanged();
+                                SQLite.delete()
+                                        .from(MediaLost.class)
+                                        .where(MediaLost_Table.media_id.is(getIdMediaBD(uri)))
+                                        .execute();
+                                //Удаляем из локалки
+                                File file = new File(uri.getPath());
+                                if(file.exists()) {
+                                    file.delete();
+                                }else{
+                                    Toast.makeText(holder.img.getContext(), "Error: Not Exist = Not Delete", Toast.LENGTH_SHORT).show();
+                                }
+                                arrayList.remove(position);
+                                if(arrayList.size() == 0){      //Если список пуст то прячем Recycler View который мы получили переопределив метод onAttachedToRecyclerView
+                                    rec.setVisibility(View.GONE);
+                                }
+
+                                break;
+                        }
+                        return false;
+                    }
+                });
+                popupMenu_desires.show();
+                return false;
+            }
+        });
         holder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(!isLongClick) {
                     //Обычный клик
                     if (type.equals("img")) {            //Если открытый файл картинка - открываем его на весь экран через диалог
                         Dialog dialog = new Dialog(holder.img.getContext());
@@ -155,10 +192,27 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                         });
                     }
 
-
+                }else {
+                    isLongClick = false;
+                }
             }
         });
     }
+    private int getIdMediaBD (Uri uri){     //Возращяет медиа id по uri
+        String str = uri.toString();
+        MediaLost mediaLost = SQLite.select()
+                .from(MediaLost.class)
+                .where(MediaLost_Table.uri.is(str))
+                .querySingle();
+       return mediaLost.getMedia_id();
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        rec = recyclerView;
+    }
+
     @Override
     public int getItemCount() {
         return arrayList.size();
@@ -175,5 +229,12 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         catch (Throwable t) {
         }
     }
-
+    private Context getWrapperStyle (Context wrapper,String light){
+        if(light.equals("light")){
+            wrapper = new ContextThemeWrapper(wrapper,R.style.Pop_menu_light);
+        }else{
+            wrapper = new ContextThemeWrapper(wrapper,R.style.Pop_menu_dark);
+        }
+        return wrapper;
+    }
 }
