@@ -11,6 +11,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -41,6 +42,7 @@ import com.raizlabs.android.dbflow.config.FlowConfig;
 import com.raizlabs.android.dbflow.config.FlowManager;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 
+import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -688,7 +690,12 @@ public class MainActivity extends AppCompatActivity{
                     recyclerView.getAdapter().notifyDataSetChanged();
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                     getOrSetDataBase("setAll", name, op, tag1, tag2, list.size(), data, 1);
-
+                    File newFileDir = new File(Environment.getExternalStorageDirectory() + "/Desires/"+name);
+                    if(!newFileDir.exists()){
+                        newFileDir.mkdirs();
+                    }else{
+                        Toast.makeText(this, "Error: New folder already exist", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         }
