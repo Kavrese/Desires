@@ -85,7 +85,7 @@
             android:background="@drawable/maket_left"
             android:gravity="left|top"
             android:orientation="horizontal"
-            android:visibility="visible"
+            android:visibility="gone"
             android:weightSum="10">
 
             <ImageView
