@@ -35,6 +35,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     ArrayList<Desires> arrayList;
     Context wrapper;
     private DesiresViewHolder holder;
+    private RecyclerView recyclerView;
     public DesiresAdapter (ArrayList<Desires> arrayList){
         this.arrayList = arrayList;
     }
@@ -190,6 +191,8 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                         .where(Lost_Table.desires.is(String.valueOf(arrayList.get(position).getName())))
                                         .execute();
                                 arrayList.remove(position);
+                                if(arrayList.size() == 0)
+                                    recyclerView.setVisibility(View.INVISIBLE);
                                 notifyDataSetChanged();
                                     SQLite.delete(MediaLost.class)   //Удаление в медиа таблице
                                             .where(MediaLost_Table.id_desires.is(id))
@@ -288,6 +291,12 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
 
         }
         return false;
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+        this.recyclerView = recyclerView;
     }
 
     private int getNumThisMediaFolder (String mode){

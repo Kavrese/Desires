@@ -55,7 +55,7 @@ public class MainActivity extends AppCompatActivity{
     boolean back_presed = false;
     boolean light = true;
     boolean searchB = false;
-    boolean text_sear = false;
+    boolean deleteMF = false;
     boolean saveBD = true;
     boolean loadBD = false;
     boolean noAlert = false;
@@ -368,11 +368,13 @@ public class MainActivity extends AppCompatActivity{
             public void onClick(View v) {
                 final Switch bd = dialog_setting.findViewById(R.id.bd_switch);
                 final Switch file = dialog_setting.findViewById(R.id.file_switch);
+                final Switch delete = dialog_setting.findViewById(R.id.delete_switch);
                 final LinearLayout alert = dialog_setting.findViewById(R.id.lin_alert);
                 TextView alertText = dialog_setting.findViewById(R.id.text_alert);
                 loadBooleans();
                 bd.setChecked(saveBD);
                 file.setChecked(loadBD);
+                delete.setChecked(deleteMF);
                 if(!loadBD && !saveBD) {
                     file.setTextColor(getResources().getColor(R.color.grey));
                 }else if(!noAlert && saveBD && loadBD){
@@ -382,7 +384,7 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View v) {
                         noAlert = true;
-                        saveBooleans(saveBD,loadBD,noAlert);
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
                         alert.setVisibility(View.GONE);
                     }
                 });
@@ -397,7 +399,7 @@ public class MainActivity extends AppCompatActivity{
                             file.setTextColor(getResources().getColor(R.color.grey));
                             file.setChecked(false);
                         }
-                        saveBooleans(saveBD,loadBD,noAlert);
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
                     }
                 });
 
@@ -415,7 +417,13 @@ public class MainActivity extends AppCompatActivity{
                             loadBD = false;
                             noAlert = false;
                         }
-                        saveBooleans(saveBD,loadBD,noAlert);
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
+                    }
+                });
+                delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                    @Override
+                    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
                     }
                 });
                 dialog_setting.show();
@@ -429,17 +437,19 @@ public class MainActivity extends AppCompatActivity{
             v.setTextColor(getResources().getColor(R.color.white));
         }
     }
-    private void saveBooleans (boolean saveBD,boolean loadBD,boolean noAlert){
+    private void saveBooleans (boolean saveBD,boolean loadBD,boolean noAlert,boolean deleteMF){
         ed = sh.edit();
         ed.putBoolean("saveBD",saveBD);
         ed.putBoolean("loadBD",loadBD);
         ed.putBoolean("noAlert",noAlert);
+        ed.putBoolean("deleteMF",deleteMF);
         ed.apply();
     }
     private void loadBooleans (){
         saveBD = sh.getBoolean("saveBD",true);
         loadBD = sh.getBoolean("loadBD",false);
         noAlert = sh.getBoolean("noAlert",false);
+        deleteMF = sh.getBoolean("deleteMF",true);
     }
     private Context getWrapperStyle (Context wrapper){
         if(light){
@@ -455,6 +465,7 @@ public class MainActivity extends AppCompatActivity{
         LinearLayout lin_file = dialog_setting.findViewById(R.id.lin_file);
         Switch bd = dialog_setting.findViewById(R.id.bd_switch);
         Switch file = dialog_setting.findViewById(R.id.file_switch);
+        Switch delete = dialog_setting.findViewById(R.id.delete_switch);
         TextView settingsText = dialog_setting.findViewById(R.id.settingsText);
         TextView text_alert = dialog_setting.findViewById(R.id.text_alert);
         ImageView alert = dialog_setting.findViewById(R.id.alert);
@@ -474,6 +485,7 @@ public class MainActivity extends AppCompatActivity{
         EditText tag2Text = findViewById(R.id.tag2_b);
         switch (color){
             case "dark":
+                recyclerView.setBackgroundColor(getResources().getColor(R.color.dark_back));
                 alert.setImageResource(R.drawable.alert_light);
                 text_alert.setTextColor(getResources().getColor(R.color.white));
                 lin_alert.setBackgroundResource(R.drawable.maket_left_light);
@@ -483,6 +495,8 @@ public class MainActivity extends AppCompatActivity{
                 bd.setTextColor(getResources().getColor(R.color.white));
                 bd.setBackgroundResource(R.drawable.maket_up_dark);
                 file.setTextColor(getResources().getColor(R.color.white));
+                file.setBackgroundResource(R.drawable.maket_up_dark);
+                delete.setTextColor(getResources().getColor(R.color.white));
                 settings.setImageResource(R.drawable.settings_light);
                 text_first.setTextColor(getResources().getColor(R.color.white));
                 up.setBackgroundResource(R.color.dark_2);
@@ -504,6 +518,7 @@ public class MainActivity extends AppCompatActivity{
                 switchFilter(searchType);
                 break;
             case "light":
+                recyclerView.setBackgroundColor(getResources().getColor(R.color.white_back));
                 alert.setImageResource(R.drawable.alert);
                 text_alert.setTextColor(getResources().getColor(R.color.dark));
                 lin_alert.setBackgroundResource(R.drawable.maket_left);
@@ -513,6 +528,8 @@ public class MainActivity extends AppCompatActivity{
                 bd.setTextColor(getResources().getColor(R.color.dark));
                 bd.setBackgroundResource(R.drawable.maket_up);
                 file.setTextColor(getResources().getColor(R.color.dark));
+                file.setBackgroundResource(R.drawable.maket_up);
+                delete.setTextColor(getResources().getColor(R.color.dark));
                 settings.setImageResource(R.drawable.settings);
                 text_first.setTextColor(getResources().getColor(R.color.dark));
                 up.setBackgroundResource(R.drawable.maket_up);
@@ -650,13 +667,11 @@ public class MainActivity extends AppCompatActivity{
         }
     }
     private void hiddenFirstIMG (){
-        text_first.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
     }
 
     private void showFirstIMG (){
-        text_first.setVisibility(View.VISIBLE);
-        recyclerView.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.INVISIBLE);
     }
 
     public void onFirstIMG(){
@@ -681,7 +696,6 @@ public class MainActivity extends AppCompatActivity{
                     if (tag2.equals("")) {
                         tag2 = "no";
                     }
-
                     if (tag1.equals("")) {
                         tag1 = "no";
                     }

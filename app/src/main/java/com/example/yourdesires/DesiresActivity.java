@@ -63,7 +63,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity implements View.OnClickListener {
-boolean light,loadDB,saveBD,recording,playback;
+boolean light,loadDB,saveBD,recording,playback,deleteFM;
 String command,tag1S,tag2S,click_dialog_share;
 int status,pos;
 Button button_share;
@@ -376,6 +376,7 @@ Dialog audio_recorder,dialog_share;
                 media_menu_pop.show();
             }
         });
+        deleteFM = sh.getBoolean("deleteFM",true);
         if(sh.getBoolean("noAlert",false)){
             synchronizedLocalMediaAndBD();
         }
@@ -614,22 +615,29 @@ Dialog audio_recorder,dialog_share;
         List<Uri> bd = getAllFileBD();
         List<Uri> local = getAllFile();
         List<Uri> no = new ArrayList<>();
+        List<Integer> yes = new ArrayList();
         if(bd_file < local_file  && local.size() != 0 ){
-
-            for(int i = 0;i<local.size();i++){
-                for(int k = 0;k<bd.size();k++){
-                    if(String.valueOf(local.get(i)).equals(String.valueOf(bd.get(k)))){
-                        break;
-                    }else{
-                        no.add(local.get(i));       //Лист с отсутсвующями медиа файлами в бд
+          for(int i = 0;i<bd.size();i++){
+              int index = local.indexOf(bd.get(i));
+              if(index != -1)
+              yes.add(local.indexOf(bd.get(i)));        //Вычесляем индексы уже добавленных в бд файлов
+          }
+          if(yes.size() == 0 && bd_file != 0 && deleteFM){          //Если совпадающих ссылок в бд нет и в настройках вкл удаление медиа файлов, то удаляем все ссылки
+             for(int i =0;i<bd.size();i++){
+                 deleteExcessUri(bd.get(i));
+             }
+          }
+          for(int i = 0;i < local.size();i++){
+              boolean bool = false;
+                for(int k =0;k<yes.size();k++){     //Проверяем сейчас ли индекс уже существующего медиа файла в бд
+                    if(yes.get(k) == i){
+                        bool = true;
                     }
                 }
-            }
-            if(bd_file == 0 && local_file != 0){
-                for (int i =0;i<local_file;i++){
-                    no.add(local.get(i));
-                }
-            }
+              if(!bool){    //Если нет добавляем в лист
+                  no.add(local.get(i));
+              }
+          }
             for(int i = 0;i<no.size();i++){     //Сохраняем недостающие файлы в бд
                 int id = getNumFileMedia();
                 id++;
@@ -639,9 +647,16 @@ Dialog audio_recorder,dialog_share;
                 mediaLost.setUri(no.get(i).toString());
                 mediaLost.save();
             }
+
         }else if(bd_file > local_file){
-            Toast.makeText(wrapper, "Error: В БД больше файлов", Toast.LENGTH_SHORT).show();
+
         }
+    }
+    private void deleteExcessUri (Uri uri){
+        String str = uri.toString();
+        SQLite.delete(MediaLost.class)
+                .where(MediaLost_Table.uri.is(str))
+                .execute();
     }
     private boolean switchColor (String color){
         TextView textMedia = audio_recorder.findViewById(R.id.mediaText);

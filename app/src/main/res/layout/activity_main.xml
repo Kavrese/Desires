@@ -86,24 +86,32 @@
                 </LinearLayout>
             </androidx.appcompat.widget.Toolbar>
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recycler_view"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="84"
-                android:visibility="visible">
+                android:layout_weight="84">
 
-            </androidx.recyclerview.widget.RecyclerView>
+                <TextView
+                    android:id="@+id/text_first"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="84"
+                    android:gravity="center"
+                    android:text="Здесь пока нечего нет. Создайте новое желание"
+                    android:textSize="30sp"
+                    android:visibility="visible" />
 
-            <TextView
-                android:id="@+id/text_first"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="84"
-                android:gravity="center"
-                android:text="Здесь пока нечего нет. Создайте новое желание"
-                android:textSize="30sp"
-                android:visibility="gone" />
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recycler_view"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="84"
+                    android:background="@color/white_back"
+                    android:visibility="visible">
+
+                </androidx.recyclerview.widget.RecyclerView>
+
+            </RelativeLayout>
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/dawn_toolbar"
