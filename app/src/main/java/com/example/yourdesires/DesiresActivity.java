@@ -141,6 +141,7 @@ Dialog audio_recorder,dialog_share;
         op.setText(getIntent().getStringExtra("op"));
         saveBD = sh.getBoolean("saveBD",true);
         loadDB = sh.getBoolean("loadBD",false);
+        deleteFM = sh.getBoolean("deleteMF",true);
         tag1S = getIntent().getStringExtra("tag1");
         tag2S = getIntent().getStringExtra("tag2");
         data.setText(getIntent().getStringExtra("data"));
@@ -376,7 +377,6 @@ Dialog audio_recorder,dialog_share;
                 media_menu_pop.show();
             }
         });
-        deleteFM = sh.getBoolean("deleteFM",true);
         if(sh.getBoolean("noAlert",false)){
             synchronizedLocalMediaAndBD();
         }

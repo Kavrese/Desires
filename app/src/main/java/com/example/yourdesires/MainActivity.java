@@ -423,6 +423,11 @@ public class MainActivity extends AppCompatActivity{
                 delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                     @Override
                     public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                        if(isChecked)
+                            deleteMF = true;
+                        else
+                            deleteMF = false;
+
                         saveBooleans(saveBD,loadBD,noAlert,deleteMF);
                     }
                 });

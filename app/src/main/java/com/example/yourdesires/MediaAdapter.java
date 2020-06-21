@@ -23,6 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.yourdesires.model.MediaLost;
 import com.example.yourdesires.model.MediaLost_Table;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
+import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.io.File;
@@ -32,10 +33,12 @@ import java.util.ArrayList;
 public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> implements  View.OnTouchListener {
     Context wrapper;
     boolean mediaIsNull = true;
-    boolean isSelects,isSelect,isLongClick;     //isSelects - был ли включен режим выбора  isSelect - есть ли в выборе это желание
+    boolean deleteMF;
+    boolean isLongClick;     //isSelects - был ли включен режим выбора  isSelect - есть ли в выборе это желание
     private MediaPlayer mediaPlayer;
     private String type;
     ArrayList<Media> arrayList;
+    ArrayList<Cup> cupArrayList;
     ArrayList selected_list = new ArrayList();
     private boolean playing;
     public SharedPreferences sh;
@@ -75,6 +78,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     @Override
     public void onBindViewHolder(@NonNull final MediaViewHolder holder, final int position) {
         wrapper = getWrapperStyle(wrapper,sh.getString("color","light"));
+        deleteMF = sh.getBoolean("deleteMF",true);
         this.holder = holder;
         final Uri uri = arrayList.get(position).getImg();
         final String str = uri.toString();
@@ -89,7 +93,23 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
             .load(uri)
             .placeholder(android.R.drawable.stat_sys_download_done)
             .error(android.R.drawable.ic_menu_close_clear_cancel)
-            .into(holder.img);
+            .into(holder.img, new Callback() {
+                @Override
+                public void onSuccess() {
+
+                }
+
+                @Override
+                public void onError(Exception e) {
+                    if(!new File(uri.toString()).exists() && deleteMF){     //Если такого файла нет и включенно авто удаление, то удаляем
+                        SQLite.delete(MediaLost.class)
+                                .where(MediaLost_Table.uri.is(uri.toString()))
+                                .execute();
+                        arrayList.remove(position);
+                        notifyDataSetChanged();
+                    }
+                }
+            });
         }else if(uri != null && type.equals("audio")){      //Если это аудио - ставим на превью сторонюю картинку
             mediaIsNull = false;
             Picasso.get()
