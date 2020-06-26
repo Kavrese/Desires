@@ -65,6 +65,11 @@ import java.util.List;
 public class DesiresActivity extends AppCompatActivity implements View.OnClickListener {
 boolean light,loadDB,saveBD,recording,playback,deleteFM;
 String command,tag1S,tag2S,click_dialog_share;
+    List<Uri> bd;
+    List<Uri> local;
+    List<Uri> noLocal;
+    List<Uri> noBd;
+    List<Uri> yes;
 int status,pos;
 Button button_share;
 TextView data,time_des,time_des2,text;
@@ -377,8 +382,11 @@ Dialog audio_recorder,dialog_share;
                 media_menu_pop.show();
             }
         });
-        if(sh.getBoolean("noAlert",false)){
+        if(sh.getBoolean("syn",false)){
             synchronizedLocalMediaAndBD();
+            ed = sh.edit();
+            ed.putBoolean("syn",false);
+            ed.apply();
         }
         if(!loadDB) {
             loadMediaFile();
@@ -597,6 +605,15 @@ Dialog audio_recorder,dialog_share;
         }
         return URIsBD;
     }
+    private int createNewMediaId (){
+        List<MediaLost> list = SQLite.select()
+                .from(MediaLost.class)
+                .where(MediaLost_Table.id_desires.is(searchIDDesires()))
+                .queryList();
+        int max = list.size()-1;
+        int id = list.get(max).getMedia_id()+1;
+        return id;
+    }
     private List<Uri> getAllFile (){   //Метод получения всех медиа файлов в корне
         File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/" );
         File[] files = file.listFiles();
@@ -612,51 +629,79 @@ Dialog audio_recorder,dialog_share;
     private void synchronizedLocalMediaAndBD(){
         int bd_file = getNumFileMedia();
         int local_file = getNumMediaFileLocal();
-        List<Uri> bd = getAllFileBD();
-        List<Uri> local = getAllFile();
-        List<Uri> no = new ArrayList<>();
-        List<Integer> yes = new ArrayList();
-        if(bd_file < local_file  && local.size() != 0 ){
-          for(int i = 0;i<bd.size();i++){
-              int index = local.indexOf(bd.get(i));
-              if(index != -1)
-              yes.add(local.indexOf(bd.get(i)));        //Вычесляем индексы уже добавленных в бд файлов
-          }
-          if(yes.size() == 0 && bd_file != 0 && deleteFM){          //Если совпадающих ссылок в бд нет и в настройках вкл удаление медиа файлов, то удаляем все ссылки
-             for(int i =0;i<bd.size();i++){
-                 deleteExcessUri(bd.get(i));
-             }
-          }
-          for(int i = 0;i < local.size();i++){
-              boolean bool = false;
-                for(int k =0;k<yes.size();k++){     //Проверяем сейчас ли индекс уже существующего медиа файла в бд
-                    if(yes.get(k) == i){
-                        bool = true;
-                    }
-                }
-              if(!bool){    //Если нет добавляем в лист
-                  no.add(local.get(i));
-              }
-          }
-            for(int i = 0;i<no.size();i++){     //Сохраняем недостающие файлы в бд
-                int id = getNumFileMedia();
-                id++;
-                MediaLost mediaLost = new MediaLost();
-                mediaLost.setMedia_id(id);
-                mediaLost.setId_desires(searchIDDesires());
-                mediaLost.setUri(no.get(i).toString());
-                mediaLost.save();
-            }
-
-        }else if(bd_file > local_file){
-
+        bd = getAllFileBD();
+        local = getAllFile();
+        yes = differenceFileMediaBdLocal();
+        if(yes.size() != 0) {       //Если есть одинаковае медиа файлы в бд и в локале, то находим лишние файлы
+            noBd = searchNoFile("bd");
+            noLocal = searchNoFile("local");
+        }else{      //Если нет одинаковах файлов, то ...
+            noBd = bd;      //Делаем все файлы в бд это-го желания лишними
+            noLocal = local;    //Делаем все файлы в локале не сохранёнными в бд
+        }
+        if(bd_file != 0 && local_file != 0 && bd != null && local != null){
+                if(deleteFM)  //Если вкл авто удаление
+                    deleteFileDB(noBd);     //Удаляем не существующие файлы из бд
+                if(noLocal.size() != 0)     //Если есть что сохранять
+                    saveFileDB(noLocal);    //Сохраняем недостоющие файлы в бд
+        }else{
+            Toast.makeText(this, "Error:Synchronized", Toast.LENGTH_SHORT).show();
         }
     }
-    private void deleteExcessUri (Uri uri){
-        String str = uri.toString();
-        SQLite.delete(MediaLost.class)
-                .where(MediaLost_Table.uri.is(str))
-                .execute();
+    private List<Uri> differenceFileMediaBdLocal(){     //Метод нахождения одинаковых файлов в бд и локале
+        List<Uri> yes = new ArrayList<>();
+        for(int i =0;i<local.size();i++){
+            for(int k =0;k<bd.size();k++){
+                if(local.get(i).equals(bd.get(k))){     //Находим одинаковый файлы uri и добавляем их
+                    yes.add(local.get(i));
+                    break;
+                }
+            }
+        }
+        return yes;
+    }
+    private List<Uri> searchNoFile (String whereSearch){        //Метод поиска недостоющих/лишних (взависимости от whereSearch) файлов в бд
+        List<Uri> list = new ArrayList<>();
+        if(whereSearch.equals("bd")){
+           list = bd;
+        }else if(whereSearch.equals("local")){
+            list = local;
+        }
+        for(int i=0;i<yes.size();i++){
+            for(int k = 0;k<list.size();k++){
+                if(list.get(k).equals(yes.get(i))){
+                    list.remove(k);
+                    break;
+                }
+            }
+        }
+       return list;
+    }
+    private void deleteFileDB (List<Uri> no){       //Метод удаления медиа фалов из бд
+        for(int i=0;i<no.size();i++) {
+            SQLite.delete(MediaLost.class)
+                    .where(MediaLost_Table.uri.is(no.get(i).toString()))
+                    .execute();
+        }
+    }
+    private void saveFileDB (List<Uri> no){     //Метод сохранения файлов в бд
+        for(int i=0;i<no.size();i++) {
+            MediaLost mediaLost = new MediaLost();
+            mediaLost.setUri(no.get(i).toString());
+            mediaLost.setId_desires(searchIDDesires());
+            mediaLost.setMedia_id(createNewMediaId());
+            mediaLost.setType(determineFormatFileMedia(no.get(i).toString()));
+            mediaLost.save();
+        }
+    }
+    private String determineFormatFileMedia (String uri){       //Метод определения формата файла
+        if(uri.contains(".jpg"))
+            return "img";
+        if(uri.contains(".mp3"))
+            return "audio";
+        if(uri.contains(".mp4"))
+            return "video";
+        return "img";
     }
     private boolean switchColor (String color){
         TextView textMedia = audio_recorder.findViewById(R.id.mediaText);

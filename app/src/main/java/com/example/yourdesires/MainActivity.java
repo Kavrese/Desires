@@ -59,6 +59,7 @@ public class MainActivity extends AppCompatActivity{
     boolean saveBD = true;
     boolean loadBD = false;
     boolean noAlert = false;
+    boolean syn = false;
     String searchType;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
@@ -375,6 +376,7 @@ public class MainActivity extends AppCompatActivity{
                 bd.setChecked(saveBD);
                 file.setChecked(loadBD);
                 delete.setChecked(deleteMF);
+                syn = sh.getBoolean("syn",false);
                 if(!loadBD && !saveBD) {
                     file.setTextColor(getResources().getColor(R.color.grey));
                 }else if(!noAlert && saveBD && loadBD){
@@ -384,8 +386,9 @@ public class MainActivity extends AppCompatActivity{
                     @Override
                     public void onClick(View v) {
                         noAlert = true;
-                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
                         alert.setVisibility(View.GONE);
+                        syn = true;
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF,syn);
                     }
                 });
                 bd.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -399,7 +402,7 @@ public class MainActivity extends AppCompatActivity{
                             file.setTextColor(getResources().getColor(R.color.grey));
                             file.setChecked(false);
                         }
-                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF,syn);
                     }
                 });
 
@@ -417,7 +420,7 @@ public class MainActivity extends AppCompatActivity{
                             loadBD = false;
                             noAlert = false;
                         }
-                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF,syn);
                     }
                 });
                 delete.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -428,7 +431,7 @@ public class MainActivity extends AppCompatActivity{
                         else
                             deleteMF = false;
 
-                        saveBooleans(saveBD,loadBD,noAlert,deleteMF);
+                        saveBooleans(saveBD,loadBD,noAlert,deleteMF,syn);
                     }
                 });
                 dialog_setting.show();
@@ -442,12 +445,13 @@ public class MainActivity extends AppCompatActivity{
             v.setTextColor(getResources().getColor(R.color.white));
         }
     }
-    private void saveBooleans (boolean saveBD,boolean loadBD,boolean noAlert,boolean deleteMF){
+    private void saveBooleans (boolean saveBD,boolean loadBD,boolean noAlert,boolean deleteMF,boolean syn){
         ed = sh.edit();
         ed.putBoolean("saveBD",saveBD);
         ed.putBoolean("loadBD",loadBD);
         ed.putBoolean("noAlert",noAlert);
         ed.putBoolean("deleteMF",deleteMF);
+        ed.putBoolean("syn",syn);
         ed.apply();
     }
     private void loadBooleans (){
