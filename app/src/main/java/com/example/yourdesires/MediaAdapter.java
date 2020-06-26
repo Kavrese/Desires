@@ -14,9 +14,12 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.PopupMenu;
 import android.widget.Toast;
 import android.os.Vibrator;
+import android.widget.VideoView;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -87,6 +90,8 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
             type = "img";
         else if(str.contains(".mp3"))
             type = "audio";
+        else if(str.contains(".mp4"))
+            type = "video";
         if(type.equals("img")){         //Если это изображение - загружаем его на превью
             mediaIsNull = false;
             Picasso.get()
@@ -110,10 +115,16 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                     }
                 }
             });
-        }else if(uri != null && type.equals("audio")){      //Если это аудио - ставим на превью сторонюю картинку
+        }else if(type.equals("audio")){      //Если это аудио - ставим на превью сторонюю картинку
             mediaIsNull = false;
             Picasso.get()
                     .load(R.drawable.wave)
+                    .error(android.R.drawable.ic_menu_close_clear_cancel)
+                    .into(holder.img);
+        }else if(type.equals("video")) {
+            mediaIsNull = false;
+            Picasso.get()
+                    .load(R.drawable.video_img)
                     .error(android.R.drawable.ic_menu_close_clear_cancel)
                     .into(holder.img);
         }else {             //Если файла нет ставим другую картинку на превью
@@ -210,8 +221,18 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                 }
                             }
                         });
+                    }else if(type.equals("video")){         //Если это видео - делаем видимы video view и запускаем
+                        Dialog dialog = new Dialog(holder.img.getContext());
+                        dialog.setContentView(R.layout.dialog_maket);
+                        dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+                        VideoView video = dialog.findViewById(R.id.video);
+                        video.setVisibility(View.VISIBLE);
+                        video.requestFocus(0);
+                        video.setMediaController(new MediaController(video.getContext()));
+                        video.setVideoURI(uri);
+                        dialog.show();
+                        video.start();
                     }
-
                 }else {
                     isLongClick = false;
                 }

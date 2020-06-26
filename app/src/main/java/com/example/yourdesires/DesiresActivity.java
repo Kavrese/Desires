@@ -350,6 +350,8 @@ Dialog audio_recorder,dialog_share;
         add_media.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();//Без этого камера не запускается
+                StrictMode.setVmPolicy(builder.build());                                //
                 PopupMenu media_menu_pop = new PopupMenu(wrapper,v);
                 media_menu_pop.inflate(R.menu.media_menu);
                 media_menu_pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -357,8 +359,6 @@ Dialog audio_recorder,dialog_share;
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
                             case R.id.menu_photo:
-                                StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();//Без этого камера не запускается
-                                StrictMode.setVmPolicy(builder.build());                                //
                                 Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                                 String name = createNameFile();
                                 final File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/",name+".jpg");
@@ -374,6 +374,14 @@ Dialog audio_recorder,dialog_share;
                             case R.id.audio_menu:
                                 editSettingsPlayerRec();
                                 audio_recorder.show();
+                                break;
+                            case R.id.video_menu:
+                                Intent intent_video = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+                                String name_video = createNameFile();
+                                final File file_video = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/",name_video+".mp4");
+                                outputfileURI = Uri.fromFile(file_video);
+                                intent_video.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
+                                startActivityForResult(intent_video,CAMERA_VIDEO);
                                 break;
                         }
                         return false;
@@ -494,6 +502,14 @@ Dialog audio_recorder,dialog_share;
                 uploadUriMedia(outputfileURI,"img");
             }
         }
+        if(requestCode == CAMERA_VIDEO && resultCode == RESULT_OK){
+            arrayListMedia.add(new Media(outputfileURI));
+            rec.getAdapter().notifyDataSetChanged();
+            rec.setVisibility(View.VISIBLE);
+            if(saveBD) {
+                uploadUriMedia(outputfileURI,"video");
+            }
+        }
         if(requestCode == GALLERY && resultCode == RESULT_OK){
  /*           Uri uriGallery = data.getData();
             File imgGallery = new File(uriGallery.toString());
@@ -606,12 +622,14 @@ Dialog audio_recorder,dialog_share;
         return URIsBD;
     }
     private int createNewMediaId (){
+        int id = 1;
         List<MediaLost> list = SQLite.select()
                 .from(MediaLost.class)
                 .where(MediaLost_Table.id_desires.is(searchIDDesires()))
                 .queryList();
         int max = list.size()-1;
-        int id = list.get(max).getMedia_id()+1;
+        if(list.size() != 0)
+            id = list.get(max).getMedia_id() + 1;
         return id;
     }
     private List<Uri> getAllFile (){   //Метод получения всех медиа файлов в корне
@@ -639,7 +657,7 @@ Dialog audio_recorder,dialog_share;
             noBd = bd;      //Делаем все файлы в бд это-го желания лишними
             noLocal = local;    //Делаем все файлы в локале не сохранёнными в бд
         }
-        if(bd_file != 0 && local_file != 0 && bd != null && local != null){
+        if(local_file != 0 && bd != null && local != null){
                 if(deleteFM)  //Если вкл авто удаление
                     deleteFileDB(noBd);     //Удаляем не существующие файлы из бд
                 if(noLocal.size() != 0)     //Если есть что сохранять
