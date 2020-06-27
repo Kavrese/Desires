@@ -1,4 +1,5 @@
 package com.example.yourdesires;
+import android.content.DialogInterface;
 import android.os.Environment;
 import android.view.ContextThemeWrapper;
 import android.app.Dialog;
@@ -37,12 +38,11 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     Context wrapper;
     boolean mediaIsNull = true;
     boolean deleteMF;
-    boolean isLongClick;     //isSelects - был ли включен режим выбора  isSelect - есть ли в выборе это желание
+    boolean isLongClick;
     private MediaPlayer mediaPlayer;
     private String type;
     ArrayList<Media> arrayList;
     ArrayList<Cup> cupArrayList;
-    ArrayList selected_list = new ArrayList();
     private boolean playing;
     public SharedPreferences sh;
     private SharedPreferences.Editor ed;
@@ -75,7 +75,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         final View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.maket_recyclerview_media,parent,false);
         final MediaViewHolder mediaViewHolder = new MediaViewHolder(view);
         sh = mediaViewHolder.img.getContext().getSharedPreferences("0",0);
-      //  mediaViewHolder.img.setOnTouchListener(this);
         return mediaViewHolder;
     }
     @Override
@@ -178,6 +177,12 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
         holder.img.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(str.contains(".jpg"))
+                    type = "img";
+                else if(str.contains(".mp3"))
+                    type = "audio";
+                else if(str.contains(".mp4"))
+                    type = "video";
                 if(!isLongClick) {
                     //Обычный клик
                     if (type.equals("img")) {            //Если открытый файл картинка - открываем его на весь экран через диалог
@@ -223,13 +228,13 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                         });
                     }else if(type.equals("video")){         //Если это видео - делаем видимы video view и запускаем
                         Dialog dialog = new Dialog(holder.img.getContext());
-                        dialog.setContentView(R.layout.dialog_maket);
+                        dialog.setContentView(R.layout.dialog_video);
                         dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-                        VideoView video = dialog.findViewById(R.id.video);
+                        final VideoView video = dialog.findViewById(R.id.video);
                         video.setVisibility(View.VISIBLE);
                         video.requestFocus(0);
                         video.setMediaController(new MediaController(video.getContext()));
-                        video.setVideoURI(uri);
+                       video.setVideoURI(uri);
                         dialog.show();
                         video.start();
                     }
