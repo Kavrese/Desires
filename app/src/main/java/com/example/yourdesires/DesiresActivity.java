@@ -55,6 +55,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -301,11 +302,19 @@ Dialog audio_recorder,dialog_share;
                         boolean bool = false;
                         SharedPreferences sh = getSharedPreferences("0",0);
                         SharedPreferences.Editor ed;
-                        String str = desires.getText().toString();
-                        Intent in_clock = new Intent(AlarmClock.ACTION_SET_ALARM);
                         switch (item.getItemId()){
                             case R.id.menu_next:        //Напомнить завтра
-
+                                DateFormat dateFormatDay = new SimpleDateFormat("dd.MM.yyyy");
+                                Calendar cal = Calendar.getInstance();
+                                Date date = null;
+                                try {
+                                    date = dateFormatDay.parse(dateFormatDay.format(Calendar.getInstance().getTime()));
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                }
+                                cal.setTime(date);
+                                cal.add(Calendar.DAY_OF_MONTH,1);   //+1 день
+                                timePick(cal);
                                 bool= true;
                                 break;
                             case R.id.menu_data:        //Выбрать дату напоминания
@@ -398,7 +407,7 @@ Dialog audio_recorder,dialog_share;
                 date.set(Calendar.YEAR,year);
                 date.set(Calendar.MONTH,month);
                 date.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                Calendar date2 = timePick(date);
+                timePick(date);
             }
         },
                 date.get(Calendar.YEAR),
