@@ -105,7 +105,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="15dp"
         android:layout_marginRight="10dp"
-        android:layout_weight="10"
+        android:layout_weight="12"
         android:background="@drawable/maket_block"
         android:gravity="center"
         android:orientation="horizontal"
@@ -229,9 +229,9 @@
             android:id="@+id/time_des"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="5dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="5dp"
             android:layout_weight="1.9"
             android:background="@drawable/maket_up"
             android:gravity="center"
@@ -243,8 +243,8 @@
             android:id="@+id/time_des_2"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginRight="5dp"
             android:layout_marginBottom="10dp"
             android:layout_weight="2"
             android:gravity="center"
@@ -257,7 +257,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="11"
+        android:layout_weight="9"
         android:gravity="bottom"
         android:orientation="vertical"
         android:weightSum="6">
@@ -265,7 +265,7 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="3"
+            android:layout_weight="3.5"
             android:background="@drawable/maket_dawn"
             android:orientation="horizontal">
 
@@ -273,6 +273,7 @@
                 android:id="@+id/data_des"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:layout_weight="3"
                 android:gravity="center"
                 android:text="10.05.20"
                 android:textColor="#000000"

@@ -325,6 +325,7 @@ Dialog audio_recorder,dialog_share;
                                 ed = sh.edit();
                                 ed.putString("next_start",desires.getText().toString());
                                 ed.apply();
+                                Snackbar.make(time_des,"Напоминание созданно",Snackbar.LENGTH_SHORT).show();
                                 bool= true;
                                 break;
                         }
@@ -445,6 +446,7 @@ Dialog audio_recorder,dialog_share;
 
         NotificationManagerCompat notificationManager = NotificationManagerCompat.from(DesiresActivity.this);
         notificationManager.notify(101, builder.build());
+        Snackbar.make(time_des,"Уведомление будет отправленно",Snackbar.LENGTH_SHORT).show();
     }
     private void saveFileScreen (Bitmap bit,File fileIMG) throws IOException{
         FileOutputStream fileOutputStream = new FileOutputStream(fileIMG);  //Указываем путь до файла
