@@ -61,6 +61,7 @@ public class MainActivity extends AppCompatActivity{
     boolean noAlert = false;
     boolean syn = false;
     String searchType;
+    Dialog dialog_next;
     DesiresAdapter adapter;
     RecyclerView recyclerView;
     ArrayList<Desires> list;
@@ -72,9 +73,9 @@ public class MainActivity extends AppCompatActivity{
     BottomSheetBehavior bottomSheetBehavior;
     TextView name_botton_sheet,text_first,text_start;
     EditText tag1,tag2,op;
-    Button save,next_start;
+    Button save;
     ImageView backIMG,filter,search,rgb,plus,settings;
-    LinearLayout con,lin_next;
+    LinearLayout con;
     androidx.appcompat.widget.Toolbar up,dawn;
     SharedPreferences sh;
     SharedPreferences.Editor ed;
@@ -92,26 +93,19 @@ public class MainActivity extends AppCompatActivity{
         position = new ArrayList<>();
         fake = findViewById(R.id.fake);
         settings = findViewById(R.id.settings);
-        text_start = findViewById(R.id.text_next_start);
-        lin_next = findViewById(R.id.lin_next_start);
-        next_start = findViewById(R.id.button_next_start);
-        next_start.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                onHiddenNextWindow();
-            }
-        });
+        dialog_next = new Dialog(MainActivity.this);
+        dialog_next.setContentView(R.layout.dialog_next_window);
+        dialog_next.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         sh = getSharedPreferences("0",0);
         String start = sh.getString("next_start","false");
         String prover = sh.getString("proverka","false");
+        //Обработка диалога "следующего запуска"
         if(start.equals("false") && prover.equals("true")){
             ed = sh.edit();
             ed.putString("proverka","false");
             ed.apply();
         }else if(!start.equals("false") && prover.equals("true")){
-            onShowNextWindow();
-            Toast.makeText(this, text_start.getText().toString() + sh.getString("next_start","error"), Toast.LENGTH_SHORT).show();
-            text_start.setText(text_start.getText().toString() + sh.getString("next_start","error"));
+            nextWindow(sh.getString("next_start","error"));
             ed = sh.edit();
             ed.putString("next_start","false");
             ed.putString("proverka","false");
@@ -438,6 +432,20 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
+
+    private void nextWindow(String name) {
+        dialog_next.show();
+        Button button_next_window = dialog_next.findViewById(R.id.button_next_window);
+        TextView text_next_window = dialog_next.findViewById(R.id.text_next_window);
+        text_next_window.setText(text_next_window.getText().toString()+name);
+        button_next_window.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog_next.dismiss();
+            }
+        });
+    }
+
     private void setActivTextColor (Switch v){
         if(light){
             v.setTextColor(getResources().getColor(R.color.dark));
@@ -469,6 +477,7 @@ public class MainActivity extends AppCompatActivity{
         return wrapper;
     }
     public void switchColor (String color){
+        LinearLayout lin_next_window = dialog_next.findViewById(R.id.lin_next_window);
         LinearLayout lin_alert = dialog_setting.findViewById(R.id.lin_alert);
         LinearLayout dialog_lin = dialog_setting.findViewById(R.id.dialog_lin);
         LinearLayout lin_file = dialog_setting.findViewById(R.id.lin_file);
@@ -478,6 +487,8 @@ public class MainActivity extends AppCompatActivity{
         TextView settingsText = dialog_setting.findViewById(R.id.settingsText);
         TextView text_alert = dialog_setting.findViewById(R.id.text_alert);
         ImageView alert = dialog_setting.findViewById(R.id.alert);
+        Button button_next_window = dialog_next.findViewById(R.id.button_next_window);
+        TextView text_next_window = dialog_next.findViewById(R.id.text_next_window);
         text_first = findViewById(R.id.text_first);
         plus = findViewById(R.id.plus);
         con = findViewById(R.id.con);
@@ -494,6 +505,10 @@ public class MainActivity extends AppCompatActivity{
         EditText tag2Text = findViewById(R.id.tag2_b);
         switch (color){
             case "dark":
+                button_next_window.setTextColor(getResources().getColor(R.color.white));
+                button_next_window.setBackgroundResource(R.drawable.maket_block_dark);
+                text_next_window.setTextColor(getResources().getColor(R.color.white));
+                lin_next_window.setBackgroundResource(R.drawable.maket_block_dark);
                 recyclerView.setBackgroundColor(getResources().getColor(R.color.dark_back));
                 alert.setImageResource(R.drawable.alert_light);
                 text_alert.setTextColor(getResources().getColor(R.color.white));
@@ -527,6 +542,10 @@ public class MainActivity extends AppCompatActivity{
                 switchFilter(searchType);
                 break;
             case "light":
+                button_next_window.setTextColor(getResources().getColor(R.color.dark));
+                button_next_window.setBackgroundResource(R.drawable.maket_block);
+                text_next_window.setTextColor(getResources().getColor(R.color.dark));
+                lin_next_window.setBackgroundResource(R.drawable.maket_block);
                 recyclerView.setBackgroundColor(getResources().getColor(R.color.white_back));
                 alert.setImageResource(R.drawable.alert);
                 text_alert.setTextColor(getResources().getColor(R.color.dark));
@@ -872,11 +891,5 @@ public class MainActivity extends AppCompatActivity{
             Snackbar.make(search,"Ничего не найденно",Snackbar.LENGTH_SHORT).show();
         }
         return buffer;
-    }
-    public void onShowNextWindow (){
-        lin_next.setVisibility(View.VISIBLE);
-    }
-    public void onHiddenNextWindow (){
-        lin_next.setVisibility(View.GONE);
     }
 }
