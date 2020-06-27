@@ -2,24 +2,30 @@ package com.example.yourdesires;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.Manifest;
+import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
 import android.media.MediaRecorder;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.FileUtils;
 import android.os.StrictMode;
 import android.provider.AlarmClock;
 import android.provider.MediaStore;
@@ -27,11 +33,13 @@ import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.example.yourdesires.model.Lost;
@@ -39,26 +47,17 @@ import com.example.yourdesires.model.Lost_Table;
 import com.example.yourdesires.model.MediaLost;
 import com.example.yourdesires.model.MediaLost_Table;
 import com.google.android.material.snackbar.Snackbar;
-import com.raizlabs.android.dbflow.sql.language.Operator;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 
-import org.w3c.dom.Text;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.channels.FileChannel;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -172,9 +171,6 @@ Dialog audio_recorder,dialog_share;
         back.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ed = sh.edit();
-                ed.putInt("size_selected",0);
-                ed.apply();
                 inputIntent();
             }
         });
@@ -308,24 +304,15 @@ Dialog audio_recorder,dialog_share;
                         String str = desires.getText().toString();
                         Intent in_clock = new Intent(AlarmClock.ACTION_SET_ALARM);
                         switch (item.getItemId()){
-                            case R.id.menu_next:
-                                DateFormat dateFormat = new SimpleDateFormat("HH");
-                                String hour_str = dateFormat.format(new Date());
-                                int hour = Integer.parseInt(hour_str);
-                                dateFormat = new SimpleDateFormat("mm");
-                                String minutesStr = dateFormat.format(new Date());
-                                int minutes = Integer.parseInt(minutesStr);
-                                in_clock.putExtra(AlarmClock.EXTRA_MESSAGE,str);
-                                in_clock.putExtra(AlarmClock.EXTRA_HOUR,hour);
-                                in_clock.putExtra(AlarmClock.EXTRA_MINUTES,minutes);
-                                startActivity(in_clock);
-                                bool= true;
-                                break;
-                            case R.id.menu_data:
+                            case R.id.menu_next:        //Напомнить завтра
 
                                 bool= true;
                                 break;
-                            case R.id.menu_return:
+                            case R.id.menu_data:        //Выбрать дату напоминания
+                                datePick();
+                                bool= true;
+                                break;
+                            case R.id.menu_return:       //Напомнить при запуске
                                 ed = sh.edit();
                                 ed.putString("next_start",desires.getText().toString());
                                 ed.apply();
@@ -402,6 +389,53 @@ Dialog audio_recorder,dialog_share;
             loadMediaFileBD();
         }
 
+    }
+    private Calendar datePick (){
+        final Calendar date = Calendar.getInstance();
+        new DatePickerDialog(DesiresActivity.this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
+                date.set(Calendar.YEAR,year);
+                date.set(Calendar.MONTH,month);
+                date.set(Calendar.DAY_OF_MONTH,dayOfMonth);
+                Calendar date2 = timePick(date);
+            }
+        },
+                date.get(Calendar.YEAR),
+                date.get(Calendar.MONTH),
+                date.get(Calendar.DAY_OF_MONTH)).show();
+        return date;
+    }
+    private Calendar timePick(final Calendar date){
+        new TimePickerDialog(DesiresActivity.this, new TimePickerDialog.OnTimeSetListener() {
+            @Override
+            public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                date.set(Calendar.MINUTE,minute);
+                date.set(Calendar.HOUR_OF_DAY,hourOfDay);
+                createNotification(date);
+            }
+        },
+            date.get(Calendar.MINUTE),
+            date.get(Calendar.HOUR_OF_DAY),true).show();
+
+        return date;
+    }
+    private void createNotification (Calendar date){
+        Intent notificationIntent = new Intent(DesiresActivity.this, MainActivity.class);
+        PendingIntent contentIntent = PendingIntent.getActivity(DesiresActivity.this,0, notificationIntent,PendingIntent.FLAG_CANCEL_CURRENT);
+        NotificationCompat.Builder builder =
+                new NotificationCompat.Builder(DesiresActivity.this, "CHANNEL_ID")
+                        .setContentTitle("Напоминание")
+                        .setContentText("Вы просили вам напомнить про желание "+desires.getText().toString())
+                        .setDefaults(Notification.DEFAULT_SOUND)
+                        .setAutoCancel(true)
+                        .setSmallIcon(R.drawable.icon)
+                        .setContentIntent(contentIntent)
+                        .setAutoCancel(true)
+                        .setWhen(date.getTime().getTime());
+
+        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(DesiresActivity.this);
+        notificationManager.notify(101, builder.build());
     }
     private void saveFileScreen (Bitmap bit,File fileIMG) throws IOException{
         FileOutputStream fileOutputStream = new FileOutputStream(fileIMG);  //Указываем путь до файла
