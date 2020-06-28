@@ -42,7 +42,6 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     private MediaPlayer mediaPlayer;
     private String type;
     ArrayList<Media> arrayList;
-    ArrayList<Cup> cupArrayList;
     private boolean playing;
     public SharedPreferences sh;
     private SharedPreferences.Editor ed;

@@ -81,6 +81,7 @@ androidx.appcompat.widget.Toolbar toolbar;
 LinearLayout lin,lin_tag,lin_time,lin_media;
 SharedPreferences sh;
 SharedPreferences.Editor ed;
+File outputfileAudio;
 RecyclerView rec;
 Uri outputfileURI;
 ArrayList<Media> arrayListMedia = new ArrayList<>();
@@ -455,6 +456,10 @@ Dialog audio_recorder,dialog_share;
         fileOutputStream.close();
     }
     private void editSettingsPlayerRec (){
+            mediaRecorder = new MediaRecorder();
+            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
+            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
+            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         final ImageView button = audio_recorder.findViewById(R.id.button);
                 if(light)
                     button.setImageResource(R.drawable.microphone);
@@ -463,17 +468,14 @@ Dialog audio_recorder,dialog_share;
                     button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        File outputfile = new File(Environment.getExternalStorageDirectory() + "/Desires/" + desires.getText().toString() + "/", createNameFile() + "rec.mp3");
+                        if(outputfileAudio == null)
+                            outputfileAudio = new File(Environment.getExternalStorageDirectory() + "/Desires/" + desires.getText().toString() + "/", createNameFile() + "rec.mp3");
                         if(!recording && !playback) {
                             if (light)
                                 button.setImageResource(R.drawable.off);
                             else
                                 button.setImageResource(R.drawable.off_light);
-
-                            mediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-                            mediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-                            mediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-                            mediaRecorder.setOutputFile(outputfile);
+                            mediaRecorder.setOutputFile(outputfileAudio);
                             startRecording();
                             if(light)
                                 button.setImageResource(R.drawable.pause);
@@ -482,8 +484,9 @@ Dialog audio_recorder,dialog_share;
                         }else if(recording && !playback){
                             stopRecording();
                             audio_recorder.hide();
-                            uploadUriMedia(Uri.fromFile(outputfile),"audio");
-                            arrayListMedia.add(new Media(Uri.fromFile(outputfile)));
+                            uploadUriMedia(Uri.fromFile(outputfileAudio),"audio");
+                            arrayListMedia.add(new Media(Uri.fromFile(outputfileAudio)));
+                            rec.setVisibility(View.VISIBLE);
                             rec.getAdapter().notifyDataSetChanged();
                         }
                     }
@@ -492,8 +495,8 @@ Dialog audio_recorder,dialog_share;
 
     private void startRecording (){
         try {
-            mediaRecorder.prepare();
-            mediaRecorder.start();
+                mediaRecorder.prepare();
+                mediaRecorder.start();
             recording = true;
             Toast.makeText(DesiresActivity.this, "Идёт запись", Toast.LENGTH_SHORT).show();
         } catch (IOException e) {
@@ -508,14 +511,10 @@ Dialog audio_recorder,dialog_share;
         }
     }
     private void uploadUriMedia(Uri uri,String type){       //Сохранение медиа файлов в бд
-        String str = uri.toString();
-        int id_desires = searchIDDesires();
-        int id_media = getNumFileMedia();   //Получаем кол-во существующих медиа файлов
-        id_media++; //Добавляем +1 - это новый файл
         MediaLost mediaLost = new MediaLost();
-        mediaLost.setId_desires(id_desires);
-        mediaLost.setMedia_id(id_media);
-        mediaLost.setUri(str);
+        mediaLost.setId_desires(searchIDDesires());
+        mediaLost.setMedia_id(createNewMediaId());
+        mediaLost.setUri(uri.toString());
         mediaLost.setType(type);
         mediaLost.save();
     }
@@ -667,15 +666,10 @@ Dialog audio_recorder,dialog_share;
         return URIsBD;
     }
     private int createNewMediaId (){
-        int id = 1;
         List<MediaLost> list = SQLite.select()
                 .from(MediaLost.class)
-                .where(MediaLost_Table.id_desires.is(searchIDDesires()))
                 .queryList();
-        int max = list.size()-1;
-        if(list.size() != 0)
-            id = list.get(max).getMedia_id() + 1;
-        return id;
+        return list.size()+1;
     }
     private List<Uri> getAllFile (){   //Метод получения всех медиа файлов в корне
         File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/" );

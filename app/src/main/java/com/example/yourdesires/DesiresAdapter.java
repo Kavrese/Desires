@@ -69,10 +69,6 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
     }
     @Override
     public void onBindViewHolder(@NonNull final DesiresViewHolder holder, final int position) {
-        //holder.cup_img.setVisibility(View.GONE);
-       // holder.cup_video.setVisibility(View.GONE);
-      //  holder.cup_audio.setVisibility(View.GONE);
-       // holder.cup_bell.setVisibility(View.GONE);
         this.holder = holder;
         wrapper = holder.itemView.getContext();             //Берём контекст
         wrapper = getWrapperStyle(wrapper,arrayList.get(position).getLight());      //Модернизируем этот же контекст
@@ -129,14 +125,6 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                 holder.statusIMG.setImageResource(R.color.red);
                 break;
         }
-    /*    if(getCupInfo("img"))
-            holder.cup_img.setVisibility(View.VISIBLE);
-        if(getCupInfo("audio"))
-            holder.cup_audio.setVisibility(View.VISIBLE);
-        if(getCupInfo("video"))
-            holder.cup_video.setVisibility(View.VISIBLE);
-
-     */
         holder.menu.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(final View v) {
@@ -221,11 +209,11 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             holder.tag1.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.grey));
             holder.tag2.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.grey));
             holder.data.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.dark));
-          /*  holder.cup_img.setImageResource(R.drawable.photo);
+            holder.cup_img.setImageResource(R.drawable.photo);
             holder.cup_audio.setImageResource(R.drawable.music);
             holder.cup_video.setImageResource(R.drawable.video);
             holder.cup_bell.setImageResource(R.drawable.bell);
-            */
+
 
         }else{
             holder.lin.setBackgroundResource(R.drawable.maket_back_recycler_view_dark);
@@ -234,13 +222,12 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
             holder.tag1.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white_text));
             holder.tag2.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white_text));
             holder.data.setTextColor(holder.itemView.getContext().getResources().getColor(R.color.white));
-          /*  holder.cup_img.setImageResource(R.drawable.photo_light);
+            holder.cup_img.setImageResource(R.drawable.photo_light);
             holder.cup_audio.setImageResource(R.drawable.music_light);
             holder.cup_video.setImageResource(R.drawable.video_light);
             holder.cup_bell.setImageResource(R.drawable.bell_light);
-
-           */
         }
+        visibleCups(holder.cup_img,holder.cup_audio,holder.cup_bell,holder.cup_video);
     }
 
     @Override
@@ -256,7 +243,28 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
         }
         return wrapper;
     }
+    private void visibleCups (ImageView img,ImageView audio,ImageView bell,ImageView video){
+        if(getCupInfo("img"))
+            img.setVisibility(View.VISIBLE);
+        else
+            img.setVisibility(View.GONE);
+        if(getCupInfo("audio"))
+            audio.setVisibility(View.VISIBLE);
+        else
+            audio.setVisibility(View.GONE);
+        if(getCupInfo("video"))
+            video.setVisibility(View.VISIBLE);
+        else
+            video.setVisibility(View.GONE);
+        if(getCupInfo("bell"))
+            bell.setVisibility(View.VISIBLE);
+        else
+            bell.setVisibility(View.GONE);
+    }
     private boolean getCupInfo (String cup){
+        List<MediaLost> mediaLosts = SQLite.select()
+                .from(MediaLost.class)
+                .queryList();
         //Вычесляем id желания
         Lost lost = SQLite.select()
                 .from(Lost.class)
