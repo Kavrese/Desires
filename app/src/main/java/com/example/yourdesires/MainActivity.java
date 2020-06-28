@@ -536,8 +536,8 @@ public class MainActivity extends AppCompatActivity{
                 delete.setTextColor(getResources().getColor(R.color.white));
                 settings.setImageResource(R.drawable.settings_light);
                 text_first.setTextColor(getResources().getColor(R.color.white));
-                up.setBackgroundResource(R.color.dark_2);
-                dawn.setBackgroundResource(R.color.dark_2);
+                up.setBackgroundResource(R.color.dark_4);
+                dawn.setBackgroundResource(R.color.dark_4);
                 rgb.setImageResource(R.drawable.rgb_light);
                 search.setImageResource(R.drawable.search_light);
                 con.setBackgroundResource(R.color.dark_back);
