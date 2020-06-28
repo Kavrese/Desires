@@ -33,7 +33,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:background="@drawable/maket_up">
+                android:background="@color/white">
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -111,6 +111,14 @@
 
                 </androidx.recyclerview.widget.RecyclerView>
 
+                <androidx.coordinatorlayout.widget.CoordinatorLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+
+                    <include layout="@layout/button_sheet_generatot" />
+                </androidx.coordinatorlayout.widget.CoordinatorLayout>
+
             </RelativeLayout>
 
             <androidx.appcompat.widget.Toolbar
@@ -118,7 +126,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
                 android:layout_weight="8"
-                android:background="@drawable/maket_dawn"
+                android:background="@color/white"
                 android:minHeight="?attr/actionBarSize"
                 android:theme="?attr/actionBarTheme">
 
@@ -147,7 +155,7 @@
                         android:layout_weight="7"
                         android:background="@color/white"
                         android:gravity="center|left"
-                        android:hint="Введите заголовок желания"
+                        android:hint="Заголовок желания"
                         android:maxLines="1"
                         android:paddingLeft="5dp"
                         android:paddingRight="5dp"
@@ -214,5 +222,6 @@
 
     <include
         layout="@layout/button_sheet"
-        tools:visibility="visible" />
+        tools:visibility="invisible" />
+
 </com.google.android.material.circularreveal.coordinatorlayout.CircularRevealCoordinatorLayout>

@@ -65,11 +65,11 @@ import java.util.List;
 public class DesiresActivity extends AppCompatActivity implements View.OnClickListener {
 boolean light,loadDB,saveBD,recording,playback,deleteFM;
 String command,tag1S,tag2S,click_dialog_share;
-    List<Uri> bd;
-    List<Uri> local;
-    List<Uri> noLocal;
-    List<Uri> noBd;
-    List<Uri> yes;
+    List<Uri> bd;               //
+    List<Uri> local;            //
+    List<Uri> noLocal;          //  Для синхронизации локалки и бд
+    List<Uri> noBd;             //
+    List<Uri> yes;              //
 int status,pos;
 Button button_share;
 TextView data,time_des,time_des2,text;
@@ -109,23 +109,28 @@ Dialog audio_recorder,dialog_share;
         editText_share = dialog_share.findViewById(R.id.editText_share);
         final String standard_text_share = getResources().getString(R.string.share_text_1) +"'"+ desires.getText().toString() +"'"+ getResources().getText(R.string.share_text_2) +" "+ getResources().getString(R.string.app_name) + "! Скачай и попробуй тоже google.com";
         editText_share.setText(standard_text_share);
+        add_media = findViewById(R.id.add_media);
         dialog_share.setOnDismissListener(new DialogInterface.OnDismissListener() {
             @Override
-            public void onDismiss(DialogInterface dialog) {
+            public void onDismiss(DialogInterface dialog) {     //При выходе из диалога Share
                 click_dialog_share = "no";
-                editText_share.setVisibility(View.GONE);
-                editText_share.setText(standard_text_share);
+                editText_share.setVisibility(View.GONE);        //Прячем поле ввода
+                editText_share.setText(standard_text_share);    //Ставим туда стандартный текст
             }
         });
-        mediaRecorder = new MediaRecorder ();
+        mediaRecorder = new MediaRecorder ();       //Recorder для записи audio
+
+        //Настройка плеера аудио
         audio_recorder = new Dialog(DesiresActivity.this);
         audio_recorder.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         audio_recorder.setContentView(R.layout.dialog_maket_recorder_audio);
-        add_media = findViewById(R.id.add_media);
+
+        //Настройка RecyclerView media
         rec = findViewById(R.id.recycler_media);
         MediaAdapter adapter = new MediaAdapter(arrayListMedia);
         rec.setAdapter(adapter);
         rec.setLayoutManager(new LinearLayoutManager(this,LinearLayoutManager.HORIZONTAL,false));
+
         sh = getSharedPreferences("0",0);
         lin = findViewById(R.id.lin_des);
         lin_tag = findViewById(R.id.lin_tag);
@@ -133,7 +138,7 @@ Dialog audio_recorder,dialog_share;
         lin_media = findViewById(R.id.lin_media);
         text = findViewById(R.id.text);
         toolbar = findViewById(R.id.des_toolbar);
-        command = "new data";
+        command = "new data";       //Комманда для выхода в MainActivity
         op = findViewById(R.id.op);
         scrap = findViewById(R.id.scrap);
         time_des = findViewById(R.id.time_des);
@@ -145,15 +150,19 @@ Dialog audio_recorder,dialog_share;
         back = findViewById(R.id.back);
         menu = findViewById(R.id.menu_tool);
         op.setText(getIntent().getStringExtra("op"));
+        //Загрузка данных
         saveBD = sh.getBoolean("saveBD",true);
         loadDB = sh.getBoolean("loadBD",false);
         deleteFM = sh.getBoolean("deleteMF",true);
         tag1S = getIntent().getStringExtra("tag1");
         tag2S = getIntent().getStringExtra("tag2");
         data.setText(getIntent().getStringExtra("data"));
-        status = getIntent().getIntExtra("status",1);
-        light = switchColor(getIntent().getStringExtra("color"));
-        wrapper = getWrapperStyle(wrapper);
+        status = getIntent().getIntExtra("status",1);       //Сейчашний статус желаний
+
+        light = switchColor(getIntent().getStringExtra("color"));       //Меняем темы активити
+        wrapper = getWrapperStyle(wrapper);     //Стиль всех PopurMenu
+
+        //Настройка tag'ов
         if(tag2S.equals("") || tag2S.equals("no")){
             hideTag2();
             tag1.setText(tag1S);
@@ -168,9 +177,9 @@ Dialog audio_recorder,dialog_share;
             }
         }
 
-        statusColor = findViewById(R.id.statusColor);
-        editStatusColor(status);
-        back.setOnClickListener(new View.OnClickListener() {
+        statusColor = findViewById(R.id.statusColor);       //В toolbar'е, сейчашний статус желания
+        editStatusColor(status);        //Устонавливаем сейчашний статус желания
+        back.setOnClickListener(new View.OnClickListener() {        //Выход в MainActivity
             @Override
             public void onClick(View v) {
                 inputIntent();
@@ -178,7 +187,7 @@ Dialog audio_recorder,dialog_share;
         });
         menu.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) {       //Меню выбора действия с желанием
                 PopupMenu pop = new PopupMenu(wrapper,v);
                 pop.inflate(R.menu.status_menu_share);
                 pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
@@ -186,33 +195,33 @@ Dialog audio_recorder,dialog_share;
                     public boolean onMenuItemClick(MenuItem item) {
                         boolean bool = false;
                         switch (item.getItemId()) {
-                            case R.id.menu_share:
-                                dialog_share.show();
-                                img_share.setOnClickListener(DesiresActivity.this);
-                                audio_share.setOnClickListener(DesiresActivity.this);
-                                text_share.setOnClickListener(DesiresActivity.this);
+                            case R.id.menu_share:       //Поделиться
+                                dialog_share.show();    //Показываем диалог поделиться
+                                img_share.setOnClickListener(DesiresActivity.this);     //Клик на скриншот
+                                audio_share.setOnClickListener(DesiresActivity.this);   //Пока не сделал
+                                text_share.setOnClickListener(DesiresActivity.this);    //Клик на текст
                                 break;
-                            case R.id.menu_work_share:
+                            case R.id.menu_work_share:      //Изменить статус на "в процессе"
                                 editStatusColor(1);
-                                command = "yellow";
+                                command = "yellow";     //Жёлтый
                                 bool = true;
                                 break;
-                            case R.id.menu_great_share:
-                                editStatusColor(2);
+                            case R.id.menu_great_share:     //Изменить статус на "сделанно"
+                                editStatusColor(2);     //Зелённый
                                 command = "green";
                                 bool = true;
                                 break;
-                            case R.id.menu_time_share:
-                                editStatusColor(3);
+                            case R.id.menu_time_share:      //Изменить статус на "отложенно на время"
+                                editStatusColor(3);     //Оранжевый
                                 command = "orange";
                                 bool = true;
                                 break;
-                            case R.id.menu_sleep_share:
-                                editStatusColor(4);
+                            case R.id.menu_sleep_share:     //Изменить статус на "отложенно"
+                                editStatusColor(4);     //Красный
                                 command = "red";
                                 bool = true;
                                 break;
-                            case R.id.menu_delete_share:
+                            case R.id.menu_delete_share:        //Удалить
                                 command = "delete";
                                 inputIntent();
                                 bool = true;
@@ -226,37 +235,38 @@ Dialog audio_recorder,dialog_share;
         });
         plus.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) {       //Добавляем Tag2
                 tag2.setText("");
                 showTag2();
             }
         });
         scrap.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void onClick(View v) {       //Удаляем Tag2
                 hideTag2();
                 tag2.setText("");
             }
         });
         button_share.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
-                final Intent in = new Intent(Intent.ACTION_SEND);
+            public void onClick(View v) {       //Клик по кнопке поделиться
+                final Intent in = new Intent(Intent.ACTION_SEND);       //Интент share
                 in.putExtra(Intent.EXTRA_SUBJECT,editText_share.getText().toString());
                 switch(click_dialog_share){
-                    case "img":
-                        //Делаем скриншот
+                    case "img":      //Делаем скриншот
+                        //Путь до файла
                         final File fileIMG = new File(Environment.getExternalStorageDirectory() +"/Desires/ScreenAppsDesires/",createNameFile()+".png");
+                        //Путь до папки скриншотов
                         File fileFolder = new File(Environment.getExternalStorageDirectory() +"/Desires/ScreenAppsDesires/");
-                        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();
-                        StrictMode.setVmPolicy(builder.build());
-                        View v1 = getWindow().getDecorView().getRootView();
+                        StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();    //Нужно для скриншота
+                        StrictMode.setVmPolicy(builder.build());                                    //
+                        View v1 = getWindow().getDecorView().getRootView();     //View экрана
                         v1.setDrawingCacheEnabled(true);
                         final Bitmap bit = Bitmap.createBitmap(v1.getDrawingCache());  //Делаем сам скриншот
                         v1.setDrawingCacheEnabled(false);
-                        fileFolder.mkdirs();
+                        fileFolder.mkdirs();        //Создаём папку скринщотов (если она уже есть, то он её не сделает)
                         try {
-                            saveFileScreen(bit,fileIMG);
+                            saveFileScreen(bit,fileIMG);        //Сохраняем скриншот по uri файла
                         } catch (IOException e) {
                             Toast.makeText(DesiresActivity.this, e.getMessage(), Toast.LENGTH_LONG).show();
                         }
@@ -266,11 +276,11 @@ Dialog audio_recorder,dialog_share;
                                 .into(new Target() {
                                     @Override
                                     public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-                                        in.setType("image/*");
+                                        in.setType("image/*");      //Тип изображение
                                         Uri uri = Uri.fromFile(fileIMG);
                                         in.putExtra(Intent.EXTRA_STREAM,uri);
-                                        startActivity(Intent.createChooser(in,"Share"));
-                                        dialog_share.dismiss();
+                                        startActivity(Intent.createChooser(in,"Share"));    //Запускаем
+                                        dialog_share.dismiss();     //Закрываем диалог
                                     }
                                     @Override
                                     public void onBitmapFailed(Exception e, Drawable errorDrawable) {}
@@ -278,12 +288,12 @@ Dialog audio_recorder,dialog_share;
                                     public void onPrepareLoad(Drawable placeHolderDrawable) {}
                                 });
                         break;
-                    case "text":
-                        in.setType("text/plain");
-                        in.putExtra(Intent.EXTRA_TEXT,editText_share.getText().toString());
-                        startActivity(Intent.createChooser(in,"Share"));
+                    case "text":        //Отправить текст
+                        in.setType("text/plain");   //Указываем тип текст
+                        in.putExtra(Intent.EXTRA_TEXT,editText_share.getText().toString());     //Интент с тем что написал пользователь
+                        startActivity(Intent.createChooser(in,"Share"));        //Запускаем
                         break;
-                    case "audio":
+                    case "audio":       //Пока отключенно, не знаю добавлю ли вообще
                         Snackbar.make(v,"soon",Snackbar.LENGTH_SHORT).show();
                         break;
                     case "no":
@@ -292,39 +302,38 @@ Dialog audio_recorder,dialog_share;
                 }
             }
         });
-        time_des.setOnClickListener(new View.OnClickListener() {
+        time_des.setOnClickListener(new View.OnClickListener() {        //Клик по "напоминанию"
             @Override
             public void onClick(View v) {
-                PopupMenu pop_time_des1 = new PopupMenu(wrapper,v);
+                PopupMenu pop_time_des1 = new PopupMenu(wrapper,v);     //Меню выбора напоминания со стилем
                 pop_time_des1.inflate(R.menu.menu_time_des_1);
                 pop_time_des1.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         boolean bool = false;
-                        SharedPreferences sh = getSharedPreferences("0",0);
-                        SharedPreferences.Editor ed;
                         switch (item.getItemId()){
                             case R.id.menu_next:        //Напомнить завтра
                                 DateFormat dateFormatDay = new SimpleDateFormat("dd.MM.yyyy");
-                                Calendar cal = Calendar.getInstance();
+                                Calendar cal = Calendar.getInstance();      //Новый календарь
                                 Date date = null;
                                 try {
+                                    //Сегоднешнюю дату трансформируем под dateFormat
                                     date = dateFormatDay.parse(dateFormatDay.format(Calendar.getInstance().getTime()));
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
-                                cal.setTime(date);
-                                cal.add(Calendar.DAY_OF_MONTH,1);   //+1 день
-                                timePick(cal);
+                                cal.setTime(date);      //Добавлем в календарь сегоднешнюю дату
+                                cal.add(Calendar.DAY_OF_MONTH,1);   //+1 день в календаре
+                                timePick(cal);      //Открываем диалог выбора времени, а за ним создание уведомления
                                 bool= true;
                                 break;
                             case R.id.menu_data:        //Выбрать дату напоминания
-                                datePick();
+                                datePick();     //Открыть диалог дату, за ним диалог выбора времени, а дальше создание уведомления
                                 bool= true;
                                 break;
                             case R.id.menu_return:       //Напомнить при запуске
                                 ed = sh.edit();
-                                ed.putString("next_start",desires.getText().toString());
+                                ed.putString("next_start",desires.getText().toString());        //Добавляем SharedPreference "next_start" название желания
                                 ed.apply();
                                 Snackbar.make(time_des,"Напоминание созданно",Snackbar.LENGTH_SHORT).show();
                                 bool= true;
@@ -333,16 +342,16 @@ Dialog audio_recorder,dialog_share;
                         return bool;
                     }
                 });
-                pop_time_des1.show();
+                pop_time_des1.show();       //Показываем меню напоминаний
             }
         });
-        time_des2.setOnClickListener(new View.OnClickListener() {
+        time_des2.setOnClickListener(new View.OnClickListener() {       //Выбор даты изменения статуса желания
             @Override
             public void onClick(View v) {
 
             }
         });
-        if(!tag2.getText().toString().equals("")){
+        if(!tag2.getText().toString().equals("")){      //Если во 2 тэге ничего нет - скрываем его
             scrap.setVisibility(View.VISIBLE);
         }
         add_media.setOnClickListener(new View.OnClickListener() {
@@ -350,66 +359,66 @@ Dialog audio_recorder,dialog_share;
             public void onClick(View v) {
                 StrictMode.VmPolicy.Builder builder = new StrictMode.VmPolicy.Builder();//Без этого камера не запускается
                 StrictMode.setVmPolicy(builder.build());                                //
-                PopupMenu media_menu_pop = new PopupMenu(wrapper,v);
+                PopupMenu media_menu_pop = new PopupMenu(wrapper,v);        //Меню медиа со стилем
                 media_menu_pop.inflate(R.menu.media_menu);
                 media_menu_pop.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()){
-                            case R.id.menu_photo:
-                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                                String name = createNameFile();
-                                final File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/",name+".jpg");
-                                outputfileURI = Uri.fromFile(file);
-                                intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
-                                startActivityForResult(intent,CAMERA_PHOTO);
+                            case R.id.menu_photo:       //Фото из камеры
+                                Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);    //Intent до встроенного приложения камеры
+                                //Путь до файла медиа
+                                final File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/",createNameFile()+".jpg");
+                                outputfileURI = Uri.fromFile(file);     //Получаем uri
+                                intent.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);     //Запускаем камеру с этим uri
+                                startActivityForResult(intent,CAMERA_PHOTO);        //Ждём результата
                                 break;
-                            case R.id.gallery_menu:
-                                Intent inGallery = new Intent(Intent.ACTION_PICK);
-                                inGallery.setType("image/*");
-                                startActivityForResult(inGallery,GALLERY);
+                            case R.id.gallery_menu:     //Выбор фото из галереи
+                                Intent inGallery = new Intent(Intent.ACTION_PICK); //Intent до галереи
+                                inGallery.setType("image/*");       //Тип выбранного файла
+                                startActivityForResult(inGallery,GALLERY);      //Ждём результата
                                 break;
-                            case R.id.audio_menu:
-                                editSettingsPlayerRec();
-                                audio_recorder.show();
+                            case R.id.audio_menu:       //Запись аудио
+                                editSettingsPlayerRec();       //Настраиваем плеер и там же запускаем
+                                audio_recorder.show();      //Показываем плеер
                                 break;
-                            case R.id.video_menu:
-                                Intent intent_video = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-                                String name_video = createNameFile();
-                                final File file_video = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/",name_video+".mp4");
-                                outputfileURI = Uri.fromFile(file_video);
-                                intent_video.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);
-                                startActivityForResult(intent_video,CAMERA_VIDEO);
+                            case R.id.video_menu:       //Запись видео
+                                Intent intent_video = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);      //Intent до камеры
+                                //Путь до файла
+                                final File file_video = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/",createNameFile()+".mp4");
+                                outputfileURI = Uri.fromFile(file_video);       //Получаем uri
+                                intent_video.putExtra(MediaStore.EXTRA_OUTPUT,outputfileURI);   //Запускаем камеру с эти uri
+                                startActivityForResult(intent_video,CAMERA_VIDEO);      //Ждём результат
                                 break;
                         }
                         return false;
                     }
                 });
-                media_menu_pop.show();
+                media_menu_pop.show();  //Показываем меню медиа
             }
         });
-        if(sh.getBoolean("syn",false)){
+        if(sh.getBoolean("syn",false)){     //Если надо синхронизировать - синхронизирует
             synchronizedLocalMediaAndBD();
             ed = sh.edit();
-            ed.putBoolean("syn",false);
+            ed.putBoolean("syn",false);     //Меняем синхронизацию на false
             ed.apply();
         }
-        if(!loadDB) {
-            loadMediaFile();
+        if(!loadDB) {       //Если не надо загружать медиа из бд
+            loadMediaFile();        //Загружаем из локалки
         }else{
-            loadMediaFileBD();
+            loadMediaFileBD();      //Загружаем из бд
         }
 
     }
     private Calendar datePick (){
-        final Calendar date = Calendar.getInstance();
+        final Calendar date = Calendar.getInstance();   //Новый календырь для времени уведомления
         new DatePickerDialog(DesiresActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
             public void onDateSet(DatePicker view, int year, int month, int dayOfMonth) {
-                date.set(Calendar.YEAR,year);
-                date.set(Calendar.MONTH,month);
-                date.set(Calendar.DAY_OF_MONTH,dayOfMonth);
-                timePick(date);
+                date.set(Calendar.YEAR,year);       //Добавляем год
+                date.set(Calendar.MONTH,month);     //Добавляем месяц
+                date.set(Calendar.DAY_OF_MONTH,dayOfMonth); //Добавляем день
+                timePick(date);     //Ооткрывает диалог с выбором времени
             }
         },
                 date.get(Calendar.YEAR),
@@ -421,9 +430,9 @@ Dialog audio_recorder,dialog_share;
         new TimePickerDialog(DesiresActivity.this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                date.set(Calendar.MINUTE,minute);
-                date.set(Calendar.HOUR_OF_DAY,hourOfDay);
-                createNotification(date);
+                date.set(Calendar.MINUTE,minute);               //Добавляем минуты
+                date.set(Calendar.HOUR_OF_DAY,hourOfDay);       //Добавляем часы
+                createNotification(date);       //Создаём уведомление с добавленным временем
             }
         },
             date.get(Calendar.MINUTE),
@@ -449,7 +458,7 @@ Dialog audio_recorder,dialog_share;
         notificationManager.notify(101, builder.build());
         Snackbar.make(time_des,"Уведомление будет отправленно",Snackbar.LENGTH_SHORT).show();
     }
-    private void saveFileScreen (Bitmap bit,File fileIMG) throws IOException{
+    private void saveFileScreen (Bitmap bit,File fileIMG) throws IOException{   //Метод сохранение скриншота через bitmap
         FileOutputStream fileOutputStream = new FileOutputStream(fileIMG);  //Указываем путь до файла
         bit.compress(Bitmap.CompressFormat.PNG,100,fileOutputStream);   //Сохраняем
         fileOutputStream.flush();
@@ -567,11 +576,11 @@ Dialog audio_recorder,dialog_share;
         return dateText;
     }
 
-    private void inputIntent(){
+    private void inputIntent(){     //Выход обратно с сохранением данных для последующий ихменений в самом желании и в бд
         Intent in = new Intent(DesiresActivity.this,MainActivity.class);
-        in.putExtra("command",command);
+        in.putExtra("command",command);     //Сохраняем комманду, что сделать с эти желанием в MainActivity
         pos = getIntent().getIntExtra("position",0);
-
+        //Я не помню зачем это здесь
         if(sh.getString("search","false").equals("true")){
             ArrayList positions = getIntent().getIntegerArrayListExtra("positions");
             pos =((Integer) positions.get(pos));
@@ -579,8 +588,7 @@ Dialog audio_recorder,dialog_share;
             ed.putString("search","false");
             ed.apply();
         }
-        in.putExtra("position",pos);
-        in.putExtra("op",String.valueOf(op.getText()));
+        //Условия выхода
         if(String.valueOf(tag1.getText()).equals("") && String.valueOf(tag2.getText()).equals("")) {
             Toast.makeText(this, "Заполните хотя-бы один тэг", Toast.LENGTH_SHORT).show();
         }else if(String.valueOf(tag1.getText()).equals(String.valueOf(tag2.getText()))){
@@ -593,11 +601,12 @@ Dialog audio_recorder,dialog_share;
             if(tag2.getText().toString().equals("")){
                 tag2S = "no";
             }
-            in.putExtra("tag1",String.valueOf(tag1.getText()));
-            in.putExtra("tag2",String.valueOf(tag2.getText()));
-            in.putExtra("op",String.valueOf(op.getText()));
-            in.putExtra("name",String.valueOf(desires.getText()));
-            startActivity(in);
+            in.putExtra("position",pos);  //Сохраняем позицию это-го желания для дальнейшего применения command
+            in.putExtra("op",String.valueOf(op.getText())); //Сохраняем описание
+            in.putExtra("tag1",String.valueOf(tag1.getText())); //Созраняем tag1
+            in.putExtra("tag2",String.valueOf(tag2.getText())); //Созраняем tag2
+            in.putExtra("name",String.valueOf(desires.getText()));  //Созраняем название желания
+            startActivity(in);  //Запуск в MainActivity
             finish();
         }
       }
@@ -665,21 +674,22 @@ Dialog audio_recorder,dialog_share;
         }
         return URIsBD;
     }
-    private int createNewMediaId (){
-        List<MediaLost> list = SQLite.select()
-                .from(MediaLost.class)
-                .queryList();
-        return list.size()+1;
+    private int createNewMediaId (){        //Создаём новое media_id
+        List<MediaLost> list = SQLite.select()  //
+                .from(MediaLost.class)          //Получаем лист всех media_id (не их кол-во, а их самих)
+                .queryList();                   //
+        return list.size()+1;       //Потом просто прибавляем +1 к размеру листа - это и будет новое media_id
     }
     private List<Uri> getAllFile (){   //Метод получения всех медиа файлов в корне
+        //Путь до папки желания
         File file = new File(Environment.getExternalStorageDirectory() + "/" + "Desires"+"/"+desires.getText().toString()+"/" );
-        File[] files = file.listFiles();
-        List<Uri> URIsLocal = new ArrayList<>();
-        if(files != null ) {
+        File[] files = file.listFiles();    //Берём в массив все файлы в папке
+        List<Uri> URIsLocal = new ArrayList<>();    //Лист uri
+        if(files != null ) {    //Если в паке есть файлы
             for (int i = 0; i < files.length; i++) {
-                URIsLocal.add(Uri.fromFile(files[i]));
+                URIsLocal.add(Uri.fromFile(files[i]));      //Добавляем в лист uri файла поочереди из массива
             }
-            return  URIsLocal;
+            return  URIsLocal;      //Возращяем лист uri
         }
         return null;
     }

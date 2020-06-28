@@ -69,8 +69,8 @@ public class MainActivity extends AppCompatActivity{
     ArrayList<Integer> position;
     EditText desiresText,searchText,fake;
     Dialog dialog_setting;
-    LinearLayout bottonSheet,lin;
-    BottomSheetBehavior bottomSheetBehavior;
+    LinearLayout bottonSheet,lin,bottonSheetGenerator;
+    BottomSheetBehavior bottomSheetBehavior,bottomSheetBehaviorGeneratot;
     TextView name_botton_sheet,text_first,text_start;
     EditText tag1,tag2,op;
     Button save;
@@ -137,8 +137,12 @@ public class MainActivity extends AppCompatActivity{
         backIMG = findViewById(R.id.back_img);
         lin = findViewById(R.id.lin);
         text_first = findViewById(R.id.text_first);
+        //Настройка bottonSheet'ов
         bottonSheet = findViewById(R.id.bottom_sheet);
+        bottonSheetGenerator = findViewById(R.id.bottom_sheet_generator_core);
         bottomSheetBehavior = BottomSheetBehavior.from(bottonSheet);
+        bottomSheetBehaviorGeneratot = BottomSheetBehavior.from(bottonSheetGenerator);
+        bottomSheetBehaviorGeneratot.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
         list = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
@@ -477,6 +481,7 @@ public class MainActivity extends AppCompatActivity{
         return wrapper;
     }
     public void switchColor (String color){
+        LinearLayout botton_sheet_generator = findViewById(R.id.bottom_sheet_generator);
         LinearLayout lin_next_window = dialog_next.findViewById(R.id.lin_next_window);
         LinearLayout lin_alert = dialog_setting.findViewById(R.id.lin_alert);
         LinearLayout dialog_lin = dialog_setting.findViewById(R.id.dialog_lin);
@@ -498,13 +503,21 @@ public class MainActivity extends AppCompatActivity{
         search = findViewById(R.id.search);
         filter = findViewById(R.id.filter);
         desiresText = findViewById(R.id.text_plus);
+        ImageView small_line = findViewById(R.id.small_line);
         LinearLayout button_sheet = findViewById(R.id.bottom_sheet);
         TextView text_desires_sheet = findViewById(R.id.name_desires_botton_sheet);
+        TextView text_botton_sheet_generator = findViewById(R.id.text_botton_sheet_generatot);
         EditText op = findViewById(R.id.op);
         EditText tag1Text = findViewById(R.id.tag1_b);
         EditText tag2Text = findViewById(R.id.tag2_b);
+        Button create_generator = findViewById(R.id.create_botton_sheet);
         switch (color){
             case "dark":
+                text_botton_sheet_generator.setTextColor(getResources().getColor(R.color.white));
+                create_generator.setBackgroundResource(R.drawable.maket_button_sheet_dark);
+                create_generator.setTextColor(getResources().getColor(R.color.white));
+                botton_sheet_generator.setBackgroundResource(R.drawable.maket_butto_sheet_dark);
+                small_line.setImageResource(R.drawable.small_line_dark);
                 button_next_window.setTextColor(getResources().getColor(R.color.white));
                 button_next_window.setBackgroundResource(R.drawable.maket_block_dark);
                 text_next_window.setTextColor(getResources().getColor(R.color.white));
@@ -542,6 +555,11 @@ public class MainActivity extends AppCompatActivity{
                 switchFilter(searchType);
                 break;
             case "light":
+                create_generator.setTextColor(getResources().getColor(R.color.dark));
+                text_botton_sheet_generator.setTextColor(getResources().getColor(R.color.dark));
+                create_generator.setBackgroundResource(R.drawable.maket_button_sheet);
+                botton_sheet_generator.setBackgroundResource(R.drawable.maket_butto_sheet);
+                small_line.setImageResource(R.drawable.small_line);
                 button_next_window.setTextColor(getResources().getColor(R.color.dark));
                 button_next_window.setBackgroundResource(R.drawable.maket_block);
                 text_next_window.setTextColor(getResources().getColor(R.color.dark));
@@ -560,8 +578,8 @@ public class MainActivity extends AppCompatActivity{
                 delete.setTextColor(getResources().getColor(R.color.dark));
                 settings.setImageResource(R.drawable.settings);
                 text_first.setTextColor(getResources().getColor(R.color.dark));
-                up.setBackgroundResource(R.drawable.maket_up);
-                dawn.setBackgroundResource(R.drawable.maket_dawn);
+                up.setBackgroundColor(getColor(R.color.white));
+                dawn.setBackgroundColor(getColor(R.color.white));
                 rgb.setImageResource(R.drawable.rgb);
                 search.setImageResource(R.drawable.search);
                 con.setBackgroundResource(R.color.white_back);

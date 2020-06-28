@@ -117,9 +117,9 @@
             android:layout_height="match_parent"
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="5dp"
             android:layout_marginBottom="10dp"
-            android:layout_weight="4.5"
+            android:layout_weight="4.3"
             android:background="@drawable/maket_right"
             android:paddingRight="1dp"
             android:visibility="gone" />
@@ -129,9 +129,9 @@
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_marginTop="5dp"
-            android:layout_marginRight="10dp"
+            android:layout_marginRight="5dp"
             android:layout_marginBottom="5dp"
-            android:layout_weight="0.5"
+            android:layout_weight="0.6"
             app:srcCompat="@drawable/clip" />
 
     </LinearLayout>
