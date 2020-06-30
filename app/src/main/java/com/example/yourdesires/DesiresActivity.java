@@ -318,17 +318,17 @@ Dialog audio_recorder,dialog_share;
                                 Date date = null;
                                 try {
                                     //Сегоднешнюю дату трансформируем под dateFormat
-                                    date = dateFormatDay.parse(dateFormatDay.format(Calendar.getInstance().getTime()));
+                                    date = dateFormatDay.parse(getTodayDate());
                                 } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
                                 cal.setTime(date);      //Добавлем в календарь сегоднешнюю дату
                                 cal.add(Calendar.DAY_OF_MONTH,1);   //+1 день в календаре
-                                timePick(cal);      //Открываем диалог выбора времени, а за ним создание уведомления
+                                timePick(cal,"date_start");      //Открываем диалог выбора времени, а за ним создание уведомления
                                 bool= true;
                                 break;
                             case R.id.menu_data:        //Выбрать дату напоминания
-                                datePick();     //Открыть диалог дату, за ним диалог выбора времени, а дальше создание уведомления
+                                datePick("date_start");     //Открыть диалог дату, за ним диалог выбора времени, а дальше создание уведомления
                                 bool= true;
                                 break;
                             case R.id.menu_return:       //Напомнить при запуске
@@ -336,6 +336,7 @@ Dialog audio_recorder,dialog_share;
                                 ed.putString("next_start",desires.getText().toString());        //Добавляем SharedPreference "next_start" название желания
                                 ed.apply();
                                 Snackbar.make(time_des,"Напоминание созданно",Snackbar.LENGTH_SHORT).show();
+                                saveNotificationBD("next_start",getTodayDate(),"no",0);     //Сохраняем напоминание в бд
                                 bool= true;
                                 break;
                         }
@@ -348,7 +349,7 @@ Dialog audio_recorder,dialog_share;
         time_des2.setOnClickListener(new View.OnClickListener() {       //Выбор даты изменения статуса желания
             @Override
             public void onClick(View v) {
-
+            //    saveNotificationBD("date_start_status",getTodayDate(),"no",0);
             }
         });
         if(!tag2.getText().toString().equals("")){      //Если во 2 тэге ничего нет - скрываем его
@@ -410,7 +411,41 @@ Dialog audio_recorder,dialog_share;
         }
 
     }
-    private Calendar datePick (){
+    private String getTodayDate (){         //Метод получения текущей даты
+        DateFormat dateFormatDay = new SimpleDateFormat("dd.MM.yyyy");
+        return dateFormatDay.format(Calendar.getInstance().getTime());
+    }
+    private void saveNotificationBD (String type,String date_created,String date_work,int status){      //Метод сохранения напоминания в бд
+        switch (type){
+            case "next_start":
+                com.example.yourdesires.model.Notification notification = new com.example.yourdesires.model.Notification();
+                notification.setType(type);
+                notification.setDate_work(date_work);
+                notification.setDate_created(date_created);
+                notification.setStatus_edit(status);
+                notification.setId_desires(searchIDDesires());
+                notification.setId_notification(createNewIdNotification());
+                notification.save();
+                break;
+        }
+        showAllBdNotification();
+    }
+    private void showAllBdNotification (){
+        List<com.example.yourdesires.model.Notification> list = SQLite.select()
+                .from(com.example.yourdesires.model.Notification.class)
+                .queryList();
+        list.size();
+    }
+    private int createNewIdNotification (){     //Метод создания нового id_notification
+        List<com.example.yourdesires.model.Notification> list= SQLite.select()
+                .from(com.example.yourdesires.model.Notification.class)
+                .queryList();
+        if(list.size() != 0)
+            return list.get(list.size()-1).getId_notification()+1;
+
+         return 1;
+    }
+    private Calendar datePick (final String type){
         final Calendar date = Calendar.getInstance();   //Новый календырь для времени уведомления
         new DatePickerDialog(DesiresActivity.this, new DatePickerDialog.OnDateSetListener() {
             @Override
@@ -418,7 +453,7 @@ Dialog audio_recorder,dialog_share;
                 date.set(Calendar.YEAR,year);       //Добавляем год
                 date.set(Calendar.MONTH,month);     //Добавляем месяц
                 date.set(Calendar.DAY_OF_MONTH,dayOfMonth); //Добавляем день
-                timePick(date);     //Ооткрывает диалог с выбором времени
+                timePick(date,type);     //Открывает диалог с выбором времени
             }
         },
                 date.get(Calendar.YEAR),
@@ -426,13 +461,14 @@ Dialog audio_recorder,dialog_share;
                 date.get(Calendar.DAY_OF_MONTH)).show();
         return date;
     }
-    private Calendar timePick(final Calendar date){
+    private Calendar timePick(final Calendar date,String type){
         new TimePickerDialog(DesiresActivity.this, new TimePickerDialog.OnTimeSetListener() {
             @Override
             public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                 date.set(Calendar.MINUTE,minute);               //Добавляем минуты
                 date.set(Calendar.HOUR_OF_DAY,hourOfDay);       //Добавляем часы
                 createNotification(date);       //Создаём уведомление с добавленным временем
+               // saveNotificationBD(type,getTodayDate(),date,0);
             }
         },
             date.get(Calendar.MINUTE),
