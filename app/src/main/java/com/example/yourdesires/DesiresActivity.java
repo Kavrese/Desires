@@ -46,6 +46,7 @@ import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
 import com.example.yourdesires.model.MediaLost;
 import com.example.yourdesires.model.MediaLost_Table;
+import com.example.yourdesires.model.Notification_Table;
 import com.google.android.material.snackbar.Snackbar;
 import com.raizlabs.android.dbflow.sql.language.SQLite;
 import com.squareup.picasso.Picasso;
@@ -332,6 +333,9 @@ Dialog audio_recorder,dialog_share;
                                 bool= true;
                                 break;
                             case R.id.menu_return:       //Напомнить при запуске
+                                ed = sh.edit();
+                                ed.putString("next_start",desires.getText().toString());        //Добавляем SharedPreference "next_start" название желания
+                                ed.apply();
                                 Snackbar.make(time_des,"Напоминание созданно",Snackbar.LENGTH_SHORT).show();
                                 saveNotificationBD("next_start",getTodayDate(),"no",0);     //Сохраняем напоминание в бд
                                 bool= true;
@@ -415,15 +419,18 @@ Dialog audio_recorder,dialog_share;
     private void saveNotificationBD (String type,String date_created,String date_work,int status){      //Метод сохранения напоминания в бд
         switch (type){
             case "next_start":
-                com.example.yourdesires.model.Notification notification = new com.example.yourdesires.model.Notification();
-                notification.setType(type);
-                notification.setDate_work(date_work);
-                notification.setDate_created(date_created);
-                notification.setStatus_edit(status);
-                notification.setId_desires(searchIDDesires());
-                notification.setId_notification(createNewIdNotification());
-                notification.setName(desires.getText().toString());
-                notification.save();
+                if(proverkaNotification(type,desires.getText().toString())) {
+                    com.example.yourdesires.model.Notification notification = new com.example.yourdesires.model.Notification();
+                    notification.setType(type);
+                    notification.setDate_work(date_work);
+                    notification.setDate_created(date_created);
+                    notification.setStatus_edit(status);
+                    notification.setId_desires(searchIDDesires());
+                    notification.setId_notification(createNewIdNotification());
+                    notification.setName(desires.getText().toString());
+                    notification.save();
+                }else
+                    Snackbar.make(desires,"Напоминание, для это-го желание, уже существует",Snackbar.LENGTH_SHORT).show();
                 break;
         }
         showAllBdNotification();
@@ -433,9 +440,6 @@ Dialog audio_recorder,dialog_share;
                 .from(com.example.yourdesires.model.Notification.class)
                 .queryList();
         list.size();
-        if(list.size() != 0){
-
-        }
     }
     private int createNewIdNotification (){     //Метод создания нового id_notification
         List<com.example.yourdesires.model.Notification> list= SQLite.select()
@@ -445,6 +449,22 @@ Dialog audio_recorder,dialog_share;
             return list.get(list.size()-1).getId_notification()+1;
 
          return 1;
+    }
+    private boolean proverkaNotification (String type,String name){
+        List<com.example.yourdesires.model.Notification> list;
+        switch (type){
+            case "next_start":
+                list = SQLite.select()
+                        .from(com.example.yourdesires.model.Notification.class)
+                        .where(Notification_Table.name.is(name))
+                        .and(Notification_Table.type.is(type))
+                        .queryList();
+                if(list.size() == 0){
+                    return true;
+                }else
+                    return false;
+        }
+        return false;
     }
     private Calendar datePick (final String type){
         final Calendar date = Calendar.getInstance();   //Новый календырь для времени уведомления

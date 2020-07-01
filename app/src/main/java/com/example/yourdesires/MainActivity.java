@@ -110,6 +110,10 @@ public class MainActivity extends AppCompatActivity{
                 for (int i = 0; i < list.size(); i++)
                     deleteNotification(list.get(i).getId_notification());
             }
+            ed = sh.edit();
+            ed.putString("proverka","false");
+            ed.putString("next_start","false");
+            ed.apply();
         }
         searchType = "def";
         ed = sh.edit();
@@ -454,7 +458,7 @@ public class MainActivity extends AppCompatActivity{
         Button button_next_window = dialog_next.findViewById(R.id.button_next_window);
         TextView text_next_window = dialog_next.findViewById(R.id.text_next_window);
         if(list.size() == 1)
-            text_next_window.setText("Напоминание про желание: " + list.get(0).getName());  //Если желание всего 1
+            text_next_window.setText("Напоминание про желание: " + list.get(0).getName());
         else
         for(int i =0;i<list.size();i++) {
             if(!bool) {
