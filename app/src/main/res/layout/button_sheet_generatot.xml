@@ -6,6 +6,7 @@
     android:layout_height="wrap_content"
     android:gravity="center"
     android:orientation="vertical"
+    android:scrollbarSize="10sp"
     android:weightSum="11.5"
     app:behavior_hideable="false"
     app:behavior_peekHeight="13dp"
@@ -21,7 +22,7 @@
     <LinearLayout
         android:id="@+id/bottom_sheet_generator"
         android:layout_width="match_parent"
-        android:layout_height="340dp"
+        android:layout_height="400dp"
         android:background="@drawable/maket_butto_sheet"
         android:orientation="vertical"
         android:weightSum="11.5">
@@ -30,26 +31,172 @@
             android:id="@+id/text_botton_sheet_generatot"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginLeft="20dp"
+            android:layout_marginLeft="10dp"
             android:layout_marginTop="15dp"
+            android:layout_marginRight="10dp"
             android:layout_weight="2"
+            android:background="@drawable/maket_up"
             android:clickable="true"
-            android:text="Генератор желаний"
+            android:gravity="center"
+            android:text="Рекомендатор желаний"
             android:textColor="#000000"
             android:textSize="25sp"
             android:textStyle="bold"
             app:autoSizeTextType="uniform" />
 
-        <TextView
-            android:id="@+id/textView"
+        <LinearLayout
+            android:id="@+id/lin_recomendator"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="7.5"
-            android:gravity="center"
-            android:text="Скоро будет"
-            android:textColor="#3F51B5"
-            android:textSize="50sp"
-            android:textStyle="bold" />
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            android:layout_weight="8"
+            android:orientation="vertical"
+            android:textStyle="bold"
+            android:weightSum="10">
+
+            <TextView
+                android:id="@+id/text_module_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:text="По дате создания :"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/lin_module_1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1.5"
+                android:background="@drawable/maket_up"
+                android:orientation="horizontal"
+                android:weightSum="10">
+
+                <Switch
+                    android:id="@+id/switch_date_create"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="4"
+                    android:checked="true"
+                    android:gravity="center"
+                    android:text="Новые"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:id="@+id/text_old"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:gravity="center"
+                    android:text="Старые"
+                    android:textColor="#000000"
+                    android:textSize="16sp" />
+
+                <CheckBox
+                    android:id="@+id/checkBox_all"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="3"
+                    android:text="Все"
+                    android:textSize="16sp" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/text_module_2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:text="Критерии создания :"
+                android:textColor="#000000"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:id="@+id/lin_module_2"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="5.5"
+                android:gravity="center"
+                android:orientation="vertical"
+                android:weightSum="14">
+
+                <CheckBox
+                    android:id="@+id/checkBox_module_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="3"
+                    android:autoSizeTextType="none"
+                    android:checked="true"
+                    android:text="Выбрать критерии случайно"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="11"
+                    android:orientation="horizontal"
+                    android:weightSum="3">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="2"
+                        android:orientation="vertical"
+                        android:weightSum="3">
+
+                        <CheckBox
+                            android:id="@+id/checkBox_edit"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:autoSizeTextType="uniform"
+                            android:text="Учитывать кол-во изменений" />
+
+                        <CheckBox
+                            android:id="@+id/checkBox_search"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:autoSizeTextType="uniform"
+                            android:text="Учитывать результаты поиска" />
+
+                        <CheckBox
+                            android:id="@+id/checkBox_notofocations"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="1"
+                            android:autoSizeTextType="uniform"
+                            android:text="Учитывать напоминания желаний" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="1"
+                        android:orientation="vertical"
+                        android:weightSum="2">
+
+                        <EditText
+                            android:id="@+id/num_return"
+                            android:layout_width="match_parent"
+                            android:layout_height="0dp"
+                            android:layout_weight="2"
+                            android:autoSizeTextType="none"
+                            android:ems="10"
+                            android:gravity="center"
+                            android:hint="Кол-во"
+                            android:inputType="numberSigned" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
 
         <Button
             android:id="@+id/create_botton_sheet"
