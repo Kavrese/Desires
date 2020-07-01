@@ -448,15 +448,21 @@ public class MainActivity extends AppCompatActivity{
                 .where(Notification_Table.id_notification.is(id_notification))
                 .execute();
     }
-    private void nextWindow(List<Notification> list) {
+    private void nextWindow(List<Notification> list) {      //Показ диалога напоминания
+        boolean bool = false;
         dialog_next.show();
         Button button_next_window = dialog_next.findViewById(R.id.button_next_window);
         TextView text_next_window = dialog_next.findViewById(R.id.text_next_window);
         if(list.size() == 1)
-            text_next_window.setText(text_next_window.getText().toString() + list.get(0).getName());
+            text_next_window.setText("Напоминание про желание: " + list.get(0).getName());  //Если желание всего 1
         else
         for(int i =0;i<list.size();i++) {
-            text_next_window.setText(text_next_window.getText().toString() +" "+list.get(i).getName());
+            if(!bool) {
+                text_next_window.setText("Напоминание про желания:" + " " + list.get(i).getName());
+                bool = true;
+            }else{
+                text_next_window.setText(text_next_window.getText().toString() + ", " + list.get(i).getName());
+            }
         }
         button_next_window.setOnClickListener(new View.OnClickListener() {
             @Override
