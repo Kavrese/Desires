@@ -1,5 +1,6 @@
 package com.example.yourdesires;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Environment;
@@ -92,6 +93,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                     in.putExtra("color", "dark");
             }
                 context.startActivity(in);
+                ((Activity)context).finish();
             }
         });
         holder.name.setText(arrayList.get(position).getName());

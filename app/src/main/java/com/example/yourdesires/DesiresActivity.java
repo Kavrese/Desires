@@ -26,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.provider.AlarmClock;
 import android.provider.MediaStore;
@@ -64,7 +65,7 @@ import java.util.Date;
 import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity implements View.OnClickListener {
-boolean light,loadDB,saveBD,recording,playback,deleteFM;
+boolean light,loadDB,saveBD,recording,playback,deleteFM,back_presed;
 String command,tag1S,tag2S,click_dialog_share;
     List<Uri> bd;               //
     List<Uri> local;            //
@@ -161,7 +162,7 @@ Dialog audio_recorder,dialog_share;
         status = getIntent().getIntExtra("status",1);       //Сейчашний статус желаний
 
         light = switchColor(getIntent().getStringExtra("color"));       //Меняем темы активити
-        wrapper = getWrapperStyle(wrapper);     //Стиль всех PopurMenu
+        wrapper = getWrapperStyle();     //Стиль всех PopurMenu
 
         //Настройка tag'ов
         if(tag2S.equals("") || tag2S.equals("no")){
@@ -933,7 +934,7 @@ Dialog audio_recorder,dialog_share;
         plus.setVisibility(View.VISIBLE);
         scrap.setVisibility(View.GONE);
     }
-    private Context getWrapperStyle (Context wrapper){
+    private Context getWrapperStyle (){
         if(light){
             wrapper = new ContextThemeWrapper(text.getContext(),R.style.Pop_menu_light);
         }else{
@@ -941,7 +942,21 @@ Dialog audio_recorder,dialog_share;
         }
         return wrapper;
     }
-
+    @Override
+    public void onBackPressed() {
+        if(!back_presed){
+            back_presed = true;
+            Toast.makeText(this, "Нажмите ещё раз что-бы выйти", Toast.LENGTH_SHORT).show();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    back_presed = false;
+                }
+            },2000);
+        }else{
+            System.exit(1);
+        }
+    }
     @Override
     public void onClick(View v) {
         switch(v.getId()){
