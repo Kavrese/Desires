@@ -332,9 +332,6 @@ Dialog audio_recorder,dialog_share;
                                 bool= true;
                                 break;
                             case R.id.menu_return:       //Напомнить при запуске
-                                ed = sh.edit();
-                                ed.putString("next_start",desires.getText().toString());        //Добавляем SharedPreference "next_start" название желания
-                                ed.apply();
                                 Snackbar.make(time_des,"Напоминание созданно",Snackbar.LENGTH_SHORT).show();
                                 saveNotificationBD("next_start",getTodayDate(),"no",0);     //Сохраняем напоминание в бд
                                 bool= true;
@@ -425,6 +422,7 @@ Dialog audio_recorder,dialog_share;
                 notification.setStatus_edit(status);
                 notification.setId_desires(searchIDDesires());
                 notification.setId_notification(createNewIdNotification());
+                notification.setName(desires.getText().toString());
                 notification.save();
                 break;
         }
@@ -435,6 +433,9 @@ Dialog audio_recorder,dialog_share;
                 .from(com.example.yourdesires.model.Notification.class)
                 .queryList();
         list.size();
+        if(list.size() != 0){
+
+        }
     }
     private int createNewIdNotification (){     //Метод создания нового id_notification
         List<com.example.yourdesires.model.Notification> list= SQLite.select()

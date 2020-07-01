@@ -19,6 +19,16 @@ public class Notification extends BaseModel {
     String type;
     @Column
     int status_edit;
+    @Column
+    String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public int getStatus_edit() {
         return status_edit;

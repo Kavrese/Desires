@@ -32,6 +32,8 @@ import android.widget.Toast;
 
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
+import com.example.yourdesires.model.Notification;
+import com.example.yourdesires.model.Notification_Table;
 import com.google.android.material.bottomsheet.BottomSheetBehavior;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
@@ -102,11 +104,12 @@ public class MainActivity extends AppCompatActivity{
             ed.putString("proverka","false");
             ed.apply();
         }else if(!start.equals("false") && prover.equals("true")){
-            nextWindow(sh.getString("next_start","error"));
-            ed = sh.edit();
-            ed.putString("next_start","false");
-            ed.putString("proverka","false");
-            ed.apply();
+            List<Notification> list = getNotificationNextStart();
+            if(list.size() != 0) {
+                nextWindow(list);
+                for (int i = 0; i < list.size(); i++)
+                    deleteNotification(list.get(i).getId_notification());
+            }
         }
         searchType = "def";
         ed = sh.edit();
@@ -433,12 +436,28 @@ public class MainActivity extends AppCompatActivity{
             }
         });
     }
-
-    private void nextWindow(String name) {
+    private List<Notification> getNotificationNextStart(){
+        List<Notification> list = SQLite.select()
+                .from(Notification.class)
+                .where(Notification_Table.type.is("next_start"))
+                .queryList();
+        return list;
+    }
+    private void deleteNotification (int id_notification){
+        SQLite.delete(Notification.class)
+                .where(Notification_Table.id_notification.is(id_notification))
+                .execute();
+    }
+    private void nextWindow(List<Notification> list) {
         dialog_next.show();
         Button button_next_window = dialog_next.findViewById(R.id.button_next_window);
         TextView text_next_window = dialog_next.findViewById(R.id.text_next_window);
-        text_next_window.setText(text_next_window.getText().toString()+name);
+        if(list.size() == 1)
+            text_next_window.setText(text_next_window.getText().toString() + list.get(0).getName());
+        else
+        for(int i =0;i<list.size();i++) {
+            text_next_window.setText(text_next_window.getText().toString() +" "+list.get(i).getName());
+        }
         button_next_window.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
