@@ -166,7 +166,7 @@
                             android:text="Учитывать результаты поиска" />
 
                         <CheckBox
-                            android:id="@+id/checkBox_notofocations"
+                            android:id="@+id/checkBox_notifocations"
                             android:layout_width="match_parent"
                             android:layout_height="0dp"
                             android:layout_weight="1"
