@@ -60,6 +60,8 @@ public class MainActivity extends AppCompatActivity{
     boolean loadBD = false;
     boolean noAlert = false;
     boolean syn = false;
+    boolean all_date,old_date,new_date,random,edit,search_generator,notifications;    //Для генерирования жедания
+    int return_des;                                                         //
     String searchType;
     Dialog dialog_next;
     DesiresAdapter adapter;
@@ -149,6 +151,7 @@ public class MainActivity extends AppCompatActivity{
         bottomSheetBehaviorGeneratot = BottomSheetBehavior.from(bottonSheetGenerator);
         bottomSheetBehaviorGeneratot.setState(BottomSheetBehavior.STATE_HIDDEN);
         bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
+        generatorDesires();
         list = new ArrayList<>();
         recyclerView = findViewById(R.id.recycler_view);
         desiresText = findViewById(R.id.text_plus);
@@ -555,13 +558,24 @@ public class MainActivity extends AppCompatActivity{
                 num_return.setTextColor(getColor(R.color.white));
                 text_module_2.setTextColor(getColor(R.color.white));
                 lin_module_1.setBackgroundResource(R.drawable.maket_up_dark);
-                checkBox_not.setTextColor(getColor(R.color.white));
-                checkBox_edit.setTextColor(getColor(R.color.white));
-                checkBox_search.setTextColor(getColor(R.color.white));
                 checkBox_module_2.setTextColor(getColor(R.color.white));
+                if(!random) {
+                    checkBox_not.setTextColor(getColor(R.color.white));
+                    checkBox_edit.setTextColor(getColor(R.color.white));
+                    checkBox_search.setTextColor(getColor(R.color.white));
+                }else {
+                    checkBox_not.setTextColor(getColor(R.color.grey));
+                    checkBox_edit.setTextColor(getColor(R.color.grey));
+                    checkBox_search.setTextColor(getColor(R.color.grey));
+                }
                 checkBox_all.setTextColor(getColor(R.color.white));
-                text_old.setTextColor(getColor(R.color.white));
-                switch_date_create.setTextColor(getColor(R.color.white));
+                if(!all_date){
+                    switch_date_create.setTextColor(getColor(R.color.white));
+                    text_old.setTextColor(getColor(R.color.white));
+                }else{
+                    switch_date_create.setTextColor(getColor(R.color.grey));
+                    text_old.setTextColor(getColor(R.color.grey));
+                }
                 text_botton_sheet_generator.setTextColor(getResources().getColor(R.color.white));
                 text_generator.setTextColor(getColor(R.color.white));
                 text_generator.setBackgroundResource(R.drawable.maket_up_dark);
@@ -610,13 +624,24 @@ public class MainActivity extends AppCompatActivity{
                 num_return.setTextColor(getColor(R.color.dark));
                 text_module_2.setTextColor(getColor(R.color.dark));
                 lin_module_1.setBackgroundResource(R.drawable.maket_up);
-                checkBox_not.setTextColor(getColor(R.color.dark));
-                checkBox_edit.setTextColor(getColor(R.color.dark));
-                checkBox_search.setTextColor(getColor(R.color.dark));
                 checkBox_module_2.setTextColor(getColor(R.color.dark));
+                if(!random) {
+                    checkBox_not.setTextColor(getColor(R.color.dark));
+                    checkBox_edit.setTextColor(getColor(R.color.dark));
+                    checkBox_search.setTextColor(getColor(R.color.dark));
+                }else {
+                    checkBox_not.setTextColor(getColor(R.color.grey));
+                    checkBox_edit.setTextColor(getColor(R.color.grey));
+                    checkBox_search.setTextColor(getColor(R.color.grey));
+                }
                 checkBox_all.setTextColor(getColor(R.color.dark));
-                text_old.setTextColor(getColor(R.color.dark));
-                switch_date_create.setTextColor(getColor(R.color.dark));
+                if(!all_date){
+                    switch_date_create.setTextColor(getColor(R.color.dark));
+                    text_old.setTextColor(getColor(R.color.dark));
+                }else{
+                    switch_date_create.setTextColor(getColor(R.color.grey));
+                    text_old.setTextColor(getColor(R.color.grey));
+                }
                 text_botton_sheet_generator.setTextColor(getResources().getColor(R.color.dark));
                 text_generator.setTextColor(getColor(R.color.dark));
                 text_generator.setBackgroundResource(R.drawable.maket_up);
@@ -671,6 +696,79 @@ public class MainActivity extends AppCompatActivity{
         ed.apply();
         editMaketRecyclerView(light,list);
         wrapper = getWrapperStyle(wrapper);
+    }
+    private void generatorDesires (){
+        final Switch switch_date_create = findViewById(R.id.switch_date_create);
+        final TextView text_old = findViewById(R.id.text_old);
+        final EditText num_return = findViewById(R.id.num_return);
+        final CheckBox checkBox_all = findViewById(R.id.checkBox_all);
+        CheckBox checkBox_module_2 = findViewById(R.id.checkBox_module_2);
+        final CheckBox checkBox_edit = findViewById(R.id.checkBox_edit);
+        final CheckBox checkBox_search = findViewById(R.id.checkBox_search);
+        final CheckBox checkBox_not = findViewById(R.id.checkBox_notifocations);
+        Button create = findViewById(R.id.create_botton_sheet);
+        checkBox_all.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked) {
+                    switch_date_create.setTextColor(getColor(R.color.grey));
+                    text_old.setTextColor(getColor(R.color.grey));
+                    all_date = true;
+                    switch_date_create.setClickable(false);
+                }else{
+                    switch_date_create.setClickable(true);
+                    all_date = false;
+                    if(light) {
+                        switch_date_create.setTextColor(getColor(R.color.dark));
+                        text_old.setTextColor(getColor(R.color.dark));
+                    }else{
+                        switch_date_create.setTextColor(getColor(R.color.white));
+                        text_old.setTextColor(getColor(R.color.white));
+                    }
+                }
+            }
+        });
+        checkBox_module_2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(isChecked){
+                    random = true;
+                    checkBox_edit.setTextColor(getColor(R.color.grey));
+                    checkBox_not.setTextColor(getColor(R.color.grey));
+                    checkBox_search.setTextColor(getColor(R.color.grey));
+                    checkBox_edit.setClickable(false);
+                    checkBox_not.setClickable(false);
+                    checkBox_search.setClickable(false);
+                }else{
+                    checkBox_edit.setClickable(true);
+                    checkBox_not.setClickable(true);
+                    checkBox_search.setClickable(true);
+                    random = false;
+                    if(light){
+                        checkBox_edit.setTextColor(getColor(R.color.dark));
+                        checkBox_not.setTextColor(getColor(R.color.dark));
+                        checkBox_search.setTextColor(getColor(R.color.dark));
+                    }else{
+                        checkBox_edit.setTextColor(getColor(R.color.white));
+                        checkBox_not.setTextColor(getColor(R.color.white));
+                        checkBox_search.setTextColor(getColor(R.color.white));
+                    }
+                }
+            }
+        });
+        create.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                return_des = Integer.parseInt(num_return.getText().toString());
+                if(return_des != 0)
+                    algorithmGenerator();
+                else
+                    Toast.makeText(MainActivity.this, "Введите кол-во генерируемых желаний", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void algorithmGenerator (){
+        
     }
     public void editMaketRecyclerView (boolean light,ArrayList<Desires> list){
         for(int i = 0;i<list.size();i++){
