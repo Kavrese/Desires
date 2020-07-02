@@ -66,6 +66,7 @@ import java.util.List;
 
 public class DesiresActivity extends AppCompatActivity implements View.OnClickListener {
 boolean light,loadDB,saveBD,recording,playback,deleteFM,back_presed;
+MainActivity mainActivity = new MainActivity();
 String command,tag1S,tag2S,click_dialog_share;
     List<Uri> bd;               //
     List<Uri> local;            //
@@ -92,7 +93,6 @@ MediaRecorder mediaRecorder;
 int CAMERA_PHOTO = 1;
 int GALLERY = 2;
 int CAMERA_VIDEO = 3;
-int AUDIO = 4;
 Dialog audio_recorder,dialog_share;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -185,6 +185,7 @@ Dialog audio_recorder,dialog_share;
             @Override
             public void onClick(View v) {
                 inputIntent();
+                mainActivity.addLogBD("close",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString()),desires.getText().toString());
             }
         });
         menu.setOnClickListener(new View.OnClickListener() {
@@ -226,9 +227,12 @@ Dialog audio_recorder,dialog_share;
                             case R.id.menu_delete_share:        //Удалить
                                 command = "delete";
                                 inputIntent();
-                                bool = true;
+                                mainActivity.addLogBD("delete",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString()),desires.getText().toString());
+                                bool = false;
                                 break;
                         }
+                        if(bool)
+                            mainActivity.addLogBD("update status",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString())+1,desires.getText().toString());
                         return bool;
                     }
                 });
@@ -282,6 +286,7 @@ Dialog audio_recorder,dialog_share;
                                         Uri uri = Uri.fromFile(fileIMG);
                                         in.putExtra(Intent.EXTRA_STREAM,uri);
                                         startActivity(Intent.createChooser(in,"Share"));    //Запускаем
+                                        mainActivity.addLogBD("share",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString()),desires.getText().toString());
                                         dialog_share.dismiss();     //Закрываем диалог
                                     }
                                     @Override
@@ -342,6 +347,8 @@ Dialog audio_recorder,dialog_share;
                                 bool= true;
                                 break;
                         }
+                        if(bool)
+                            mainActivity.addLogBD("new notification",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString()),desires.getText().toString());
                         return bool;
                     }
                 });
@@ -552,9 +559,10 @@ Dialog audio_recorder,dialog_share;
                             stopRecording();
                             audio_recorder.hide();
                             uploadUriMedia(Uri.fromFile(outputfileAudio),"audio");
-                            arrayListMedia.add(new Media(Uri.fromFile(outputfileAudio)));
+                            arrayListMedia.add(new Media(Uri.fromFile(outputfileAudio),desires.getText().toString()));
                             rec.setVisibility(View.VISIBLE);
                             rec.getAdapter().notifyDataSetChanged();
+                            mainActivity.addLogBD("create new media audio",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString()),desires.getText().toString());
                         }
                     }
                 });
@@ -606,7 +614,8 @@ Dialog audio_recorder,dialog_share;
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == CAMERA_PHOTO && resultCode == RESULT_OK) {
-            arrayListMedia.add(new Media(outputfileURI));
+            arrayListMedia.add(new Media(outputfileURI,desires.getText().toString()));
+            mainActivity.addLogBD("new media photo",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString()),desires.getText().toString());
             rec.getAdapter().notifyDataSetChanged();
             rec.setVisibility(View.VISIBLE);
             if(saveBD) {
@@ -614,7 +623,8 @@ Dialog audio_recorder,dialog_share;
             }
         }
         if(requestCode == CAMERA_VIDEO && resultCode == RESULT_OK){
-            arrayListMedia.add(new Media(outputfileURI));
+            arrayListMedia.add(new Media(outputfileURI,desires.getText().toString()));
+            mainActivity.addLogBD("new media video",mainActivity.createNewIdLog(),mainActivity.getNumEdit(desires.getText().toString()),desires.getText().toString());
             rec.getAdapter().notifyDataSetChanged();
             rec.setVisibility(View.VISIBLE);
             if(saveBD) {
@@ -689,7 +699,7 @@ Dialog audio_recorder,dialog_share;
        if (listOfFiles != null) {
            if (listOfFiles.size() != 0) {
                for (int i = 0; i < listOfFiles.size(); i++) {
-                   arrayListMedia.add(new Media(listOfFiles.get(i)));
+                   arrayListMedia.add(new Media(listOfFiles.get(i),desires.getText().toString()));
                }
                rec.getAdapter().notifyDataSetChanged();
                rec.setVisibility(View.VISIBLE);
@@ -714,7 +724,7 @@ Dialog audio_recorder,dialog_share;
                 .queryList();
         if(mediaLost != null) {
             for (int i = 0; i < mediaLost.size(); i++) {
-                arrayListMedia.add(new Media(Uri.parse(mediaLost.get(i).getUri())));
+                arrayListMedia.add(new Media(Uri.parse(mediaLost.get(i).getUri()),desires.getText().toString()));
                 rec.getAdapter().notifyDataSetChanged();
                 rec.setVisibility(View.VISIBLE);
             }

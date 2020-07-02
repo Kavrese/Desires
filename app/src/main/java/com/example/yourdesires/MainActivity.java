@@ -31,6 +31,8 @@ import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.yourdesires.model.LogData;
+import com.example.yourdesires.model.LogData_Table;
 import com.example.yourdesires.model.Lost;
 import com.example.yourdesires.model.Lost_Table;
 import com.example.yourdesires.model.Notification;
@@ -49,6 +51,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity{
     int pos;
@@ -60,8 +63,7 @@ public class MainActivity extends AppCompatActivity{
     boolean loadBD = false;
     boolean noAlert = false;
     boolean syn = false;
-    boolean all_date,old_date,new_date,random,edit,search_generator,notifications;    //Для генерирования жедания
-    int return_des;                                                         //
+    boolean random,edit,search_generator,notifications;    //Для генерирования жедания
     String searchType;
     Dialog dialog_next;
     DesiresAdapter adapter;
@@ -338,6 +340,9 @@ public class MainActivity extends AppCompatActivity{
                     Toast.makeText(MainActivity.this, "Заполните поле для поиска", Toast.LENGTH_SHORT).show();
                 }else{
                     listSearch = onSearch(list, searchType,String.valueOf(searchText.getText()));
+                    for(int i = 0;i<listSearch.size();i++){     //Добавляем гайденные желания в логи бд
+                        addLogBD("in search",createNewIdLog(),getNumEdit(listSearch.get(i).getName()),listSearch.get(i).getName());
+                    }
                     if(listSearch.size() != 0) {
                         ed = sh.edit();
                         ed.putString("search","true");
@@ -373,6 +378,7 @@ public class MainActivity extends AppCompatActivity{
         settings.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                showLog();  //Для отладки
                 final Switch bd = dialog_setting.findViewById(R.id.bd_switch);
                 final Switch file = dialog_setting.findViewById(R.id.file_switch);
                 final Switch delete = dialog_setting.findViewById(R.id.delete_switch);
@@ -510,7 +516,7 @@ public class MainActivity extends AppCompatActivity{
         }
         return wrapper;
     }
-    public void switchColor (String color){
+    private void switchColor (String color){
         LinearLayout botton_sheet_generator = findViewById(R.id.bottom_sheet_generator);
         LinearLayout lin_next_window = dialog_next.findViewById(R.id.lin_next_window);
         LinearLayout lin_alert = dialog_setting.findViewById(R.id.lin_alert);
@@ -520,17 +526,11 @@ public class MainActivity extends AppCompatActivity{
         Switch file = dialog_setting.findViewById(R.id.file_switch);
         Switch delete = dialog_setting.findViewById(R.id.delete_switch);
         TextView text_generator = findViewById(R.id.text_botton_sheet_generatot);
-        TextView text_module_1 = findViewById(R.id.text_module_1);
         TextView text_module_2 = findViewById(R.id.text_module_2);
-        Switch switch_date_create = findViewById(R.id.switch_date_create);
-        TextView text_old = findViewById(R.id.text_old);
-        EditText num_return = findViewById(R.id.num_return);
-        CheckBox checkBox_all = findViewById(R.id.checkBox_all);
         CheckBox checkBox_module_2 = findViewById(R.id.checkBox_module_2);
         CheckBox checkBox_edit = findViewById(R.id.checkBox_edit);
         CheckBox checkBox_search = findViewById(R.id.checkBox_search);
         CheckBox checkBox_not = findViewById(R.id.checkBox_notifocations);
-        LinearLayout lin_module_1 = findViewById(R.id.lin_module_1);
         TextView settingsText = dialog_setting.findViewById(R.id.settingsText);
         TextView text_alert = dialog_setting.findViewById(R.id.text_alert);
         ImageView alert = dialog_setting.findViewById(R.id.alert);
@@ -555,9 +555,7 @@ public class MainActivity extends AppCompatActivity{
         Button create_generator = findViewById(R.id.create_botton_sheet);
         switch (color){
             case "dark":
-                num_return.setTextColor(getColor(R.color.white));
                 text_module_2.setTextColor(getColor(R.color.white));
-                lin_module_1.setBackgroundResource(R.drawable.maket_up_dark);
                 checkBox_module_2.setTextColor(getColor(R.color.white));
                 if(!random) {
                     checkBox_not.setTextColor(getColor(R.color.white));
@@ -568,18 +566,9 @@ public class MainActivity extends AppCompatActivity{
                     checkBox_edit.setTextColor(getColor(R.color.grey));
                     checkBox_search.setTextColor(getColor(R.color.grey));
                 }
-                checkBox_all.setTextColor(getColor(R.color.white));
-                if(!all_date){
-                    switch_date_create.setTextColor(getColor(R.color.white));
-                    text_old.setTextColor(getColor(R.color.white));
-                }else{
-                    switch_date_create.setTextColor(getColor(R.color.grey));
-                    text_old.setTextColor(getColor(R.color.grey));
-                }
                 text_botton_sheet_generator.setTextColor(getResources().getColor(R.color.white));
                 text_generator.setTextColor(getColor(R.color.white));
                 text_generator.setBackgroundResource(R.drawable.maket_up_dark);
-                text_module_1.setTextColor(getColor(R.color.white));
                 create_generator.setBackgroundResource(R.drawable.maket_button_sheet_dark);
                 create_generator.setTextColor(getResources().getColor(R.color.white));
                 botton_sheet_generator.setBackgroundResource(R.drawable.maket_butto_sheet_dark);
@@ -621,9 +610,7 @@ public class MainActivity extends AppCompatActivity{
                 switchFilter(searchType);
                 break;
             case "light":
-                num_return.setTextColor(getColor(R.color.dark));
                 text_module_2.setTextColor(getColor(R.color.dark));
-                lin_module_1.setBackgroundResource(R.drawable.maket_up);
                 checkBox_module_2.setTextColor(getColor(R.color.dark));
                 if(!random) {
                     checkBox_not.setTextColor(getColor(R.color.dark));
@@ -634,18 +621,9 @@ public class MainActivity extends AppCompatActivity{
                     checkBox_edit.setTextColor(getColor(R.color.grey));
                     checkBox_search.setTextColor(getColor(R.color.grey));
                 }
-                checkBox_all.setTextColor(getColor(R.color.dark));
-                if(!all_date){
-                    switch_date_create.setTextColor(getColor(R.color.dark));
-                    text_old.setTextColor(getColor(R.color.dark));
-                }else{
-                    switch_date_create.setTextColor(getColor(R.color.grey));
-                    text_old.setTextColor(getColor(R.color.grey));
-                }
                 text_botton_sheet_generator.setTextColor(getResources().getColor(R.color.dark));
                 text_generator.setTextColor(getColor(R.color.dark));
                 text_generator.setBackgroundResource(R.drawable.maket_up);
-                text_module_1.setTextColor(getColor(R.color.dark));
                 create_generator.setBackgroundResource(R.drawable.maket_button_sheet);
                 create_generator.setTextColor(getResources().getColor(R.color.dark));
                 botton_sheet_generator.setBackgroundResource(R.drawable.maket_butto_sheet);
@@ -698,36 +676,11 @@ public class MainActivity extends AppCompatActivity{
         wrapper = getWrapperStyle(wrapper);
     }
     private void generatorDesires (){
-        final Switch switch_date_create = findViewById(R.id.switch_date_create);
-        final TextView text_old = findViewById(R.id.text_old);
-        final EditText num_return = findViewById(R.id.num_return);
-        final CheckBox checkBox_all = findViewById(R.id.checkBox_all);
         CheckBox checkBox_module_2 = findViewById(R.id.checkBox_module_2);
         final CheckBox checkBox_edit = findViewById(R.id.checkBox_edit);
         final CheckBox checkBox_search = findViewById(R.id.checkBox_search);
         final CheckBox checkBox_not = findViewById(R.id.checkBox_notifocations);
-        Button create = findViewById(R.id.create_botton_sheet);
-        checkBox_all.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                if(isChecked) {
-                    switch_date_create.setTextColor(getColor(R.color.grey));
-                    text_old.setTextColor(getColor(R.color.grey));
-                    all_date = true;
-                    switch_date_create.setClickable(false);
-                }else{
-                    switch_date_create.setClickable(true);
-                    all_date = false;
-                    if(light) {
-                        switch_date_create.setTextColor(getColor(R.color.dark));
-                        text_old.setTextColor(getColor(R.color.dark));
-                    }else{
-                        switch_date_create.setTextColor(getColor(R.color.white));
-                        text_old.setTextColor(getColor(R.color.white));
-                    }
-                }
-            }
-        });
+        final Button create = findViewById(R.id.create_botton_sheet);
         checkBox_module_2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -759,16 +712,101 @@ public class MainActivity extends AppCompatActivity{
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                return_des = Integer.parseInt(num_return.getText().toString());
-                if(return_des != 0)
+                if(random || (search_generator && notifications && edit))
                     algorithmGenerator();
                 else
-                    Toast.makeText(MainActivity.this, "Введите кол-во генерируемых желаний", Toast.LENGTH_SHORT).show();
+                    Snackbar.make(create,"Выберите хоть один пункт",Snackbar.LENGTH_LONG).show();
             }
         });
     }
     private void algorithmGenerator (){
-        
+        Random ran = new Random();
+        if(list.size() != 0) {
+            if (random) {         //Если выбранно "случайные критерии"
+                showGeneratorResult(ran.nextInt(list.size() - 1),list);     //Рандом число в зависимости от кол-во желаний
+            } else {
+                int index_1 = 0, index_2 = 0,index_3 = 0;
+                if (edit) {           //Если выбранно "Учитывать кол-во измений"
+                    int num_edit = 0;       //Доп переменная
+                    for (int i = 0; i < list.size(); i++) {
+                        if(num_edit < search_edit_desires(list.get(i).getName())){      //Если кол-во изменений в желании больше чем в другом
+                            index_1 = i;        //То изменяем индекс
+                            num_edit = search_edit_desires(list.get(i).getName());
+                        }
+                    }
+                }
+                if (search_generator) {       //Если выбранно "Учитывать результаты поиска"
+                    int num_search = 0;
+                    for(int i =0;i<list.size();i++){
+                        if(num_search < search_search_desires(list.get(i).getName())){
+                            index_2 = i;
+                            num_search = search_search_desires(list.get(i).getName());
+                        }
+                    }
+                }
+                if (notifications) {          //Если выбранно "Учитывать напоминания желания"
+                    int num_notification = 0;
+                    for(int i =0;i<list.size();i++){
+                        if(num_notification < search_notifications_desires(list.get(i).getName())){
+                            index_3 = i;
+                            num_notification = search_notifications_desires(list.get(i).getName());
+                        }
+                    }
+                }
+                int result = 0;
+                if(index_1 != index_2 && index_2 != index_3 && index_3 != index_1)     //Если индексы 3 поисков разные
+                   result = ran.nextInt(2);     //Выбираем любой
+                else if(index_1 == index_2)
+                    result = 1;
+                else if(index_2 == index_3)
+                    result = 2;
+                else
+                    result = 3;
+                showGeneratorResult(result,list);
+            }
+        }else {
+            Snackbar.make(desiresText, "Не обнаруженно ни одного желания! Создайте их!", Snackbar.LENGTH_LONG).show();
+        }
+    }
+    private void showGeneratorResult (int index,List<Desires> list){
+
+    }
+    private int search_search_desires (String name_desires){
+        List<LogData> list = getLogDesires("get_desires",name_desires);
+        int num_search = 0;
+        for(int i=0;i<list.size();i++){
+            if(list.get(i).getMessage().equals("in search"))
+                num_search++;
+        }
+        return num_search;
+    }
+    private int search_notifications_desires (String name_desires){
+        List<Notification> list = SQLite.select()
+                .from(Notification.class)
+                .where(Notification_Table.name.is(name_desires))
+                .queryList();
+        return list.size();
+    }
+    private int search_edit_desires (String name_desires){
+        List<LogData> list = getLogDesires("get_desires",name_desires);
+        return list.get(list.size()-1).getNum_edit();
+    }
+    public List<LogData> getLogDesires(String mode,String name){
+        List<LogData> list = new ArrayList<>();
+        switch(mode){
+            case "get_desires":
+                list = SQLite.select()
+                        .from(LogData.class)
+                        .where(LogData_Table.name_desires.is(name))
+                        .queryList();
+                return list;
+            case "get_all":
+                list = SQLite.select()
+                        .from(LogData.class)
+                        .queryList();
+                return list;
+        }
+        return list;
     }
     public void editMaketRecyclerView (boolean light,ArrayList<Desires> list){
         for(int i = 0;i<list.size();i++){
@@ -856,7 +894,12 @@ public class MainActivity extends AppCompatActivity{
             }
         }
     }
-
+    private void showLog (){
+        List<LogData> list = SQLite.select()
+                .from(LogData.class)
+                .queryList();
+        list.size();
+    }
     public void openBottonSheet (View view){
         boolean bool = true;
         for(int i = 0;i<list.size();i++){
@@ -913,7 +956,7 @@ public class MainActivity extends AppCompatActivity{
                         tag1 = "no";
                     }
                     String data = dateFormat.format(new Date());
-                    list.add(new Desires(String.valueOf(desiresText.getText()), status, tag1, tag2, data, op,light,searchB,position));
+                    list.add(new Desires(desiresText.getText().toString(), status, tag1, tag2, data, op,light,searchB,position));
                     recyclerView.getAdapter().notifyDataSetChanged();
                     bottomSheetBehavior.setState(BottomSheetBehavior.STATE_HIDDEN);
                     getOrSetDataBase("setAll", name, op, tag1, tag2, list.size(), data, 1);
@@ -923,11 +966,27 @@ public class MainActivity extends AppCompatActivity{
                     }else{
                         Toast.makeText(this, "Error: New folder already exist", Toast.LENGTH_SHORT).show();
                     }
+                    addLogBD("create",createNewIdLog(),0,desiresText.getText().toString());
                 }
             }
         }
     }
-    public void remove (){
+    public int getNumEdit (String name){
+        List<LogData> list = SQLite.select()
+                .from(LogData.class)
+                .where(LogData_Table.name_desires.is(name))
+                .queryList();
+        if(list.size() == 0)
+            return 0;
+        return list.get(list.size()-1).getNum_edit();
+    }
+    public int createNewIdLog(){
+        List<LogData> list = SQLite.select()
+                .from(LogData.class)
+                .queryList();
+        return list.size()+1;
+    }
+    private void remove (){
         desiresText.setText("");
         this.tag1.setText("");
         this.tag2.setText("");
@@ -1076,5 +1135,13 @@ public class MainActivity extends AppCompatActivity{
             Snackbar.make(search,"Ничего не найденно",Snackbar.LENGTH_SHORT).show();
         }
         return buffer;
+    }
+    public void addLogBD (String message,int id_log,int num_edit,String name_desires){
+        LogData logData = new LogData();
+        logData.setId_log(id_log);
+        logData.setMessage(message);
+        logData.setName_desires(name_desires);
+        logData.setNum_edit(num_edit);
+        logData.save();
     }
 }

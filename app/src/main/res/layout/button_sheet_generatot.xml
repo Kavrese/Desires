@@ -25,7 +25,7 @@
         android:layout_height="400dp"
         android:background="@drawable/maket_butto_sheet"
         android:orientation="vertical"
-        android:weightSum="11.5">
+        android:weightSum="10">
 
         <TextView
             android:id="@+id/text_botton_sheet_generatot"
@@ -50,66 +50,16 @@
             android:layout_height="0dp"
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
-            android:layout_weight="8"
+            android:layout_weight="6"
             android:orientation="vertical"
             android:textStyle="bold"
             android:weightSum="10">
 
             <TextView
-                android:id="@+id/text_module_1"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1.5"
-                android:gravity="center"
-                android:text="По дате создания :"
-                android:textColor="#000000"
-                android:textSize="20sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:id="@+id/lin_module_1"
-                android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_weight="1.5"
-                android:background="@drawable/maket_up"
-                android:orientation="horizontal"
-                android:weightSum="10">
-
-                <Switch
-                    android:id="@+id/switch_date_create"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="4"
-                    android:checked="true"
-                    android:gravity="center"
-                    android:text="Новые"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
-
-                <TextView
-                    android:id="@+id/text_old"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:gravity="center"
-                    android:text="Старые"
-                    android:textColor="#000000"
-                    android:textSize="16sp" />
-
-                <CheckBox
-                    android:id="@+id/checkBox_all"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_weight="3"
-                    android:text="Все"
-                    android:textSize="16sp" />
-            </LinearLayout>
-
-            <TextView
                 android:id="@+id/text_module_2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="1.5"
+                android:layout_weight="2"
                 android:gravity="center"
                 android:text="Критерии создания :"
                 android:textColor="#000000"
@@ -120,79 +70,55 @@
                 android:id="@+id/lin_module_2"
                 android:layout_width="match_parent"
                 android:layout_height="0dp"
-                android:layout_weight="5.5"
+                android:layout_weight="8"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:weightSum="14">
 
                 <CheckBox
                     android:id="@+id/checkBox_module_2"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="3"
                     android:autoSizeTextType="none"
                     android:checked="false"
                     android:text="Выбрать критерии случайно"
-                    android:textSize="18sp" />
+                    android:textSize="22sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="0dp"
                     android:layout_weight="11"
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:weightSum="3">
 
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
-                        android:layout_weight="2"
-                        android:orientation="vertical"
-                        android:weightSum="3">
-
-                        <CheckBox
-                            android:id="@+id/checkBox_edit"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:autoSizeTextType="uniform"
-                            android:text="Учитывать кол-во изменений" />
-
-                        <CheckBox
-                            android:id="@+id/checkBox_search"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:autoSizeTextType="uniform"
-                            android:text="Учитывать результаты поиска" />
-
-                        <CheckBox
-                            android:id="@+id/checkBox_notifocations"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="1"
-                            android:autoSizeTextType="uniform"
-                            android:text="Учитывать напоминания желаний" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="match_parent"
+                    <CheckBox
+                        android:id="@+id/checkBox_search"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
                         android:layout_weight="1"
-                        android:orientation="vertical"
-                        android:weightSum="2">
+                        android:autoSizeTextType="none"
+                        android:text="Учитывать результаты поиска"
+                        android:textSize="20sp" />
 
-                        <EditText
-                            android:id="@+id/num_return"
-                            android:layout_width="match_parent"
-                            android:layout_height="0dp"
-                            android:layout_weight="2"
-                            android:autoSizeTextType="none"
-                            android:ems="10"
-                            android:gravity="center"
-                            android:hint="Кол-во"
-                            android:inputType="numberSigned" />
-                    </LinearLayout>
+                    <CheckBox
+                        android:id="@+id/checkBox_edit"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:autoSizeTextType="none"
+                        android:text="Учитывать кол-во изменений"
+                        android:textSize="20sp" />
+
+                    <CheckBox
+                        android:id="@+id/checkBox_notifocations"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:autoSizeTextType="none"
+                        android:text="Учитывать напоминания желаний"
+                        android:textSize="20sp" />
+
                 </LinearLayout>
             </LinearLayout>
 

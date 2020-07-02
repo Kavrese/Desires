@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresViewHolder> {
+    MainActivity mainActivity = new MainActivity();
     ArrayList<Desires> arrayList;
     Context wrapper;
     private DesiresViewHolder holder;
@@ -92,6 +93,7 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                 } else{
                     in.putExtra("color", "dark");
             }
+                mainActivity.addLogBD("open",mainActivity.createNewIdLog(),mainActivity.getNumEdit(holder.name.getText().toString()),holder.name.getText().toString());
                 context.startActivity(in);
                 ((Activity)context).finish();
             }
@@ -195,9 +197,12 @@ public class DesiresAdapter extends RecyclerView.Adapter<DesiresAdapter.DesiresV
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-                                bool = true;
+                                mainActivity.addLogBD("delete",mainActivity.createNewIdLog(),mainActivity.getNumEdit(holder.name.getText().toString()),holder.name.getText().toString());
+                                bool = false;
                                 break;
                         }
+                        if(bool)
+                            mainActivity.addLogBD("update status",mainActivity.createNewIdLog(),mainActivity.getNumEdit(holder.name.getText().toString())+1,holder.name.getText().toString());
                         return bool;
                     }
                 });

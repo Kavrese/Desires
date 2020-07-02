@@ -14,9 +14,15 @@ public class LogData extends BaseModel {
     @Column
     String name_desires;
     @Column
-    int id_desires_sum;
-    @Column
-    int id_desires;
+    int num_edit;
+
+    public int getNum_edit() {
+        return num_edit;
+    }
+
+    public void setNum_edit(int num_edit) {
+        this.num_edit = num_edit;
+    }
 
     public String getName_desires() {
         return name_desires;
@@ -26,28 +32,12 @@ public class LogData extends BaseModel {
         this.name_desires = name_desires;
     }
 
-    public int getId_desires() {
-        return id_desires;
-    }
-
-    public int getId_desires_sum() {
-        return id_desires_sum;
-    }
-
     public int getId_log() {
         return id_log;
     }
 
     public String getMessage() {
         return message;
-    }
-
-    public void setId_desires(int id_desires) {
-        this.id_desires = id_desires;
-    }
-
-    public void setId_desires_sum(int id_desires_sum) {
-        this.id_desires_sum = id_desires_sum;
     }
 
     public void setId_log(int id_log) {

@@ -34,7 +34,7 @@ import java.io.File;
 import java.sql.Wrapper;
 import java.util.ArrayList;
 
-public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> implements  View.OnTouchListener {
+public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHolder> {
     Context wrapper;
     boolean mediaIsNull = true;
     boolean deleteMF;
@@ -47,16 +47,9 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
     private SharedPreferences.Editor ed;
     MediaViewHolder holder;
     RecyclerView rec;
+    MainActivity mainActivity = new MainActivity();
     public MediaAdapter(ArrayList<Media> arrayList){
         this.arrayList = arrayList;
-    }
-
-
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        Toast.makeText(v.getContext(), "up", Toast.LENGTH_SHORT).show();
-        return false;
     }
 
     public class MediaViewHolder extends RecyclerView.ViewHolder {
@@ -160,6 +153,7 @@ public class MediaAdapter extends RecyclerView.Adapter<MediaAdapter.MediaViewHol
                                     Toast.makeText(holder.img.getContext(), "Error: Not Exist = Not Delete", Toast.LENGTH_SHORT).show();
                                 }
                                 arrayList.remove(position);
+                                mainActivity.addLogBD("delete media",mainActivity.createNewIdLog(),mainActivity.getNumEdit(arrayList.get(position).getName_desires()),arrayList.get(position).getName_desires());
                                 if(arrayList.size() == 0){      //Если список пуст то прячем Recycler View который мы получили переопределив метод onAttachedToRecyclerView
                                     rec.setVisibility(View.GONE);
                                 }
