@@ -9,6 +9,7 @@ import android.Manifest;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -53,7 +54,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {
     int pos;
     boolean back_presed = false;
     boolean light = true;
@@ -72,7 +73,7 @@ public class MainActivity extends AppCompatActivity{
     ArrayList<Desires> listSearch;
     ArrayList<Integer> position;
     EditText desiresText,searchText,fake;
-    Dialog dialog_setting;
+    Dialog dialog_setting,dialog_show_gen;
     LinearLayout bottonSheet,lin,bottonSheetGenerator;
     BottomSheetBehavior bottomSheetBehavior,bottomSheetBehaviorGeneratot;
     TextView name_botton_sheet,text_first;
@@ -100,6 +101,9 @@ public class MainActivity extends AppCompatActivity{
         dialog_next = new Dialog(MainActivity.this);
         dialog_next.setContentView(R.layout.dialog_next_window);
         dialog_next.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+        dialog_show_gen = new Dialog(MainActivity.this);
+        dialog_show_gen.setContentView(R.layout.dialog_show_generator);
+        dialog_show_gen.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         sh = getSharedPreferences("0",0);
         String start = sh.getString("next_start","false");
         String prover = sh.getString("proverka","false");
@@ -522,6 +526,11 @@ public class MainActivity extends AppCompatActivity{
         LinearLayout lin_alert = dialog_setting.findViewById(R.id.lin_alert);
         LinearLayout dialog_lin = dialog_setting.findViewById(R.id.dialog_lin);
         LinearLayout lin_file = dialog_setting.findViewById(R.id.lin_file);
+        LinearLayout lin_gen = dialog_show_gen.findViewById(R.id.main_gen);
+        Button close_gen = dialog_show_gen.findViewById(R.id.close_gen);
+        Button open_gen = dialog_show_gen.findViewById(R.id.open_gen);
+        TextView name_gen = dialog_show_gen.findViewById(R.id.name_desires_gen);
+        TextView text = dialog_show_gen.findViewById(R.id.text_gen);
         Switch bd = dialog_setting.findViewById(R.id.bd_switch);
         Switch file = dialog_setting.findViewById(R.id.file_switch);
         Switch delete = dialog_setting.findViewById(R.id.delete_switch);
@@ -555,6 +564,13 @@ public class MainActivity extends AppCompatActivity{
         Button create_generator = findViewById(R.id.create_botton_sheet);
         switch (color){
             case "dark":
+                text.setTextColor(getColor(R.color.white));
+                lin_gen.setBackgroundResource(R.color.dark_2);
+                close_gen.setBackgroundResource(R.drawable.maket_button_sheet_dark);
+                close_gen.setTextColor(getColor(R.color.white));
+                open_gen.setTextColor(getColor(R.color.white));
+                open_gen.setBackgroundResource(R.drawable.maket_button_sheet_dark);
+                name_gen.setTextColor(getColor(R.color.white));
                 text_module_2.setTextColor(getColor(R.color.white));
                 checkBox_module_2.setTextColor(getColor(R.color.white));
                 if(!random) {
@@ -610,6 +626,13 @@ public class MainActivity extends AppCompatActivity{
                 switchFilter(searchType);
                 break;
             case "light":
+                text.setTextColor(getColor(R.color.dark));
+                lin_gen.setBackgroundResource(R.color.dark_2);
+                close_gen.setBackgroundResource(R.drawable.maket_button_sheet);
+                close_gen.setTextColor(getColor(R.color.dark));
+                open_gen.setTextColor(getColor(R.color.dark));
+                open_gen.setBackgroundResource(R.drawable.maket_button_sheet);
+                name_gen.setTextColor(getColor(R.color.dark));
                 text_module_2.setTextColor(getColor(R.color.dark));
                 checkBox_module_2.setTextColor(getColor(R.color.dark));
                 if(!random) {
@@ -681,6 +704,9 @@ public class MainActivity extends AppCompatActivity{
         final CheckBox checkBox_search = findViewById(R.id.checkBox_search);
         final CheckBox checkBox_not = findViewById(R.id.checkBox_notifocations);
         final Button create = findViewById(R.id.create_botton_sheet);
+        checkBox_edit.setOnCheckedChangeListener(this);
+        checkBox_not.setOnCheckedChangeListener(this);
+        checkBox_search.setOnCheckedChangeListener(this);
         checkBox_module_2.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -712,7 +738,7 @@ public class MainActivity extends AppCompatActivity{
         create.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(random || (search_generator && notifications && edit))
+                if(random || search_generator || notifications || edit)
                     algorithmGenerator();
                 else
                     Snackbar.make(create,"Выберите хоть один пункт",Snackbar.LENGTH_LONG).show();
@@ -723,13 +749,13 @@ public class MainActivity extends AppCompatActivity{
         Random ran = new Random();
         if(list.size() != 0) {
             if (random) {         //Если выбранно "случайные критерии"
-                showGeneratorResult(ran.nextInt(list.size() - 1),list);     //Рандом число в зависимости от кол-во желаний
+                showGeneratorResult(ran.nextInt(list.size()),list);     //Рандом число в зависимости от кол-во желаний
             } else {
-                int index_1 = 0, index_2 = 0,index_3 = 0;
+                int index_1 = -1, index_2 = -1, index_3 = -1;
                 if (edit) {           //Если выбранно "Учитывать кол-во измений"
                     int num_edit = 0;       //Доп переменная
                     for (int i = 0; i < list.size(); i++) {
-                        if(num_edit < search_edit_desires(list.get(i).getName())){      //Если кол-во изменений в желании больше чем в другом
+                        if (num_edit < search_edit_desires(list.get(i).getName())) {      //Если кол-во изменений в желании больше чем в другом
                             index_1 = i;        //То изменяем индекс
                             num_edit = search_edit_desires(list.get(i).getName());
                         }
@@ -737,8 +763,8 @@ public class MainActivity extends AppCompatActivity{
                 }
                 if (search_generator) {       //Если выбранно "Учитывать результаты поиска"
                     int num_search = 0;
-                    for(int i =0;i<list.size();i++){
-                        if(num_search < search_search_desires(list.get(i).getName())){
+                    for (int i = 0; i < list.size(); i++) {
+                        if (num_search < search_search_desires(list.get(i).getName())) {
                             index_2 = i;
                             num_search = search_search_desires(list.get(i).getName());
                         }
@@ -746,30 +772,72 @@ public class MainActivity extends AppCompatActivity{
                 }
                 if (notifications) {          //Если выбранно "Учитывать напоминания желания"
                     int num_notification = 0;
-                    for(int i =0;i<list.size();i++){
-                        if(num_notification < search_notifications_desires(list.get(i).getName())){
+                    for (int i = 0; i < list.size(); i++) {
+                        if (num_notification < search_notifications_desires(list.get(i).getName())) {
                             index_3 = i;
                             num_notification = search_notifications_desires(list.get(i).getName());
                         }
                     }
                 }
                 int result = 0;
-                if(index_1 != index_2 && index_2 != index_3 && index_3 != index_1)     //Если индексы 3 поисков разные
-                   result = ran.nextInt(2);     //Выбираем любой
-                else if(index_1 == index_2)
-                    result = 1;
-                else if(index_2 == index_3)
-                    result = 2;
-                else
-                    result = 3;
-                showGeneratorResult(result,list);
+                boolean bool = true;
+                while (bool) {
+                    switch (ran.nextInt(3)) {
+                        case 0:
+                            result = index_1;
+                            break;
+                        case 1:
+                            result = index_2;
+                            break;
+                        case 2:
+                            result = index_3;
+                            break;
+                    }
+                    if(result != -1){
+                        bool = false;
+                    }
+                }
+                showGeneratorResult(result, list);
             }
         }else {
             Snackbar.make(desiresText, "Не обнаруженно ни одного желания! Создайте их!", Snackbar.LENGTH_LONG).show();
         }
     }
-    private void showGeneratorResult (int index,List<Desires> list){
-
+    private void showGeneratorResult (final int index, final List<Desires> list){
+        bottomSheetBehaviorGeneratot.setState(BottomSheetBehavior.STATE_COLLAPSED);        //Закрываем сам генератор
+        Button close = dialog_show_gen.findViewById(R.id.close_gen);
+        Button open = dialog_show_gen.findViewById(R.id.open_gen);
+        TextView name = dialog_show_gen.findViewById(R.id.name_desires_gen);
+        name.setText(list.get(index).getName());
+        dialog_show_gen.show();
+        close.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog_show_gen.dismiss();
+            }
+        });
+        open.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //Отправляем данные в Intent и запускаем
+                Intent in = new Intent(MainActivity.this, DesiresActivity.class);
+                in.putExtra("name", list.get(index).getName());
+                in.putExtra("status", list.get(index).getStatus());
+                in.putExtra("position", index);
+                in.putExtra("data", list.get(index).getData());
+                in.putExtra("op", list.get(index).getOp());
+                in.putExtra("tag1", list.get(index).getTag1());
+                in.putExtra("tag2", list.get(index).getTag2());
+                in.putExtra("search",list.get(index).getSearch());
+                in.putExtra("positions",list.get(index).getPosition());
+                if(light)
+                    in.putExtra("color","light");
+                else
+                    in.putExtra("color","dark");
+                startActivity(in);
+                finish();
+            }
+        });
     }
     private int search_search_desires (String name_desires){
         List<LogData> list = getLogDesires("get_desires",name_desires);
@@ -1143,5 +1211,20 @@ public class MainActivity extends AppCompatActivity{
         logData.setName_desires(name_desires);
         logData.setNum_edit(num_edit);
         logData.save();
+    }
+
+    @Override
+    public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        switch (buttonView.getId()){
+            case R.id.checkBox_edit:
+                edit = isChecked;
+                break;
+            case R.id.checkBox_notifocations:
+                notifications = isChecked;
+                break;
+            case R.id.checkBox_search:
+                search_generator = isChecked;
+                break;
+        }
     }
 }
