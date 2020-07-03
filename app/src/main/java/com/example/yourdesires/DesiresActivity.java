@@ -506,22 +506,30 @@ Dialog audio_recorder,dialog_share;
         return date;
     }
     private void createNotification (Calendar date){
-        Intent notificationIntent = new Intent(DesiresActivity.this, MainActivity.class);
-        PendingIntent contentIntent = PendingIntent.getActivity(DesiresActivity.this,0, notificationIntent,PendingIntent.FLAG_CANCEL_CURRENT);
-        NotificationCompat.Builder builder =
-                new NotificationCompat.Builder(DesiresActivity.this, "CHANNEL_ID")
-                        .setContentTitle("Напоминание")
-                        .setContentText("Вы просили вам напомнить про желание "+desires.getText().toString())
-                        .setDefaults(Notification.DEFAULT_SOUND)
-                        .setAutoCancel(true)
-                        .setSmallIcon(R.drawable.icon)
-                        .setContentIntent(contentIntent)
-                        .setAutoCancel(true)
-                        .setWhen(date.getTime().getTime());
+        NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationManagerCompat notificationManager = NotificationManagerCompat.from(DesiresActivity.this);
-        notificationManager.notify(101, builder.build());
+        NotificationCompat.Builder notificationBuilder =
+                new NotificationCompat.Builder(getApplicationContext(), "101")
+                        .setAutoCancel(false)
+                        .setSmallIcon(R.drawable.icon)
+                        .setWhen(date.getTimeInMillis())
+                        .setContentIntent(pendingIntent)
+                        .setContentTitle("Напоминание")
+                        .setContentText("Вы просили напомнить про желание")
+                        .setPriority(Notification.PRIORITY_HIGH);
+
+        createChannelIfNeeded(notificationManager);
+        notificationManager.notify(101, notificationBuilder.build());
         Snackbar.make(time_des,"Уведомление будет отправленно",Snackbar.LENGTH_SHORT).show();
+    }
+    public static void createChannelIfNeeded(NotificationManager manager) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel notificationChannel = new NotificationChannel("101", "101", NotificationManager.IMPORTANCE_DEFAULT);
+            manager.createNotificationChannel(notificationChannel);
+        }
     }
     private void saveFileScreen (Bitmap bit,File fileIMG) throws IOException{   //Метод сохранение скриншота через bitmap
         FileOutputStream fileOutputStream = new FileOutputStream(fileIMG);  //Указываем путь до файла
